@@ -1,0 +1,11 @@
+node_modules
+temp
+.tmp
+.idea
+dist
+.sass-cache
+app/bower_components
+test/bower_components
+package
+npm-debug.log
+/coverage/
