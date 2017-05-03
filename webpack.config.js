@@ -7,10 +7,8 @@ module.exports = {
   context: path.join(__dirname, 'src'),
   entry: './index.js',
   output: {
-    path: __dirname + "/dist",
-    filename: "bundle.js",
-    libraryTarget: "var", // export itself to a global var
-    library: "playground" // name of the global var: "Foo"
+    path: __dirname + '/public/',
+    filename: 'bundle.js'
   },
   module: {
     rules: [{
