@@ -9,3 +9,4 @@ test/bower_components
 package
 npm-debug.log
 /coverage/
+*.iml
