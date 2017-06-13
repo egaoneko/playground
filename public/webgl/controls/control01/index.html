@@ -4,6 +4,7 @@
   <title>Control</title>
   <script type="text/javascript" src="../../../lib/glMatrix.js"></script>
   <script src="../../../lib/webgl-debug.js"></script>
+  <script src="../../../js/webgl/Basis.js"></script>
 
   <meta charset="utf-8">
   <style>
@@ -44,27 +45,6 @@
   var modelViewMatrix;
   var projectionMatrix;
   var modelViewMatrixStack;
-
-  function createGLContext (canvas) {
-    var names = ["webgl", "experimental-webgl"];
-    var context = null;
-    for (var i = 0; i < names.length; i++) {
-      try {
-        context = canvas.getContext(names[i]);
-      } catch (e) {
-      }
-      if (context) {
-        break;
-      }
-    }
-    if (context) {
-      context.viewportWidth = canvas.width;
-      context.viewportHeight = canvas.height;
-    } else {
-      alert("Failed to create WebGL context!");
-    }
-    return context;
-  }
 
   function loadShader (shaderType) {
     // If we don't find an element with the specified id
@@ -306,7 +286,7 @@
     canvas = document.getElementById("myGLCanvas");
     resizeCanvas();
 
-    gl = WebGLDebugUtils.makeDebugContext(createGLContext(canvas));
+    gl = WebGLDebugUtils.makeDebugContext(Basis.getGLContext(canvas));
     setupShaders();
     setupBuffers();
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
