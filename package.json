@@ -13,15 +13,15 @@
     "prepublish": "npm test"
   },
   "repository": {
-    "url": "https://github.com/egaoneko/sketchbook.js.git",
+    "url": "https://github.com/egaoneko/playground.js.git",
     "type": "git"
   },
-  "author": "",
+  "author": "Donghyun Seo",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/egaoneko/sketchbook.js/issues"
+    "url": "https://github.com/egaoneko/playground.js/issues"
   },
-  "homepage": "hhttps://github.com/egaoneko/sketchbook.js#readme",
+  "homepage": "hhttps://github.com/egaoneko/playground.js#readme",
   "devDependencies": {
     "babel-core": "^6.21.0",
     "babel-loader": "^6.2.10",
@@ -53,8 +53,11 @@
   "dependencies": {
     "es6-enum": "^1.1.0",
     "lodash": "^4.17.4",
+    "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
+    "react-redux": "^5.0.6",
+    "redux": "^3.7.2",
     "sylvester-es6": "0.0.2"
   }
 }

@@ -1,0 +1,28 @@
+[
+  {
+    "category": "WebGL",
+    "pages": [
+      {
+        "name": "Control01",
+        "url": "webgl/controls/control01/index.html"
+      }
+    ]
+  },
+  {
+    "category": "WebGL / Three.js",
+    "pages": [
+      {
+        "name": "Control01",
+        "url": "webgl/threejs/controls/control01/index.html"
+      },
+      {
+        "name": "Control02",
+        "url": "webgl/threejs/controls/control02/index.html"
+      },
+      {
+        "name": "Control03",
+        "url": "webgl/threejs/controls/control03/index.html"
+      }
+    ]
+  }
+]
