@@ -1,18 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./contianers/App";
-
-import { createStore } from 'redux';
-import reducers from './reducers';
 import { Provider } from 'react-redux';
 
-import './sass/style.sass';
-import list from "./list.json";
+import Routes from './Routes';
+import store from './lib/store';
 
-const store = createStore(reducers);
+import './sass/style.sass';
+
+
 
 ReactDOM.render(
   <Provider store={store}>
-      <App list={list}/>
+      <Routes />
   </Provider>
   , document.querySelector('#root'));

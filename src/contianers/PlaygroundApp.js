@@ -1,7 +1,8 @@
 import React from "react";
+
 import Playground from "./Playground";
 
-class App extends React.Component {
+class PlaygroundApp extends React.Component {
   
   constructor(props) {
     super(props)
@@ -9,9 +10,9 @@ class App extends React.Component {
 
   render() {
     return (
-      <Playground/>
+      <Playground />
     );
   }
 }
 
-export default App;
+export default PlaygroundApp;
