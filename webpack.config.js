@@ -1,13 +1,21 @@
 // webpack.config.js
 
+/*global require, process, module, __dirname*/
+
 var path = require('path');
 var webpack = require('webpack');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
+
+var extractSass = new ExtractTextPlugin({
+    filename: "style.css",
+    // disable: process.env.NODE_ENV === "development"
+});
 
 module.exports = {
   context: path.join(__dirname, 'src'),
   entry: './index.js',
   output: {
-    path: __dirname + '/public/',
+    path: __dirname + '/dist',
     filename: 'bundle.js'
   },
   module: {
@@ -18,14 +26,28 @@ module.exports = {
       exclude: /(node_modules|bower_components)/
     }, {
       test: /\.sass$/,
-      loader: 'style-loader!css-loader!sass-loader'
+      use: extractSass.extract({
+        use: [{
+          loader: "css-loader", options: {
+            sourceMap: true
+          }
+        }, {
+          loader: "sass-loader", options: {
+            sourceMap: true
+          }
+        }],
+        // use style-loader in development
+        fallback: "style-loader"
+      })
     }, {
       test: /\.js$/,
       loader: 'babel-loader',
       exclude: /(node_modules|bower_components)/
     }]
   },
-  plugins: [],
+  plugins: [
+    extractSass
+  ],
   devServer: {
     contentBase: path.join(__dirname, "public"),
     historyApiFallback: true,

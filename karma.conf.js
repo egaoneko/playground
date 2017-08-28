@@ -1,46 +1,47 @@
 // Karma configuration
 
+/*global require, module*/
+
 var webpackTestConfig = require('./webpack.config-test.js');
 
 module.exports = function (config) {
-	config.set({
-		// ... normal karma configuration
-		files: [
-			// all files ending in ".spec"
-			{pattern: 'test/*.spec.js', watched: false},
-			{pattern: 'test/**/*.spec.js', watched: false}
-			// each file acts as entry point for the webpack configuration
-		],
+  config.set({
+    frameworks: ['mocha'],
+    files: [
+      {pattern: 'test/**/*.spec.js', watched: false}
+    ],
 
-		browsers: ['Chrome'],
+    browsers: ['Chrome', 'Firefox'],
 
-		preprocessors: {
-			// add webpack as preprocessor
-			'test/*.spec.js': ['webpack'],
-			'test/**/*.spec.js': ['webpack']
-		},
+    preprocessors: {
+      'src/**/*.js': ['webpack', 'coverage'],
+      'test/**/*.spec.js': ['webpack']
+    },
 
-		frameworks: ['mocha'],
-		client: {
-			mocha: {
-				opts: 'test/mocha.opts'
+    reporters: ['progress', 'coverage-istanbul'],
+    coverageIstanbulReporter: {
+      dir: 'coverage',
+      reports: ['text-summary', 'html', 'text'],
+      fixWebpackSourcePaths: true
+    },
 
-				// // change Karma's debug.html to the mocha web reporter
-				// reporter: 'html',
-				//
-				// // require specific files after Mocha is initialized
-				// require: [require.resolve('bdd-lazy-var/bdd_lazy_var_global')],
-				//
-				// // custom ui, defined in required file above
-				// ui: 'bdd-lazy-var/global',
-			}
-		},
+    client: {
+      mocha: {
+        opts: 'test/mocha.opts',
 
-		webpack: webpackTestConfig,
-		webpackMiddleware: {
-			// webpack-dev-middleware configuration
-			// i. e.
-			stats: 'errors-only'
-		}
-	});
+        // change Karma's debug.html to the mocha web reporter
+        reporter: 'html',
+
+        // require specific files after Mocha is initialized
+        require: [require.resolve('bdd-lazy-var/bdd_lazy_var_global')],
+
+        // custom ui, defined in required file above
+        ui: 'bdd-lazy-var/global',
+      }
+    },
+    webpack: webpackTestConfig,
+    webpackMiddleware: {
+      stats: 'errors-only'
+    },
+  });
 };

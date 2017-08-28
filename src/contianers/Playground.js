@@ -1,4 +1,5 @@
 import React from 'react';
+import Sidebar from '../components/Sidebar';
 
 class Playground extends React.Component {
   
@@ -9,7 +10,7 @@ class Playground extends React.Component {
   render() {
     return(
       <div>
-        Playground
+        <Sidebar/>
       </div>
     );
   }

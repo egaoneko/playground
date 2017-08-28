@@ -1,3 +1,5 @@
+/*global require, module, global, process*/
+
 const instanbul = require('istanbul');
 const MochaSpecReporter = require('mocha/lib/reporters/spec');
 
