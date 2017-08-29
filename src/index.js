@@ -7,8 +7,6 @@ import store from './lib/store';
 
 import './sass/style.sass';
 
-
-
 ReactDOM.render(
   <Provider store={store}>
       <Routes />

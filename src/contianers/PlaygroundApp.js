@@ -1,6 +1,6 @@
 import React from "react";
 
-import Playground from "./Playground";
+import Playground from "../components/Playground";
 
 class PlaygroundApp extends React.Component {
   
