@@ -1,24 +1,36 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import contents from "../lib/content";
+import CategoryContent from "./CategoryContent";
 
-const propTypes = {
-  
-};
+const propTypes = {};
 
-const defaultProps = {
-  
-};
+const defaultProps = {};
 
 class Sidebar extends React.Component {
-  
-  constructor(props) {
-    super(props);
-  }
-  
   render() {
-    return(
+    const contentMap = new Map();
+
+    contents.forEach(content => {
+      if (!contentMap.has(content.category)) {
+        contentMap.set(content.category, []);
+      }
+
+      const contents = contentMap.get(content.category);
+      contents.push(content);
+    });
+
+    const categoryContents = Array.from(contentMap.entries()).map(
+      entry => {
+        const category = entry[0];
+        const contents = entry[1];
+        return <CategoryContent key={category} category={category} contents={contents}/>;
+      }
+    );
+
+    return (
       <div>
         Sidebar
+        {categoryContents}
       </div>
     );
   }
