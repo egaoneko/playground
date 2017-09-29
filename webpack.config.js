@@ -25,7 +25,7 @@ module.exports = {
       loader: 'eslint-loader',
       exclude: /(node_modules|bower_components)/
     }, {
-      test: /\.sass$/,
+      test: /\.(sass|scss)$/,
       use: extractSass.extract({
         use: [{
           loader: "css-loader", options: {

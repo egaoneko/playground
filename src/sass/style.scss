@@ -1,0 +1,26 @@
+*{
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.wrapper {
+  display: grid;
+  grid-gap: 2px;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(12, 1fr);
+  background-color: #fff;
+  color: #444;
+  width: 100vw;
+  height: 100vh;
+}
+
+.sidebar {
+  grid-column: 1 / 4;
+  grid-row: 1 / 13;
+}
+
+.content {
+  grid-column: 4 / 13;
+  grid-row: 1 / 13;
+}

@@ -7,7 +7,7 @@ const propTypes = {
 
 function Content(props) {
   return (
-    <li>{JSON.stringify(props.content)}</li>
+    <li><a href={props.content.url}>{props.content.name}</a></li>
   );
 }
 

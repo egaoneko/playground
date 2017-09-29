@@ -28,8 +28,7 @@ class Sidebar extends React.Component {
     );
 
     return (
-      <div>
-        Sidebar
+      <div className="sidebar">
         {categoryContents}
       </div>
     );
