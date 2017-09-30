@@ -1,17 +1,23 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-const propTypes = {};
+const propTypes = {
+  selected: PropTypes.object
+};
 
-const defaultProps = {};
+const defaultProps = {
+  selected: null
+};
 
-class Viewer extends React.Component {
-
-  render() {
-    return (
-      <div className="content">
+function Viewer(props) {
+  const url = props.selected ? props.selected.url : "";
+  return (
+    <div className="content">
+      <div className="viewer">
+        <iframe src={url}></iframe>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 Viewer.propTypes = propTypes;

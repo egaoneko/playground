@@ -15,9 +15,11 @@
 
     /* to remove the top and left whitespace */
 
-    html, body {
+    body {
       width: 100%;
       height: 100%;
+      margin: 0;
+      overflow: hidden;
     }
 
     /* just to be sure these are full screen*/
@@ -46,7 +48,7 @@
   var projectionMatrix;
   var modelViewMatrixStack;
 
-  function loadShader (shaderType) {
+  function loadShader(shaderType) {
     // If we don't find an element with the specified id
     // we do an early exit
     if (!shaderType) {
@@ -89,7 +91,7 @@
     return shader;
   }
 
-  function setupShaders () {
+  function setupShaders() {
     var vertexShader = loadShader("vertex");
     var fragmentShader = loadShader("fragment");
 
@@ -116,19 +118,19 @@
     modelViewMatrixStack = [];
   }
 
-  function pushModelViewMatrix () {
+  function pushModelViewMatrix() {
     var copyToPush = mat4.create(modelViewMatrix);
     modelViewMatrixStack.push(copyToPush);
   }
 
-  function popModelViewMatrix () {
+  function popModelViewMatrix() {
     if (modelViewMatrixStack.length == 0) {
       throw "Error popModelViewMatrix() - Stack was empty ";
     }
     modelViewMatrix = modelViewMatrixStack.pop();
   }
 
-  function setupCubeBuffers () {
+  function setupCubeBuffers() {
     cubeVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
 
@@ -191,20 +193,20 @@
     cubeVertexIndexBuffer.numberOfItems = 36;
   }
 
-  function setupBuffers () {
+  function setupBuffers() {
     setupCubeBuffers();
   }
 
-  function uploadModelViewMatrixToShader () {
+  function uploadModelViewMatrixToShader() {
     gl.uniformMatrix4fv(shaderProgram.uniformMVMatrix, false, modelViewMatrix);
   }
 
-  function uploadProjectionMatrixToShader () {
+  function uploadProjectionMatrixToShader() {
     gl.uniformMatrix4fv(shaderProgram.uniformProjMatrix,
       false, projectionMatrix);
   }
 
-  function drawCube (r, g, b, a) {
+  function drawCube(r, g, b, a) {
     // Disable vertex attrib array and use constant color for the cube.
     gl.disableVertexAttribArray(shaderProgram.vertexColorAttribute);
     // Set color
@@ -220,7 +222,7 @@
       gl.UNSIGNED_SHORT, 0);
   }
 
-  function drawCubeWire (r, g, b, a) {
+  function drawCubeWire(r, g, b, a) {
     // Disable vertex attrib array and use constant color for the cube.
     gl.disableVertexAttribArray(shaderProgram.vertexColorAttribute);
     // Set color
@@ -236,7 +238,7 @@
       gl.UNSIGNED_SHORT, 0);
   }
 
-  function draw () {
+  function draw() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     mat4.perspective(60, gl.viewportWidth / gl.viewportHeight,
@@ -257,32 +259,32 @@
     popModelViewMatrix();
   }
 
-  function resizeCanvas () {
+  function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
 
-  function setupEvent () {
+  function setupEvent() {
     canvas.addEventListener('mousedown', onMouseDown, false);
     canvas.addEventListener('mousemove', onMouseMove, false);
     canvas.addEventListener('mouseup', onMouseUp, false);
   }
 
-  function onMouseDown (evt) {
+  function onMouseDown(evt) {
     var lastX = evt.offsetX || (evt.pageX - container.offsetLeft);
     var lastY = evt.offsetY || (evt.pageY - container.offsetTop);
     console.log(lastX, lastY);
   }
 
-  function onMouseMove (evt) {
+  function onMouseMove(evt) {
 
   }
 
-  function onMouseUp (evt) {
+  function onMouseUp(evt) {
 
   }
 
-  function startup () {
+  function startup() {
     canvas = document.getElementById("myGLCanvas");
     resizeCanvas();
 

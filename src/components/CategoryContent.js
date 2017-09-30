@@ -5,11 +5,16 @@ import Content from "./Content";
 
 const propTypes = {
   category: PropTypes.string.isRequired,
-  contents: PropTypes.array.isRequired
+  contents: PropTypes.array.isRequired,
+  selected: PropTypes.object,
+  handleSelect: PropTypes.func
 };
 
 function CategoryContent(props) {
-  const contents = props.contents.map(content=><Content key={content.name} content={content}/>);
+  const contents = props.contents.map(content=><Content key={content.name}
+                                                        content={content}
+                                                        selected={props.selected}
+                                                        handleSelect={props.handleSelect}/>);
 
   return (
     <ul>

@@ -1,7 +1,8 @@
-import * as types from './ActionTypes';
+import * as types from "../constants/ActionTypes";
 
-export function select() {
-    return {
-        type: types.SELECT
-    };
+export function select(content) {
+  return {
+    type: types.SELECT,
+    selected: content
+  };
 }

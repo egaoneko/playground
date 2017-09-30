@@ -1,14 +1,14 @@
-import * as types from '../actions/ActionTypes';
+import * as types from "../constants/ActionTypes";
 
 const initialState = {
-    current: null
+  selected: null
 };
 
 export default function content(state = initialState, action) {
-    switch(action.type) {
-        case types.SELECT:
-            return { current: action.current };
-        default:
-            return state;
-    }
+  switch (action.type) {
+    case types.SELECT:
+      return {selected: action.selected};
+    default:
+      return state;
+  }
 }
