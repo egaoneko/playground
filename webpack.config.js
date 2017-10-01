@@ -78,7 +78,7 @@ if (process.env.NODE_ENV === 'production') {
       'process.env': {
         NODE_ENV: JSON.stringify("production")
       },
-      STATIC: JSON.stringify("/dist")
+      STATIC: JSON.stringify("/playground/dist")
     }),
     new webpack.optimize.UglifyJsPlugin({
       sourceMap: true,
