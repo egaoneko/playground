@@ -1,25 +1,28 @@
 import React from "react";
 import PropTypes from "prop-types";
+import {Link} from "react-router";
 import {log} from "../utils";
 
 const propTypes = {
   content: PropTypes.object.isRequired,
-  selected: PropTypes.object,
-  handleSelect: PropTypes.func
+  selectedContent: PropTypes.object,
+  handleSelectContent: PropTypes.func
 };
 
 const defaultProps = {
   selected: null,
-  handleSelect: log.createWarning('handleSelect')
+  handleSelectContent: log.createWarning('handleSelect')
 };
 
 function Content(props) {
   const onSelect = () => {
-    props.handleSelect(props.content);
+    props.handleSelectContent(props.content);
   };
 
   return (
-    <li onClick={onSelect}><a>{props.content.name}</a></li>
+    <li className={`link ${props.selectedContent === props.content ? "selected" : ""}`}>
+      <Link to={`/examples/${props.content.id}`} onClick={onSelect}>{props.content.name}</Link>
+    </li>
   );
 }
 

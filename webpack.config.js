@@ -7,8 +7,8 @@ var webpack = require('webpack');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var extractSass = new ExtractTextPlugin({
-    filename: "style.css",
-    // disable: process.env.NODE_ENV === "development"
+  filename: "style.css",
+  // disable: process.env.NODE_ENV === "development"
 });
 
 module.exports = {
@@ -60,16 +60,29 @@ module.exports = {
   devtool: '#eval-source-map'
 };
 
+if (process.env.NODE_ENV === 'development') {
+  module.exports.plugins = (module.exports.plugins || []).concat([
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify("development"),
+      },
+      STATIC: JSON.stringify("")
+    })
+  ]);
+}
+
 if (process.env.NODE_ENV === 'production') {
   module.exports.devtool = '#source-map';
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: '"production"'
-      }
+        NODE_ENV: JSON.stringify("production")
+      },
+      STATIC: JSON.stringify("/dist")
     }),
     new webpack.optimize.UglifyJsPlugin({
       sourceMap: true,
+      minimize: true,
       compress: {
         warnings: false
       }
@@ -77,5 +90,5 @@ if (process.env.NODE_ENV === 'production') {
     new webpack.LoaderOptionsPlugin({
       minimize: true
     })
-  ])
+  ]);
 }

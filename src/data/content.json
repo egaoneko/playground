@@ -2,21 +2,25 @@
   {
     "category": "WebGL",
     "name": "Control01",
-    "url": "webgl/controls/control01/index.html"
+    "url": "/webgl/controls/control01/index.html",
+    "id": "webgl-control01"
   },
   {
     "category": "WebGL / Three.js",
     "name": "Control01",
-    "url": "webgl/threejs/controls/control01/index.html"
+    "url": "/webgl/threejs/controls/control01/index.html",
+    "id": "webgl-threejs-control01"
   },
   {
     "category": "WebGL / Three.js",
     "name": "Control02",
-    "url": "webgl/threejs/controls/control02/index.html"
+    "url": "/webgl/threejs/controls/control02/index.html",
+    "id": "webgl-threejs-control02"
   },
   {
     "category": "WebGL / Three.js",
     "name": "Control03",
-    "url": "webgl/threejs/controls/control03/index.html"
+    "url": "/webgl/threejs/controls/control03/index.html",
+    "id": "webgl-threejs-control03"
   }
 ]

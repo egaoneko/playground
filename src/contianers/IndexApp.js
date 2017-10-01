@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router';
+import React from "react";
+import {Link} from "react-router";
 
 class IndexApp extends React.Component {
 
@@ -11,7 +11,10 @@ class IndexApp extends React.Component {
     return (
       <div className="wrapper">
         <div className="sidebar">
-          <Link to="/sample">Sample</Link>
+          <h1><Link to="/">Playground</Link></h1>
+          <ul>
+            <h2><Link to="/examples">Examples</Link></h2>
+          </ul>
         </div>
         <div className="content">
         </div>

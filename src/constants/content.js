@@ -1,17 +1,44 @@
+/*global STATIC*/
 //noinspection JSUnresolvedVariable
 import contents from "../data/content.json";
 
-const contentMap = new Map();
-
 contents.forEach(content => {
-  if (!contentMap.has(content.category)) {
-    contentMap.set(content.category, []);
-  }
-
-  const contents = contentMap.get(content.category);
-  contents.push(content);
+  content.url = STATIC + content.url;
 });
 
+const contentMap = getContentMap(contents);
+
+function searchById(id) {
+  const searched = contents.filter(content=>content.id === id);
+  return searched.length > 0 ? searched[0] : null;
+}
+
+function getContentMap(contents) {
+  const map = new Map();
+
+  contents.forEach(content => {
+    if (!map.has(content.category)) {
+      map.set(content.category, []);
+    }
+
+    const contents = map.get(content.category);
+    contents.push(content);
+  });
+
+  return map;
+}
+
+function filterByText(contents, text) {
+  if (!text) {
+    return contents;
+  }
+  return contents.filter(content => ~content.name.toLowerCase().indexOf(text));
+}
+
 export default {
-  contents, contentMap
+  contents,
+  contentMap,
+  searchById,
+  getContentMap,
+  filterByText
 }

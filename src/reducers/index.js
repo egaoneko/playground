@@ -1,9 +1,10 @@
 import {combineReducers} from "redux";
 import {routerReducer} from "react-router-redux";
-import content from "./content";
+import {select, filter} from "./content";
 
 const reducers = combineReducers({
-  content,
+  select,
+  filter,
   routing: routerReducer
 });
 

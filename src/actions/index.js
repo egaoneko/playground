@@ -3,6 +3,13 @@ import * as types from "../constants/ActionTypes";
 export function select(content) {
   return {
     type: types.SELECT,
-    selected: content
+    selectedContent: content
+  };
+}
+
+export function filter(filterText) {
+  return {
+    type: types.FILTER,
+    filterText: filterText
   };
 }

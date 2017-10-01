@@ -14,5 +14,9 @@ module.exports = {
       'jsx': true,
       'spread': true
     }
+  },
+  "globals": {
+    "STATIC": true,
+    "process.env": true
   }
 };

@@ -1,30 +1,35 @@
 import React from "react";
 import PropTypes from "prop-types";
-import content from "../constants/content";
+import {Link} from "react-router";
 import CategoryContent from "./CategoryContent";
-
-const contentMap = content.contentMap;
+import ContentFilter from "./ContentFilter";
 
 const propTypes = {
-  selected: PropTypes.object,
-  handleSelect: PropTypes.func
+  contentMap: PropTypes.instanceOf(Map).isRequired,
+  filterText: PropTypes.string,
+  selectedContent: PropTypes.object,
+  handleSelectContent: PropTypes.func,
+  handleFilter: PropTypes.func
 };
 
 function Sidebar(props) {
-  const categoryContents = Array.from(contentMap.entries()).map(
+  const categoryContents = Array.from(props.contentMap.entries()).map(
     entry => {
       const category = entry[0];
       const contents = entry[1];
       return <CategoryContent key={category}
                               category={category}
                               contents={contents}
-                              selected={props.selected}
-                              handleSelect={props.handleSelect}/>;
+                              selectedContent={props.selectedContent}
+                              handleSelectContent={props.handleSelectContent}/>;
     }
   );
 
   return (
     <div className="sidebar">
+      <h1><Link to="/">Playground</Link> / examples</h1>
+      <ContentFilter filterText={props.filterText}
+                     handleFilter={props.handleFilter}/>
       {categoryContents}
     </div>
   );

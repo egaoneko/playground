@@ -1,14 +1,35 @@
 import * as types from "../constants/ActionTypes";
+import content from "../constants/content";
 
-const initialState = {
-  selected: null
+const initialSelectState = {
+  selectedContent: null
 };
 
-export default function content(state = initialState, action) {
+export function select(state = initialSelectState, action) {
   switch (action.type) {
     case types.SELECT:
-      return {selected: action.selected};
+      return {selectedContent: action.selectedContent};
     default:
       return state;
   }
 }
+
+const contents = content.contents;
+const initialFilterState = {
+  filterText: "",
+  contentMap: content.getContentMap(contents)
+};
+
+export function filter(state = initialFilterState, action) {
+  const filterText = action.filterText;
+  switch (action.type) {
+    case types.FILTER:
+      return {
+        contentMap: content.getContentMap(content.filterByText(contents, filterText.toLowerCase())),
+        filterText: filterText
+      };
+    default:
+      return state;
+  }
+}
+
