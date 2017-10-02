@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
-import Sidebar from "../components/Sidebar";
-import Viewer from "../components/Viewer";
+import Sidebar from "../components/sidebar/Sidebar";
+import Viewer from "../components/viewer/Viewer";
 import * as actions from "../actions";
 import content from "../constants/content";
 
@@ -38,7 +38,8 @@ class Example extends React.Component {
                  selectedContent={this.props.selectedContent}
                  handleSelectContent={this.props.handleSelectContent}
                  handleFilter={this.props.handleFilter}/>
-        <Viewer selectedContent={this.props.selectedContent}/>
+        <Viewer selectedContent={this.props.selectedContent}
+                handleSelectContent={this.props.handleSelectContent}/>
       </div>
     );
   }

@@ -126,7 +126,11 @@
     controls.target = new THREE.Vector3(0, 0, 800);
     //
 
-    document.addEventListener('keydown', onKeyDown, false);
+    if (window.parent) {
+      window.parent.document.addEventListener('keydown', onKeyDown, false);
+    } else {
+      document.addEventListener('keydown', onKeyDown, false);
+    }
     window.addEventListener('resize', onWindowResize, false);
   }
   //

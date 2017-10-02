@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {Link} from "react-router";
-import {log} from "../utils";
+import {log} from "../../utils";
 
 const propTypes = {
   content: PropTypes.object.isRequired,
