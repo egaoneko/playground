@@ -15,6 +15,7 @@ export default class Routes extends Component {
         <Route path="/" component={IndexApp}/>
         <Route path="/examples" component={ExampleApp}/>
         <Route path="/examples/:id" component={ExampleApp}/>
+        <Route path="/:path" component={IndexApp}/>
         <Route path="*" component={NoMatch}/>
       </Router>
     );

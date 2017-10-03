@@ -1,15 +1,4 @@
-import * as types from "../constants/ActionTypes";
+import * as content from "./content";
+import * as transpiler from "./transpiler";
 
-export function select(content) {
-  return {
-    type: types.SELECT,
-    selectedContent: content
-  };
-}
-
-export function filter(filterText) {
-  return {
-    type: types.FILTER,
-    filterText: filterText
-  };
-}
+export default {content, transpiler};

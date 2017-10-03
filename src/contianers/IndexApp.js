@@ -1,5 +1,10 @@
 import React from "react";
-import {Link} from "react-router";
+import PropTypes from "prop-types";
+import Index from "./Index";
+
+const propTypes = {
+  routeParams: PropTypes.object
+};
 
 class IndexApp extends React.Component {
 
@@ -9,18 +14,11 @@ class IndexApp extends React.Component {
 
   render() {
     return (
-      <div className="wrapper">
-        <div className="sidebar">
-          <h1><Link to="/">Playground</Link></h1>
-          <ul>
-            <h2><Link to="/examples">Examples</Link></h2>
-          </ul>
-        </div>
-        <div className="content">
-        </div>
-      </div>
+      <Index path={this.props.routeParams.path}/>
     );
   }
 }
+
+IndexApp.propTypes = propTypes;
 
 export default IndexApp;

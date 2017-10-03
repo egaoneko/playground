@@ -7,7 +7,7 @@ const initialSelectState = {
 
 export function select(state = initialSelectState, action) {
   switch (action.type) {
-    case types.SELECT:
+    case types.EXAMPLE_SELECT:
       return {selectedContent: action.selectedContent};
     default:
       return state;
@@ -23,7 +23,7 @@ const initialFilterState = {
 export function filter(state = initialFilterState, action) {
   const filterText = action.filterText;
   switch (action.type) {
-    case types.FILTER:
+    case types.EXAMPLE_FILTER:
       return {
         contentMap: content.getContentMap(content.filterByText(contents, filterText.toLowerCase())),
         filterText: filterText

@@ -1,2 +1,4 @@
-export const SELECT = "SELECT";
-export const FILTER = "FILTER";
+export const EXAMPLE_SELECT = "EXAMPLE_SELECT";
+export const EXAMPLE_FILTER = "EXAMPLE_FILTER";
+
+export const TRANSPILER_CHANGE = "TRANSPILER_CHANGE";

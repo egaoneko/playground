@@ -1,6 +1,6 @@
 import React from "react";
-import Example from "./Example";
 import PropTypes from "prop-types";
+import Example from "./Example";
 
 const propTypes = {
   routeParams: PropTypes.object

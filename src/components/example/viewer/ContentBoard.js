@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import CategoryContent from "./CategoryContent";
-import content from "../../constants/content";
+import content from "../../../constants/content";
 
 const propTypes = {
   handleSelectContent: PropTypes.func

@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
-import Sidebar from "../components/sidebar/Sidebar";
-import Viewer from "../components/viewer/Viewer";
-import * as actions from "../actions";
+import Sidebar from "../components/example/sidebar/Sidebar";
+import Viewer from "../components/example/viewer/Viewer";
+import actions from "../actions";
 import content from "../constants/content";
 
 const propTypes = {
@@ -56,10 +56,10 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     handleSelectContent: (content) => {
-      dispatch(actions.select(content));
+      dispatch(actions.content.select(content));
     },
     handleFilter: (text) => {
-      dispatch(actions.filter(text));
+      dispatch(actions.content.filter(text));
     }
   };
 };
