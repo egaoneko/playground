@@ -34,11 +34,13 @@
       <script id="shader-vs" type="x-shader/x-vertex">
         attribute vec3 aVertexPosition;
         attribute vec4 aVertexColor;
+        uniform mat4 uMVMatrix;
+        uniform mat4 uPMatrix;
         varying vec4 vColor;
   
         void main() {
+          gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
           vColor = aVertexColor;
-          gl_Position = vec4(aVertexPosition, 1.0);
         }
       </script>
       <script id="shader-fs" type="x-shader/x-fragment">
@@ -51,11 +53,16 @@
       </script>
       <script src="../../../lib/webgl-debug.js"></script>
       <script src="../../../js/webgl/webgl-tools.js"></script>
+      <script src="../../../lib/glMatrix.js"></script>
       <script type="text/javascript">
         var gl;
         var canvas;
         var shaderProgram;
         var basisVertexBuffer;
+
+        var modelViewMatrix;
+        var projectionMatrix;
+        var modelViewMatrixStack;
 
         function setupShaders() {
           vertexShader = WebGLTools.loadShaderFromDOM(gl, "shader-vs");
@@ -74,8 +81,26 @@
           
           shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition"); 
           shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
+          shaderProgram.uniformMVMatrix = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+          shaderProgram.uniformProjMatrix = gl.getUniformLocation(shaderProgram, "uPMatrix");
           
           gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+          modelViewMatrix = mat4.create();
+          projectionMatrix = mat4.create();
+          modelViewMatrixStack = [];
+        }
+
+        function pushModelViewMatrix() {
+          var copyToPush = mat4.create(modelViewMatrix);
+          modelViewMatrixStack.push(copyToPush);
+        }
+
+        function popModelViewMatrix() {
+          if (modelViewMatrixStack.length == 0) {
+            throw "Error popModelViewMatrix() - Stack was empty ";
+          }
+          modelViewMatrix = modelViewMatrixStack.pop();
         }
         
         function setupBuffers() {
@@ -95,10 +120,16 @@
           basisVertexBuffer.numberOfItems = 6;
         }
         
+        function uploadModelViewMatrixToShader() {
+          gl.uniformMatrix4fv(shaderProgram.uniformMVMatrix, false, modelViewMatrix);
+        }
+
+        function uploadProjectionMatrixToShader() {
+          gl.uniformMatrix4fv(shaderProgram.uniformProjMatrix,
+            false, projectionMatrix);
+        }
+
         function drawBasis() { 
-          gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-          gl.clear(gl.COLOR_BUFFER_BIT);
-          
           gl.disableVertexAttribArray(shaderProgram.vertexColorAttribute);          
           gl.bindBuffer(gl.ARRAY_BUFFER, basisVertexBuffer);
           gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 
@@ -112,6 +143,25 @@
 
           gl.vertexAttrib4f(shaderProgram.vertexColorAttribute, 0.0, 0.0, 1.0, 1.0);
           gl.drawArrays(gl.LINES, 4, 2);
+        }
+
+        function draw() {
+          gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+          mat4.perspective(60, gl.viewportWidth / gl.viewportHeight,
+            0.1, 100.0, projectionMatrix);
+          mat4.identity(modelViewMatrix);
+          mat4.lookAt([8, 5, -10], [0, 0, 0], [0, 1, 0], modelViewMatrix);
+      
+          uploadModelViewMatrixToShader();
+          uploadProjectionMatrixToShader();
+      
+          // pushModelViewMatrix();
+          // mat4.translate(modelViewMatrix, [0.0, 0.0, 0.0], modelViewMatrix);
+          // mat4.scale(modelViewMatrix, [1.0, 1.0, 1.0], modelViewMatrix);
+          // uploadModelViewMatrixToShader();
+          drawBasis();
+          // popModelViewMatrix();
         }
 
         function resizeCanvas() {
@@ -132,7 +182,7 @@
           gl.enable(gl.CULL_FACE);
           gl.cullFace(gl.BACK);
         
-          drawBasis();  
+          draw();  
         }
       </script>
   </body>
