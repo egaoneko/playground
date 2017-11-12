@@ -50,7 +50,7 @@
         }
       </script>
       <script src="../../../lib/webgl-debug.js"></script>
-      <script src="../../../js/webgl/Basis.js"></script>
+      <script src="../../../js/webgl/webgl-tools.js"></script>
       <script type="text/javascript">
         var gl;
         var canvas;
@@ -58,8 +58,8 @@
         var basisVertexBuffer;
 
         function setupShaders() {
-          vertexShader = Basis.loadShaderFromDOM(gl, "shader-vs");
-          fragmentShader = Basis.loadShaderFromDOM(gl, "shader-fs");
+          vertexShader = WebGLTools.loadShaderFromDOM(gl, "shader-vs");
+          fragmentShader = WebGLTools.loadShaderFromDOM(gl, "shader-fs");
           
           shaderProgram = gl.createProgram();
           gl.attachShader(shaderProgram, vertexShader);
@@ -95,7 +95,7 @@
           basisVertexBuffer.numberOfItems = 6;
         }
         
-        function draw() { 
+        function drawBasis() { 
           gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
           gl.clear(gl.COLOR_BUFFER_BIT);
           
@@ -123,7 +123,7 @@
           canvas = document.getElementById("myGLCanvas");
           resizeCanvas();
 
-          gl = WebGLDebugUtils.makeDebugContext(Basis.getGLContext(canvas));
+          gl = WebGLDebugUtils.makeDebugContext(WebGLTools.getGLContext(canvas));
           setupShaders(); 
           setupBuffers();
           gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -132,7 +132,7 @@
           gl.enable(gl.CULL_FACE);
           gl.cullFace(gl.BACK);
         
-          draw();  
+          drawBasis();  
         }
       </script>
   </body>

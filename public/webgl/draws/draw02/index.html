@@ -50,7 +50,7 @@
         }
       </script>
       <script src="../../../lib/webgl-debug.js"></script>
-      <script src="../../../js/webgl/Basis.js"></script>
+      <script src="../../../js/webgl/webgl-tools.js"></script>
       <script type="text/javascript">
         var gl;
         var canvas;
@@ -62,8 +62,8 @@
         var stripElementBuffer;
 
         function setupShaders() {
-          vertexShader = Basis.loadShaderFromDOM(gl, "shader-vs");
-          fragmentShader = Basis.loadShaderFromDOM(gl, "shader-fs");
+          vertexShader = WebGLTools.loadShaderFromDOM(gl, "shader-vs");
+          fragmentShader = WebGLTools.loadShaderFromDOM(gl, "shader-fs");
           
           shaderProgram = gl.createProgram();
           gl.attachShader(shaderProgram, vertexShader);
@@ -228,7 +228,7 @@
           canvas = document.getElementById("myGLCanvas");
           resizeCanvas();
 
-          gl = WebGLDebugUtils.makeDebugContext(Basis.getGLContext(canvas));
+          gl = WebGLDebugUtils.makeDebugContext(WebGLTools.getGLContext(canvas));
           setupShaders(); 
           setupBuffers();
           gl.clearColor(1.0, 1.0, 1.0, 1.0);

@@ -1,5 +1,5 @@
-var Basis = {  
-  getGLContext : function getGLContext(canvas) {
+var WebGLTools = (function() {  
+  function getGLContext(canvas) {
     var names = ["webgl", "experimental-webgl"];
     var context = null;
     for (var i = 0; i < names.length; i++) {
@@ -17,9 +17,9 @@ var Basis = {
       alert("Failed to create WebGL context!");
     }
     return context;
-  },
+  }
 
-  loadShaderFromDOM : function loadShaderFromDOM(gl, id) {
+  function loadShaderFromDOM(gl, id) {
     var shaderScript = document.getElementById(id);
     
     // id로 요소를 찾지 못하면 바로 종료한다.
@@ -55,9 +55,9 @@ var Basis = {
     }
     return shader;
   }
-};
 
-// browserify support
-if (typeof module === 'object') {
-  module.exports = Basis;
-}
+  return {
+    'getGLContext' : getGLContext,
+    'loadShaderFromDOM' : loadShaderFromDOM
+  }
+})();
