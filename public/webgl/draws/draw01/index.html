@@ -28,7 +28,7 @@
         /* To remove the scrollbars */
       </style>
   </head>
-  <body onload="startup();">
+  <body>
       <canvas id="myGLCanvas"></canvas>
 
       <script id="shader-vs" type="x-shader/x-vertex">
@@ -51,140 +51,11 @@
           gl_FragColor = vColor;
         }
       </script>
-      <script src="../../../lib/webgl-debug.js"></script>
+      <script src="../../../lib/webgl/webgl-debug.js"></script>
       <script src="../../../js/webgl/webgl-tools.js"></script>
-      <script src="../../../lib/glMatrix.js"></script>
-      <script type="text/javascript">
-        var gl;
-        var canvas;
-        var shaderProgram;
-        var basisVertexBuffer;
-
-        var modelViewMatrix;
-        var projectionMatrix;
-        var modelViewMatrixStack;
-
-        function setupShaders() {
-          vertexShader = WebGLTools.loadShaderFromDOM(gl, "shader-vs");
-          fragmentShader = WebGLTools.loadShaderFromDOM(gl, "shader-fs");
-          
-          shaderProgram = gl.createProgram();
-          gl.attachShader(shaderProgram, vertexShader);
-          gl.attachShader(shaderProgram, fragmentShader);
-          gl.linkProgram(shaderProgram);
-        
-          if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-            alert("Failed to setup shaders");
-          }
-        
-          gl.useProgram(shaderProgram);
-          
-          shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition"); 
-          shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
-          shaderProgram.uniformMVMatrix = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-          shaderProgram.uniformProjMatrix = gl.getUniformLocation(shaderProgram, "uPMatrix");
-          
-          gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
-          modelViewMatrix = mat4.create();
-          projectionMatrix = mat4.create();
-          modelViewMatrixStack = [];
-        }
-
-        function pushModelViewMatrix() {
-          var copyToPush = mat4.create(modelViewMatrix);
-          modelViewMatrixStack.push(copyToPush);
-        }
-
-        function popModelViewMatrix() {
-          if (modelViewMatrixStack.length == 0) {
-            throw "Error popModelViewMatrix() - Stack was empty ";
-          }
-          modelViewMatrix = modelViewMatrixStack.pop();
-        }
-        
-        function setupBuffers() {
-          basisVertexBuffer = gl.createBuffer();
-          gl.bindBuffer(gl.ARRAY_BUFFER, basisVertexBuffer);
-          var basisVertices = [
-            0.0,  0.0,  0.0, // vO
-            1.0,  0.0,  0.0, // vX
-            0.0,  0.0,  0.0, // vO
-            0.0,  1.0,  0.0, // vY
-            0.0,  0.0,  0.0, // vO
-            0.0,  0.0,  1.0 // vZ
-          ];
-          
-          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(basisVertices), gl.STATIC_DRAW);
-          basisVertexBuffer.itemSize = 3;
-          basisVertexBuffer.numberOfItems = 6;
-        }
-        
-        function uploadModelViewMatrixToShader() {
-          gl.uniformMatrix4fv(shaderProgram.uniformMVMatrix, false, modelViewMatrix);
-        }
-
-        function uploadProjectionMatrixToShader() {
-          gl.uniformMatrix4fv(shaderProgram.uniformProjMatrix,
-            false, projectionMatrix);
-        }
-
-        function drawBasis() { 
-          gl.disableVertexAttribArray(shaderProgram.vertexColorAttribute);          
-          gl.bindBuffer(gl.ARRAY_BUFFER, basisVertexBuffer);
-          gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 
-          basisVertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-          gl.vertexAttrib4f(shaderProgram.vertexColorAttribute, 1.0, 0.0, 0.0, 1.0);
-          gl.drawArrays(gl.LINES, 0, 2);
-
-          gl.vertexAttrib4f(shaderProgram.vertexColorAttribute, 0.0, 1.0, 0.0, 1.0);
-          gl.drawArrays(gl.LINES, 2, 2);
-
-          gl.vertexAttrib4f(shaderProgram.vertexColorAttribute, 0.0, 0.0, 1.0, 1.0);
-          gl.drawArrays(gl.LINES, 4, 2);
-        }
-
-        function draw() {
-          gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-          mat4.perspective(60, gl.viewportWidth / gl.viewportHeight,
-            0.1, 100.0, projectionMatrix);
-          mat4.identity(modelViewMatrix);
-          mat4.lookAt([8, 5, -10], [0, 0, 0], [0, 1, 0], modelViewMatrix);
-      
-          uploadModelViewMatrixToShader();
-          uploadProjectionMatrixToShader();
-      
-          // pushModelViewMatrix();
-          // mat4.translate(modelViewMatrix, [0.0, 0.0, 0.0], modelViewMatrix);
-          // mat4.scale(modelViewMatrix, [1.0, 1.0, 1.0], modelViewMatrix);
-          // uploadModelViewMatrixToShader();
-          drawBasis();
-          // popModelViewMatrix();
-        }
-
-        function resizeCanvas() {
-          canvas.width = window.innerWidth;
-          canvas.height = window.innerHeight;
-        }
-        
-        function startup() {
-          canvas = document.getElementById("myGLCanvas");
-          resizeCanvas();
-
-          gl = WebGLDebugUtils.makeDebugContext(WebGLTools.getGLContext(canvas));
-          setupShaders(); 
-          setupBuffers();
-          gl.clearColor(1.0, 1.0, 1.0, 1.0);
-          
-          gl.frontFace(gl.CCW);
-          gl.enable(gl.CULL_FACE);
-          gl.cullFace(gl.BACK);
-        
-          draw();  
-        }
-      </script>
+      <script src="../../../lib/math/glMatrix.js"></script>
+      <script src="../../../lib/util/dat.gui.min.js"></script>
+      <script src="./index.js"></script>
   </body>
 
 </html>

@@ -1,12 +1,6 @@
 [
   {
     "category": "WebGL",
-    "name": "Control01",
-    "url": "/webgl/controls/control01/index.html",
-    "id": "webgl-control01"
-  },
-  {
-    "category": "WebGL",
     "name": "Draw01",
     "url": "/webgl/draws/draw01/index.html",
     "id": "webgl-draw01"
@@ -16,6 +10,12 @@
     "name": "Draw02",
     "url": "/webgl/draws/draw02/index.html",
     "id": "webgl-draw02"
+  },
+  {
+    "category": "WebGL",
+    "name": "Control01",
+    "url": "/webgl/controls/control01/index.html",
+    "id": "webgl-control01"
   },
   {
     "category": "WebGL / Three.js",
