@@ -231,15 +231,24 @@
   
     uploadModelViewMatrixToShader();
     uploadProjectionMatrixToShader();
-  
-    // pushModelViewMatrix();
-    // mat4.translate(modelViewMatrix, [0.0, 0.0, 0.0], modelViewMatrix);
-    // mat4.scale(modelViewMatrix, [1.0, 1.0, 1.0], modelViewMatrix);
-    // uploadModelViewMatrixToShader();
+
+    pushModelViewMatrix();
+    mat4.translate(modelViewMatrix, [0.0, 0.0, 0.0], modelViewMatrix);
+    mat4.scale(modelViewMatrix, [1.0, 1.0, 1.0], modelViewMatrix);
+    uploadModelViewMatrixToShader();
     drawBasis();
-    drawCube(0.0, 0.0, 0.0, 0.2);
-    drawCubeWire(1.0, 1.0, 0.0, 1.0);
-    // popModelViewMatrix();
+    popModelViewMatrix();
+
+    for(var col = -2; col < 3; col++) {
+      for(var row = 0; row < 5; row++) {
+        pushModelViewMatrix();
+        mat4.translate(modelViewMatrix, [1.5 * col, 0.0, 1.5 * row], modelViewMatrix);
+        uploadModelViewMatrixToShader();
+        drawCube(0.0, 0.0, 0.0, 0.2);
+        drawCubeWire(1.0, 1.0, 0.0, 1.0);
+        popModelViewMatrix();
+      }
+    }
   }
   
   function resizeCanvas() {
