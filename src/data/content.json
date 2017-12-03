@@ -34,5 +34,11 @@
     "name": "Control03",
     "url": "/webgl/threejs/controls/control03/index.html",
     "id": "webgl-threejs-control03"
+  },
+  {
+    "category": "Angular",
+    "name": "Tour of Heroes",
+    "url": "https://egaoneko.github.io/angular-tour-of-heroes",
+    "id": "angular-tour-of-heroes"
   }
 ]
