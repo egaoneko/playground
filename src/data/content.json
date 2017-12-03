@@ -3,42 +3,49 @@
     "category": "WebGL",
     "name": "Draw01",
     "url": "/webgl/draws/draw01/index.html",
-    "id": "webgl-draw01"
+    "id": "webgl-draw01",
+    "isExternal": false
   },
   {
     "category": "WebGL",
     "name": "Draw02",
     "url": "/webgl/draws/draw02/index.html",
-    "id": "webgl-draw02"
+    "id": "webgl-draw02",
+    "isExternal": false
   },
   {
     "category": "WebGL",
     "name": "Control01",
     "url": "/webgl/controls/control01/index.html",
-    "id": "webgl-control01"
+    "id": "webgl-control01",
+    "isExternal": false
   },
   {
     "category": "WebGL / Three.js",
     "name": "Control01",
     "url": "/webgl/threejs/controls/control01/index.html",
-    "id": "webgl-threejs-control01"
+    "id": "webgl-threejs-control01",
+    "isExternal": false
   },
   {
     "category": "WebGL / Three.js",
     "name": "Control02",
     "url": "/webgl/threejs/controls/control02/index.html",
-    "id": "webgl-threejs-control02"
+    "id": "webgl-threejs-control02",
+    "isExternal": false
   },
   {
     "category": "WebGL / Three.js",
     "name": "Control03",
     "url": "/webgl/threejs/controls/control03/index.html",
-    "id": "webgl-threejs-control03"
+    "id": "webgl-threejs-control03",
+    "isExternal": false
   },
   {
     "category": "Angular",
     "name": "Tour of Heroes",
     "url": "https://egaoneko.github.io/angular-tour-of-heroes",
-    "id": "angular-tour-of-heroes"
+    "id": "angular-tour-of-heroes",
+    "isExternal": true
   }
 ]

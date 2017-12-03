@@ -66,7 +66,7 @@ if (process.env.NODE_ENV === 'development') {
       'process.env': {
         NODE_ENV: JSON.stringify("development"),
       },
-      STATIC: JSON.stringify("")
+      STATIC_URL: JSON.stringify("")
     })
   ]);
 }
@@ -78,7 +78,7 @@ if (process.env.NODE_ENV === 'production') {
       'process.env': {
         NODE_ENV: JSON.stringify("production")
       },
-      STATIC: JSON.stringify("/playground/dist")
+      STATIC_URL: JSON.stringify("/playground/dist")
     }),
     new webpack.optimize.UglifyJsPlugin({
       sourceMap: true,

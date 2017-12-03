@@ -1,9 +1,10 @@
-/*global STATIC*/
+/*global STATIC_URL*/
 //noinspection JSUnresolvedVariable
 import contents from "../data/content.json";
 
 contents.forEach(content => {
-  content.url = STATIC + content.url;
+  const prefix = content.isExternal? "" : STATIC_URL;
+  content.url = prefix + content.url;
 });
 
 const contentMap = getContentMap(contents);

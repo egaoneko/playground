@@ -16,7 +16,7 @@ module.exports = {
     }
   },
   "globals": {
-    "STATIC": true,
+    "STATIC_URL": true,
     "process.env": true
   }
 };
