@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Draw</title>
+    <meta charset="utf-8">
+
+    <style>
+        * {
+          margin: 0;
+          padding: 0;
+        }
+    
+        /* to remove the top and left whitespace */
+    
+        body {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          overflow: hidden;
+        }
+    
+        /* just to be sure these are full screen*/
+    
+        button {
+          font-size: 18px;
+        }
+
+        .image-box {
+          width: 600px;
+          height: 400px;
+        }
+      </style>
+  </head>
+  <body>
+      <h1>Preload image with JS</h1>
+      <h2>Without preload</h2>
+      <div class="image-box" id="image-box"></div>
+      <button id="image-box-prev-btn">Prev</button>
+      <button id="image-box-next-btn">Next</button>
+
+      <h2>With preload</h2>
+      <div class="image-box" id="preload-image-box"></div>
+      <button id="preload-image-box-prev-btn">Prev</button>
+      <button id="preload-image-box-next-btn">Next</button>
+      <script src="./index.js"></script>
+  </body>
+
+</html>

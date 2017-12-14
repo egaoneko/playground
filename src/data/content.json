@@ -47,5 +47,19 @@
     "url": "https://egaoneko.github.io/angular-tour-of-heroes",
     "id": "angular-tour-of-heroes",
     "isExternal": true
+  },
+  {
+    "category": "Image",
+    "name": "Preload with JS",
+    "url": "/frontend/image/preload/javascript/index.html",
+    "id": "image-preload-javascript",
+    "isExternal": false
+  },
+  {
+    "category": "Image",
+    "name": "Preload with CSS",
+    "url": "/frontend/image/preload/css/index.html",
+    "id": "image-preload-css",
+    "isExternal": false
   }
 ]
