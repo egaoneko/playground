@@ -46,7 +46,7 @@ window.addEventListener('load', function(){
   function preloadImages(images) {
     images.forEach(function(src) {
       setTimeout(() => {
-        let img = new Image();
+        var img = new Image();
         img.src = src;
         img.onload = () => {
           img = null;
