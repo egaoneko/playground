@@ -35,6 +35,13 @@
     "isExternal": true
   },
   {
+    "category": "Mapbox",
+    "name": "quick-start",
+    "url": "/mapbox/quick-start/index.html",
+    "id": "mapbox-quick-start",
+    "isExternal": false
+  },
+  {
     "category": "WebGL",
     "name": "Draw01",
     "url": "/webgl/draws/draw01/index.html",

@@ -55,6 +55,7 @@
     "webpack-dev-server": "^2.2.1"
   },
   "dependencies": {
+    "codemirror": "^5.34.0",
     "es6-enum": "^1.1.0",
     "immutable": "^3.8.1",
     "lodash": "^4.17.4",
