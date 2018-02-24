@@ -82,5 +82,12 @@
     "url": "/webgl/threejs/controls/control03/index.html",
     "id": "webgl-threejs-control03",
     "isExternal": false
+  },
+  {
+    "category": "Worker",
+    "name": "Example01",
+    "url": "/frontend/worker/example01/index.html",
+    "id": "worker-example01",
+    "isExternal": false
   }
 ]
