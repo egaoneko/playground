@@ -1,0 +1,5 @@
+var CanvasTools = (function() {  
+
+  return {
+  }
+})();

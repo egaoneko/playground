@@ -2,28 +2,28 @@
   {
     "category": "Image",
     "name": "Preload with JS",
-    "url": "/frontend/image/preload/javascript/index.html",
+    "url": "/pages/image/preload/javascript/index.html",
     "id": "image-preload-javascript",
     "isExternal": false
   },
   {
     "category": "Image",
     "name": "Preload with CSS",
-    "url": "/frontend/image/preload/css/index.html",
+    "url": "/pages/image/preload/css/index.html",
     "id": "image-preload-css",
     "isExternal": false
   },
   {
     "category": "Image",
     "name": "Lazy load with Vanilla",
-    "url": "/frontend/image/lazy-load/vanilla/index.html",
+    "url": "/pages/image/lazy-load/vanilla/index.html",
     "id": "image-lazy-load-vanilla",
     "isExternal": false
   },
   {
     "category": "Image",
     "name": "Lazy load with IntersectionObserver",
-    "url": "/frontend/image/lazy-load/intersection-observer/index.html",
+    "url": "/pages/image/lazy-load/intersection-observer/index.html",
     "id": "image-lazy-load-intersection-observer",
     "isExternal": false
   },
@@ -37,57 +37,64 @@
   {
     "category": "Mapbox",
     "name": "quick-start",
-    "url": "/mapbox/quick-start/index.html",
+    "url": "/pages/mapbox/quick-start/index.html",
     "id": "mapbox-quick-start",
     "isExternal": false
   },
   {
     "category": "WebGL",
     "name": "Draw01",
-    "url": "/webgl/draws/draw01/index.html",
+    "url": "/pages/webgl/draws/draw01/index.html",
     "id": "webgl-draw01",
     "isExternal": false
   },
   {
     "category": "WebGL",
     "name": "Draw02",
-    "url": "/webgl/draws/draw02/index.html",
+    "url": "/pages/webgl/draws/draw02/index.html",
     "id": "webgl-draw02",
     "isExternal": false
   },
   {
     "category": "WebGL",
     "name": "Control01",
-    "url": "/webgl/controls/control01/index.html",
+    "url": "/pages/webgl/controls/control01/index.html",
     "id": "webgl-control01",
     "isExternal": false
   },
   {
     "category": "WebGL / Three.js",
     "name": "Control01",
-    "url": "/webgl/threejs/controls/control01/index.html",
+    "url": "/pages/webgl/threejs/controls/control01/index.html",
     "id": "webgl-threejs-control01",
     "isExternal": false
   },
   {
     "category": "WebGL / Three.js",
     "name": "Control02",
-    "url": "/webgl/threejs/controls/control02/index.html",
+    "url": "/pages/webgl/threejs/controls/control02/index.html",
     "id": "webgl-threejs-control02",
     "isExternal": false
   },
   {
     "category": "WebGL / Three.js",
     "name": "Control03",
-    "url": "/webgl/threejs/controls/control03/index.html",
+    "url": "/pages/webgl/threejs/controls/control03/index.html",
     "id": "webgl-threejs-control03",
     "isExternal": false
   },
   {
     "category": "Worker",
     "name": "Example01",
-    "url": "/frontend/worker/example01/index.html",
+    "url": "/pages/worker/example01/index.html",
     "id": "worker-example01",
+    "isExternal": false
+  },
+  {
+    "category": "Canvas",
+    "name": "Example01",
+    "url": "/pages/canvas/example01/index.html",
+    "id": "canvas-example01",
     "isExternal": false
   }
 ]
