@@ -8,7 +8,7 @@ window.addEventListener('load', function(){
   var loader = new Utils.ImageLoader();
 
   var image = loader.load(
-    '../../../../textures/iu01.jpg',
+    '../../../textures/iu01.jpg',
     function() {
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     }
