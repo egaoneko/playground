@@ -92,9 +92,9 @@
   },
   {
     "category": "Canvas",
-    "name": "Example01",
-    "url": "/pages/canvas/example01/index.html",
-    "id": "canvas-example01",
+    "name": "Grayscale",
+    "url": "/pages/canvas/grayscale/index.html",
+    "id": "canvas-grayscale",
     "isExternal": false
   }
 ]
