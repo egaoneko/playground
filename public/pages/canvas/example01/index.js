@@ -5,9 +5,12 @@ window.addEventListener('load', function(){
   canvas.width = 400;
   canvas.height = 711;
 
-  var image = new Image();
-  image.src = '../../../../textures/iu01.jpg';
-  image.onload = function() {
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-  }
+  var loader = new Utils.ImageLoader();
+
+  var image = loader.load(
+    '../../../../textures/iu01.jpg',
+    function() {
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    }
+  );
 });
