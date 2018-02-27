@@ -111,8 +111,11 @@ var CanvasTools = (function() {
   constant.CHANNEL_RED = 'CHANNEL_RED';
   constant.CHANNEL_GREEN = 'CHANNEL_GREEN';
   constant.CHANNEL_BLUE = 'CHANNEL_BLUE';
+  
+  constant.CHANNEL_SINGLE = 'CHANNEL_SINGLE';
+  constant.CHANNEL_GRAYSCALE = 'CHANNEL_GRAYSCALE';
 
-  function channel(image, type) {
+  function channel(image, channelType, presentType) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
     canvas.width = image.width;
@@ -121,15 +124,15 @@ var CanvasTools = (function() {
 
     var imageData = ctx.getImageData(0, 0, image.width, image.height);
 
-    switch (type) {
+    switch (channelType) {
       case constant.CHANNEL_RED:
-        splitChannel(imageData, 0);
+        splitChannel(imageData, 0, presentType);
         break;
       case constant.CHANNEL_GREEN:
-        splitChannel(imageData, 1);
+        splitChannel(imageData, 1, presentType);
         break;
       case constant.CHANNEL_BLUE:
-        splitChannel(imageData, 2);
+        splitChannel(imageData, 2, presentType);
         break;
       default:
         break;
@@ -138,16 +141,26 @@ var CanvasTools = (function() {
     return canvas;
   }
 
-  function splitChannel(imageData, channel) {
-    var data = imageData.data;    
+  function splitChannel(imageData, channel, presentType) {
+    var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       var brightness = data[i + channel];
-      // red
-      data[i] = brightness;
-      // green
-      data[i+1] = brightness;
-      // blue
-      data[i+2] = brightness;
+
+      if (constant.CHANNEL_SINGLE === presentType) {
+        // red
+        data[i] = channel === 0? brightness : 0;
+        // green
+        data[i+1] = channel === 1? brightness : 0;
+        // blue
+        data[i+2] = channel === 2? brightness : 0;
+      } else {
+        // red
+        data[i] = brightness;
+        // green
+        data[i+1] = brightness;
+        // blue
+        data[i+2] = brightness;
+      }
     }
   }
 
