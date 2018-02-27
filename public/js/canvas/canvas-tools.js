@@ -108,8 +108,52 @@ var CanvasTools = (function() {
     }
   }
 
+  constant.CHANNEL_RED = 'CHANNEL_RED';
+  constant.CHANNEL_GREEN = 'CHANNEL_GREEN';
+  constant.CHANNEL_BLUE = 'CHANNEL_BLUE';
+
+  function channel(image, type) {
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0);
+
+    var imageData = ctx.getImageData(0, 0, image.width, image.height);
+
+    switch (type) {
+      case constant.CHANNEL_RED:
+        splitChannel(imageData, 0);
+        break;
+      case constant.CHANNEL_GREEN:
+        splitChannel(imageData, 1);
+        break;
+      case constant.CHANNEL_BLUE:
+        splitChannel(imageData, 2);
+        break;
+      default:
+        break;
+    }
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+  }
+
+  function splitChannel(imageData, channel) {
+    var data = imageData.data;    
+    for(var i = 0; i < data.length; i += 4) {
+      var brightness = data[i + channel];
+      // red
+      data[i] = brightness;
+      // green
+      data[i+1] = brightness;
+      // blue
+      data[i+2] = brightness;
+    }
+  }
+
   return {
     'constant': constant,
-    'grayscale': grayscale
+    'grayscale': grayscale,
+    'channel': channel
   }
 })();

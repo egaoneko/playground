@@ -96,5 +96,12 @@
     "url": "/pages/canvas/grayscale/index.html",
     "id": "canvas-grayscale",
     "isExternal": false
+  },
+  {
+    "category": "Canvas",
+    "name": "Channel",
+    "url": "/pages/canvas/channel/index.html",
+    "id": "canvas-channel",
+    "isExternal": false
   }
 ]
