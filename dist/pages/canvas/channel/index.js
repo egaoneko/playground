@@ -50,7 +50,7 @@ window.addEventListener('load', function(){
     blueGrayScaleCanvas.width = width;
     blueGrayScaleCanvas.height = height;
 
-    originalCtx.drawImage(image, 0, 0, width, originalCanvas.height);
+    originalCtx.drawImage(image, 0, 0, width, height);
     redSingleCtx.drawImage(CanvasTools.channel(image, CanvasTools.constant.CHANNEL_RED, CanvasTools.constant.CHANNEL_SINGLE), 0, 0, width, height);
     redGrayScaleCtx.drawImage(CanvasTools.channel(image, CanvasTools.constant.CHANNEL_RED, CanvasTools.constant.CHANNEL_GRAYSCALE), 0, 0, width, height);
     greenSingleCtx.drawImage(CanvasTools.channel(image, CanvasTools.constant.CHANNEL_GREEN, CanvasTools.constant.CHANNEL_SINGLE), 0, 0, width, height);

@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Canvas Merge</title>
+    <meta charset="utf-8">
+
+    <style>
+        * {
+          margin: 0;
+          padding: 0;
+        }
+
+        h1, h2 {
+          margin: 20px 0;
+        }
+
+        canvas {
+          margin: 20px 0px;
+          border: 1px solid #c8c8c8;
+        }
+
+        .box {
+          display: inline-block;
+        }
+      </style>
+  </head>
+  <body>
+      <h1>Canvas Merge</h1>
+
+      <div class="box">
+        <h2>Original iu01</h2>
+        <canvas id="original_iu01"></canvas>
+      </div>
+
+      <div class="box">
+        <h2>Original iu02</h2>
+        <canvas id="original_iu02"></canvas>
+      </div>
+
+      <div class="box">
+        <h2>Merge Remainder</h2>
+        <canvas id="merge_remainder"></canvas>
+      </div>
+
+      <div class="box">
+        <h2>Merge Min</h2>
+        <canvas id="merge_min"></canvas>
+      </div>
+
+      <div class="box">
+        <h2>Merge Weight</h2>
+        <input style="position: absolute;" type="range" min="0" max="100" step="1" id="weight" value="0">
+        <canvas id="merge_weight"></canvas>
+      </div>
+
+      <script src="../../../js/utils.js"></script>
+      <script src="../../../js/canvas/canvas-tools.js"></script>
+      <script src="./index.js"></script>
+  </body>
+
+</html>

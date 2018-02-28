@@ -45,7 +45,7 @@ window.addEventListener('load', function(){
     hsiCanvas.width = width;
     hsiCanvas.height = height;
 
-    originalCtx.drawImage(image, 0, 0, width, originalCanvas.height);
+    originalCtx.drawImage(image, 0, 0, width, height);
     averageCtx.drawImage(CanvasTools.grayscale(image, CanvasTools.constant.GRAYSCALE_AVERAGE), 0, 0, width, height);
     yuvCtx.drawImage(CanvasTools.grayscale(image, CanvasTools.constant.GRAYSCALE_YUV), 0, 0, width, height);
     hslCtx.drawImage(CanvasTools.grayscale(image, CanvasTools.constant.GRAYSCALE_HSL), 0, 0, width, height);

@@ -103,5 +103,12 @@
     "url": "/pages/canvas/channel/index.html",
     "id": "canvas-channel",
     "isExternal": false
+  },
+  {
+    "category": "Canvas",
+    "name": "Merge",
+    "url": "/pages/canvas/merge/index.html",
+    "id": "canvas-merge",
+    "isExternal": false
   }
 ]
