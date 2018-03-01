@@ -63,6 +63,13 @@
     "isExternal": false
   },
   {
+    "category": "Canvas",
+    "name": "Masking",
+    "url": "/pages/canvas/masking/index.html",
+    "id": "canvas-masking",
+    "isExternal": false
+  },
+  {
     "category": "Mapbox",
     "name": "quick-start",
     "url": "/pages/mapbox/quick-start/index.html",
