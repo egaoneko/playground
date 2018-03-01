@@ -27,6 +27,10 @@ window.addEventListener('load', function(){
   });
 
   function run() {
+    if (!image.complete || !logo.complete) {
+      return;
+    }
+
     var width = 300;
     var height = image.height * (width / image.width);
 

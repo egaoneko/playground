@@ -4,6 +4,10 @@ window.addEventListener('load', function(){
   var image2 = loader.load('../../../textures/iu02.jpg', run);
 
   function run() {
+    if (!image1.complete || !image2.complete) {
+      return;
+    }
+
     var width = 300;
     var height = image1.height * (width / image1.width);
 
