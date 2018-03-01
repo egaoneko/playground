@@ -323,7 +323,7 @@ var CanvasTools = (function() {
       default:
         break;
     }
-    masking(imageData.data, mask);
+    _masking(imageData.data, mask);
     ctx.putImageData(imageData, 0, 0);
     return canvas;
   }
@@ -358,7 +358,7 @@ var CanvasTools = (function() {
     return mask;
   }
 
-  function masking(data, mask) {
+  function _masking(data, mask) {
     for(var i = 0; i < data.length; i += 4) {
       var m = Math.min(mask[i], mask[i+1], mask[i+2], mask[i+3]);
       data[i] *= m;
@@ -388,7 +388,7 @@ var CanvasTools = (function() {
         break;
     }
     console.log(hsvData, mask, imageData.data);
-    masking(imageData.data, mask);
+    _masking(imageData.data, mask);
     console.log(imageData.data);
   }
 
@@ -475,6 +475,48 @@ var CanvasTools = (function() {
     }
   }
 
+  function mask(image, lower, upper) {
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0);
+
+    var imageData = ctx.getImageData(0, 0, image.width, image.height);
+    return inRagne(imageData.data, lower, upper);;
+  }
+
+  function masking(image, maskImage, mask) {
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0);
+
+    var maskCanvas = document.createElement('canvas');
+    var maskCtx = maskCanvas.getContext('2d');
+    maskCanvas.width = image.width;
+    maskCanvas.height = image.height;
+    maskCtx.drawImage(maskImage, 0, 0);
+
+    var imageData = ctx.getImageData(0, 0, maskImage.width, maskImage.height);
+    var maskImageData = maskCtx.getImageData(0, 0, maskImage.width, maskImage.height);
+
+    _maskingFromData(imageData.data, maskImageData.data, mask);
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+  }
+
+  function _maskingFromData(data, maskData, mask) {
+    for(var i = 0; i < data.length; i += 4) {
+      var m = Math.min(mask[i], mask[i+1], mask[i+2], mask[i+3]);
+      data[i] = m === 1 ? maskData[i] : data[i];
+      data[i+1] = m === 1 ? maskData[i+1] : data[i+2];
+      data[i+2] = m === 1 ? maskData[i+2] : data[i+2];
+      // data[i+3] = maskData[i+3] * m : data[i+3];
+    }
+  }
+
   return {
     'constant': constant,
     'grayscale': grayscale,
@@ -484,5 +526,7 @@ var CanvasTools = (function() {
     'filterHSL': filterHSL,
     'filterHSLTest': filterHSLTest,
     'threshold': threshold,
+    'mask': mask,
+    'masking': masking,
   };
 })();
