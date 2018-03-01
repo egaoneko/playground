@@ -28,11 +28,39 @@
     "isExternal": false
   },
   {
-    "category": "Angular",
-    "name": "Tour of Heroes",
-    "url": "https://egaoneko.github.io/angular-tour-of-heroes",
-    "id": "angular-tour-of-heroes",
-    "isExternal": true
+    "category": "Canvas",
+    "name": "Grayscale",
+    "url": "/pages/canvas/grayscale/index.html",
+    "id": "canvas-grayscale",
+    "isExternal": false
+  },
+  {
+    "category": "Canvas",
+    "name": "Channel",
+    "url": "/pages/canvas/channel/index.html",
+    "id": "canvas-channel",
+    "isExternal": false
+  },
+  {
+    "category": "Canvas",
+    "name": "Merge",
+    "url": "/pages/canvas/merge/index.html",
+    "id": "canvas-merge",
+    "isExternal": false
+  },
+  {
+    "category": "Canvas",
+    "name": "HSL",
+    "url": "/pages/canvas/hsl/index.html",
+    "id": "canvas-hsl",
+    "isExternal": false
+  },
+  {
+    "category": "Canvas",
+    "name": "Thresholding",
+    "url": "/pages/canvas/thresholding/index.html",
+    "id": "canvas-thresholding",
+    "isExternal": false
   },
   {
     "category": "Mapbox",
@@ -91,31 +119,10 @@
     "isExternal": false
   },
   {
-    "category": "Canvas",
-    "name": "Grayscale",
-    "url": "/pages/canvas/grayscale/index.html",
-    "id": "canvas-grayscale",
-    "isExternal": false
-  },
-  {
-    "category": "Canvas",
-    "name": "Channel",
-    "url": "/pages/canvas/channel/index.html",
-    "id": "canvas-channel",
-    "isExternal": false
-  },
-  {
-    "category": "Canvas",
-    "name": "Merge",
-    "url": "/pages/canvas/merge/index.html",
-    "id": "canvas-merge",
-    "isExternal": false
-  },
-  {
-    "category": "Canvas",
-    "name": "HSL",
-    "url": "/pages/canvas/hsl/index.html",
-    "id": "canvas-hsl",
-    "isExternal": false
+    "category": "Angular",
+    "name": "Tour of Heroes",
+    "url": "https://egaoneko.github.io/angular-tour-of-heroes",
+    "id": "angular-tour-of-heroes",
+    "isExternal": true
   }
 ]

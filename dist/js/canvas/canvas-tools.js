@@ -7,7 +7,7 @@ var CanvasTools = (function() {
   constant.GRAYSCALE_HSV = 'GRAYSCALE_HSV';
   constant.GRAYSCALE_HSI = 'GRAYSCALE_HSI';
 
-  function grayscale(image, type) {
+  function grayscale(image, flag) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
     canvas.width = image.width;
@@ -16,7 +16,7 @@ var CanvasTools = (function() {
 
     var imageData = ctx.getImageData(0, 0, image.width, image.height);
 
-    switch (type) {
+    switch (flag) {
       case constant.GRAYSCALE_AVERAGE:
         convertGrayscaleByAverage(imageData);
         break;
@@ -40,7 +40,7 @@ var CanvasTools = (function() {
   }
 
   function convertGrayscaleByAverage(imageData) {
-    var data = imageData.data;    
+    var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       var brightness = (data[i] + data[i+1] + data[i+2]) / 3;
       // red
@@ -53,7 +53,7 @@ var CanvasTools = (function() {
   }
 
   function convertGrayscaleByYUV(imageData) {
-    var data = imageData.data;    
+    var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       var brightness = data[i]*0.2126 + data[i+1]*0.7152 + data[i+2]*0.0722;
       // red
@@ -66,7 +66,7 @@ var CanvasTools = (function() {
   }
 
   function convertGrayscaleByHSL(imageData) {
-    var data = imageData.data;    
+    var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       var red = data[i];
       var green = data[i+1];
@@ -83,7 +83,7 @@ var CanvasTools = (function() {
   }
 
   function convertGrayscaleByHSV(imageData) {
-    var data = imageData.data;    
+    var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       var brightness = Math.max(data[i], data[i+1], data[i+2]);
       // red
@@ -96,7 +96,7 @@ var CanvasTools = (function() {
   }
 
   function convertGrayscaleByHSI(imageData) {
-    var data = imageData.data;    
+    var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       var brightness = (data[i] + data[i+1] + data[i+2]) / 3;
       // red
@@ -115,7 +115,7 @@ var CanvasTools = (function() {
   constant.CHANNEL_SINGLE = 'CHANNEL_SINGLE';
   constant.CHANNEL_GRAYSCALE = 'CHANNEL_GRAYSCALE';
 
-  function channel(image, channelType, presentType) {
+  function channel(image, channelFlag, presentFlag) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
     canvas.width = image.width;
@@ -124,15 +124,15 @@ var CanvasTools = (function() {
 
     var imageData = ctx.getImageData(0, 0, image.width, image.height);
 
-    switch (channelType) {
+    switch (channelFlag) {
       case constant.CHANNEL_RED:
-        splitChannel(imageData, 0, presentType);
+        splitChannel(imageData, 0, presentFlag);
         break;
       case constant.CHANNEL_GREEN:
-        splitChannel(imageData, 1, presentType);
+        splitChannel(imageData, 1, presentFlag);
         break;
       case constant.CHANNEL_BLUE:
-        splitChannel(imageData, 2, presentType);
+        splitChannel(imageData, 2, presentFlag);
         break;
       default:
         break;
@@ -141,12 +141,12 @@ var CanvasTools = (function() {
     return canvas;
   }
 
-  function splitChannel(imageData, channel, presentType) {
+  function splitChannel(imageData, channel, presentFlag) {
     var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       var brightness = data[i + channel];
 
-      if (constant.CHANNEL_SINGLE === presentType) {
+      if (constant.CHANNEL_SINGLE === presentFlag) {
         // red
         data[i] = channel === 0? brightness : 0;
         // green
@@ -168,7 +168,7 @@ var CanvasTools = (function() {
   constant.MERGE_MIN = 'MERGE_MIN';
   constant.MERGE_WEIGHT = 'MERGE_WEIGHT';
 
-  function merge(image1, image2, type, weight1, weight2) {
+  function merge(image1, image2, flag, weight1, weight2) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
     var width = Math.max(image1.width, image2.width);
@@ -184,7 +184,7 @@ var CanvasTools = (function() {
     ctx.drawImage(image2, 0, 0);
     var image2Data = ctx.getImageData(0, 0, width, height);
 
-    switch (type) {
+    switch (flag) {
       case constant.MERGE_REMAINDER:
         remainderMerge(image1Data, image2Data);
         break;
@@ -246,14 +246,15 @@ var CanvasTools = (function() {
   constant.PIXEL_RGB = 'PIXEL_RGB';
   constant.PIXEL_HSL = 'PIXEL_HSL';
 
-  function getPixelColor(canvas, x, y, type) {
+  function getPixelColor(canvas, x, y, flag) {
     var ctx = canvas.getContext('2d');
     var pixel = ctx.getImageData(x, y, 1, 1);
 
-    switch (type) {
+    switch (flag) {
       case constant.PIXEL_HSL:
         return convertPixelColorHSL(pixel.data);
       case constant.PIXEL_RGB:
+        return convertPixelColorRGB(pixel.data);
       default:
         return convertPixelColorRGB(pixel.data);
     }
@@ -288,7 +289,7 @@ var CanvasTools = (function() {
           h = (r - g) / d + 4;
           break;
       }
-      h /= 6
+      h /= 6;
     }
 
     return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
@@ -298,7 +299,7 @@ var CanvasTools = (function() {
   constant.FILTER_HSL_GREEN = 'FILTER_HSL_GREEN';
   constant.FILTER_HSL_BLUE = 'FILTER_HSL_BLUE';
 
-  function filterHSL(image, type) {
+  function filterHSL(image, flag) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
     canvas.width = image.width;
@@ -309,7 +310,7 @@ var CanvasTools = (function() {
     var hsvData = convertHSL(imageData.data);
     var mask;
 
-    switch (type) {
+    switch (flag) {
       case constant.FILTER_HSL_RED:
         mask = inRagne(hsvData, [-10, 30, 40], [10, 100, 60]);
         break;
@@ -343,7 +344,7 @@ var CanvasTools = (function() {
       for(var j = 0; j < step; j += 1) {
         var m;
         if (j === 0 && (lower[j] < 0 && upper[j] > 0)) {
-          m = (data[i+j] >= (lower[j] + 360) || data[i+j] <= upper[j]) ? 1 : 0;          
+          m = (data[i+j] >= (lower[j] + 360) || data[i+j] <= upper[j]) ? 1 : 0;
         } else {
           m = (data[i+j] >= lower[j] && data[i+j] <= upper[j]) ? 1 : 0;
         }
@@ -367,21 +368,21 @@ var CanvasTools = (function() {
     }
   }
 
-  function filterHSLTest(canvas, type, x, y) {
+  function filterHSLTest(canvas, flag, x, y) {
     var ctx = canvas.getContext('2d');
     var imageData = ctx.getImageData(x, y, 1, 1);
     var hsvData = convertHSL(imageData.data);
     var mask;
 
-    switch (type) {
+    switch (flag) {
       case constant.FILTER_HSL_RED:
         mask = inRagne(hsvData, [-30, 30, 20], [30, 100, 80]);
         break;
       case constant.FILTER_HSL_GREEN:
-        mask = inRagne(hsvData, [90, 30, 20], [150, 100, 80]);        
+        mask = inRagne(hsvData, [90, 30, 20], [150, 100, 80]);
         break;
       case constant.FILTER_HSL_BLUE:
-        mask = inRagne(hsvData, [210, 30, 20], [270, 100, 80]);      
+        mask = inRagne(hsvData, [210, 30, 20], [270, 100, 80]);
         break;
       default:
         break;
@@ -389,6 +390,89 @@ var CanvasTools = (function() {
     console.log(hsvData, mask, imageData.data);
     masking(imageData.data, mask);
     console.log(imageData.data);
+  }
+
+  constant.THRESHOLD_BINARY = 'THRESHOLD_BINARY';
+  constant.THRESHOLD_BINARY_INV = 'THRESHOLD_BINARY_INV';
+  constant.THRESHOLD_TRUNC = 'THRESHOLD_TRUNC';
+  constant.THRESHOLD_TOZERO = 'THRESHOLD_TOZERO';
+  constant.THRESHOLD_TOZERO_INV = 'THRESHOLD_TOZERO_INV';
+
+  function threshold(image, threshold_value, value, flag) {
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0);
+
+    var imageData = ctx.getImageData(0, 0, image.width, image.height);
+
+    switch (flag) {
+      case constant.THRESHOLD_BINARY:
+        binaryThreshold(imageData, threshold_value, value);
+        break;
+      case constant.THRESHOLD_BINARY_INV:
+        binaryInvThreshold(imageData, threshold_value, value);
+        break;
+      case constant.THRESHOLD_TRUNC:
+        truncThreshold(imageData, threshold_value);
+        break;
+      case constant.THRESHOLD_TOZERO:
+        tozeroThreshold(imageData, threshold_value);
+        break;
+      case constant.THRESHOLD_TOZERO_INV:
+        tozeroInvThreshold(imageData, threshold_value);
+        break;
+      default:
+        break;
+    }
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+  }
+
+  function binaryThreshold(imageData, threshold_value, value) {
+    var data = imageData.data;
+    for(var i = 0; i < data.length; i += 4) {
+      for(var j = 0; j < 3; j += 1) {
+        data[i+j] = data[i+j] >= threshold_value ? value : 0;
+      }
+    }
+  }
+
+  function binaryInvThreshold(imageData, threshold_value, value) {
+    var data = imageData.data;
+    for(var i = 0; i < data.length; i += 4) {
+      for(var j = 0; j < 3; j += 1) {
+        data[i+j] = data[i+j] >= threshold_value ? 0 : value;
+      }
+    }
+  }
+
+  function truncThreshold(imageData, threshold_value) {
+    var data = imageData.data;
+    for(var i = 0; i < data.length; i += 4) {
+      for(var j = 0; j < 3; j += 1) {
+        data[i+j] = data[i+j] >= threshold_value ? threshold_value : data[i+j];
+      }
+    }
+  }
+
+  function tozeroThreshold(imageData, threshold_value) {
+    var data = imageData.data;
+    for(var i = 0; i < data.length; i += 4) {
+      for(var j = 0; j < 3; j += 1) {
+          data[i+j] = data[i+j] >= threshold_value ? data[i+j] : 0;
+      }
+    }
+  }
+
+  function tozeroInvThreshold(imageData, threshold_value) {
+    var data = imageData.data;
+    for(var i = 0; i < data.length; i += 4) {
+      for(var j = 0; j < 3; j += 1) {
+        data[i+j] = data[i+j] >= threshold_value ? 0 : data[i+j];
+      }
+    }
   }
 
   return {
@@ -399,5 +483,6 @@ var CanvasTools = (function() {
     'getPixelColor': getPixelColor,
     'filterHSL': filterHSL,
     'filterHSLTest': filterHSLTest,
-  }
+    'threshold': threshold,
+  };
 })();
