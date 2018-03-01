@@ -110,5 +110,12 @@
     "url": "/pages/canvas/merge/index.html",
     "id": "canvas-merge",
     "isExternal": false
+  },
+  {
+    "category": "Canvas",
+    "name": "HSL",
+    "url": "/pages/canvas/hsl/index.html",
+    "id": "canvas-hsl",
+    "isExternal": false
   }
 ]
