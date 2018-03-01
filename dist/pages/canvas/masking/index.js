@@ -1,7 +1,7 @@
 window.addEventListener('load', function(){
   var loader = new Utils.ImageLoader();
   var image = loader.load('../../../textures/iu01.jpg', run);
-  var logo = loader.load('../../../textures/opencv.png');
+  var logo = loader.load('../../../textures/opencv.png', run);
   var radios = document.querySelectorAll('input[type=radio][name="image"]');
   var grayscaleFlag = 'GRAYSCALE_AVERAGE';
 
