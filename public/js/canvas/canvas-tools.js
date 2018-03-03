@@ -1,5 +1,7 @@
 var CanvasTools = (function() {
   var constant = {};
+  var offscreenCanvas = document.createElement('canvas');
+  var offscreenCtx = offscreenCanvas.getContext('2d');
 
   constant.GRAYSCALE_AVERAGE = 'GRAYSCALE_AVERAGE';
   constant.GRAYSCALE_YUV = 'GRAYSCALE_YUV';
@@ -398,7 +400,7 @@ var CanvasTools = (function() {
   constant.THRESHOLD_TOZERO = 'THRESHOLD_TOZERO';
   constant.THRESHOLD_TOZERO_INV = 'THRESHOLD_TOZERO_INV';
 
-  function threshold(image, threshold_value, value, flag) {
+  function threshold(image, thresholdValue, value, flag) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
     canvas.width = image.width;
@@ -409,19 +411,19 @@ var CanvasTools = (function() {
 
     switch (flag) {
       case constant.THRESHOLD_BINARY:
-        binaryThreshold(imageData, threshold_value, value);
+        binaryThreshold(imageData, thresholdValue, value);
         break;
       case constant.THRESHOLD_BINARY_INV:
-        binaryInvThreshold(imageData, threshold_value, value);
+        binaryInvThreshold(imageData, thresholdValue, value);
         break;
       case constant.THRESHOLD_TRUNC:
-        truncThreshold(imageData, threshold_value);
+        truncThreshold(imageData, thresholdValue);
         break;
       case constant.THRESHOLD_TOZERO:
-        tozeroThreshold(imageData, threshold_value);
+        tozeroThreshold(imageData, thresholdValue);
         break;
       case constant.THRESHOLD_TOZERO_INV:
-        tozeroInvThreshold(imageData, threshold_value);
+        tozeroInvThreshold(imageData, thresholdValue);
         break;
       default:
         break;
@@ -430,47 +432,47 @@ var CanvasTools = (function() {
     return canvas;
   }
 
-  function binaryThreshold(imageData, threshold_value, value) {
+  function binaryThreshold(imageData, thresholdValue, value) {
     var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       for(var j = 0; j < 3; j += 1) {
-        data[i+j] = data[i+j] >= threshold_value ? value : 0;
+        data[i+j] = data[i+j] >= thresholdValue ? value : 0;
       }
     }
   }
 
-  function binaryInvThreshold(imageData, threshold_value, value) {
+  function binaryInvThreshold(imageData, thresholdValue, value) {
     var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       for(var j = 0; j < 3; j += 1) {
-        data[i+j] = data[i+j] >= threshold_value ? 0 : value;
+        data[i+j] = data[i+j] >= thresholdValue ? 0 : value;
       }
     }
   }
 
-  function truncThreshold(imageData, threshold_value) {
+  function truncThreshold(imageData, thresholdValue) {
     var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       for(var j = 0; j < 3; j += 1) {
-        data[i+j] = data[i+j] >= threshold_value ? threshold_value : data[i+j];
+        data[i+j] = data[i+j] >= thresholdValue ? thresholdValue : data[i+j];
       }
     }
   }
 
-  function tozeroThreshold(imageData, threshold_value) {
+  function tozeroThreshold(imageData, thresholdValue) {
     var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       for(var j = 0; j < 3; j += 1) {
-          data[i+j] = data[i+j] >= threshold_value ? data[i+j] : 0;
+        data[i+j] = data[i+j] >= thresholdValue ? data[i+j] : 0;
       }
     }
   }
 
-  function tozeroInvThreshold(imageData, threshold_value) {
+  function tozeroInvThreshold(imageData, thresholdValue) {
     var data = imageData.data;
     for(var i = 0; i < data.length; i += 4) {
       for(var j = 0; j < 3; j += 1) {
-        data[i+j] = data[i+j] >= threshold_value ? 0 : data[i+j];
+        data[i+j] = data[i+j] >= thresholdValue ? 0 : data[i+j];
       }
     }
   }
@@ -517,6 +519,271 @@ var CanvasTools = (function() {
     }
   }
 
+  constant.ADAPTIVE_THRESH_MEAN_C = 'ADAPTIVE_THRESH_MEAN_C';
+  constant.ADAPTIVE_THRESH_GAUSSIAN_C = 'ADAPTIVE_THRESH_GAUSSIAN_C';
+
+  function adaptiveThresholding(image, value, adaptiveMethodFlag, flag, blocksize, C) {
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0);
+
+    var imageData = ctx.getImageData(0, 0, image.width, image.height);
+
+    if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_GAUSSIAN_C) {
+      return canvas;
+    }
+
+    switch (flag) {
+      case constant.THRESHOLD_BINARY:
+        imageData = binaryAdaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, value);
+        break;
+      case constant.THRESHOLD_BINARY_INV:
+        imageData = binaryInvAdaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, value);
+        break;
+      case constant.THRESHOLD_TRUNC:
+        imageData = truncAdaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C);
+        break;
+      case constant.THRESHOLD_TOZERO:
+        imageData = tozeroAdaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C);
+        break;
+      case constant.THRESHOLD_TOZERO_INV:
+        imageData = tozeroInvAdaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C);
+        break;
+      default:
+        break;
+    }
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+  }
+
+  function binaryAdaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, value) {
+    var clone = copyImageData(imageData);
+    var data = clone.data;
+    var w = imageData.width;
+    var h = imageData.height;
+
+    for (var x = 0; x < w; x++) {
+      for (var y = 0; y < h; y ++) {
+        // for(var channel = 0; channel < 3; channel += 1) {
+        //   var threshold = adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, channel);
+        //   var index = getPixelIndex(w, x, y, channel);
+        //   data[index] = data[index] >= threshold ? value : 0;
+        // }
+        var threshold = adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, 0);
+        var index = getPixelIndex(w, x, y, 0);
+        var d = data[index] >= threshold ? value : 0;
+        data[index] = d;
+        data[index+1] = d;
+        data[index+2] = d;
+      }
+    }
+    return clone;
+  }
+
+  function copyImageData(src) {
+      var dst = offscreenCtx.createImageData(src.width, src.height);
+      dst.data.set(src.data);
+      return dst;
+  }
+
+  function adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, channel) {
+    var threshold;
+    var data = imageData.data;
+    var w = imageData.width;
+    var h = imageData.height;
+    var sum = 0;
+    var cnt = 0;
+
+    var offset = Math.floor(blocksize * 0.5);
+    var start = -offset;
+    var end = blocksize - offset;
+
+    for (var i = start; i < end; i++) {
+      for (var j = start; j < end; j++) {
+        if (x + i < 0 ||
+            y + j < 0 ||
+            x + i > w ||
+            y + j > h) {
+          continue;
+        }
+        var index = getPixelIndex(w, x + i, y + j, channel);          
+        cnt++
+        
+        if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_MEAN_C) {
+          sum += data[index];
+        } else if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_GAUSSIAN_C) {
+        }
+      }
+    }
+
+    if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_MEAN_C) {
+      threshold = sum / cnt - C;
+    } else if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_GAUSSIAN_C) {
+    }
+    
+    return threshold;
+  }
+
+  function getPixelIndex(width, x, y, channel) {
+    return (y * width + x) * 4 + channel;
+  }
+
+  function binaryInvAdaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, value) {
+    var clone = copyImageData(imageData);
+    var data = clone.data;
+    var w = imageData.width;
+    var h = imageData.height;
+
+    for (var x = 0; x < w; x++) {
+      for (var y = 0; y < h; y ++) {
+        // for(var channel = 0; channel < 3; channel += 1) {
+        //   var threshold = adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, channel);
+        //   var index = getPixelIndex(w, x, y, channel);
+        //   data[index] = data[index] >= threshold ? 0 : value;
+        // }
+        var threshold = adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, 0);
+        var index = getPixelIndex(w, x, y, 0);
+        var d = data[index] >= threshold ? 0 : value;
+        data[index] = d;
+        data[index+1] = d;
+        data[index+2] = d;
+      }
+    }
+    return clone;
+  }
+
+  function truncAdaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C) {
+    var clone = copyImageData(imageData);
+    var data = clone.data;
+    var w = imageData.width;
+    var h = imageData.height;
+
+    for (var x = 0; x < w; x++) {
+      for (var y = 0; y < h; y ++) {
+        // for(var channel = 0; channel < 3; channel += 1) {
+        //   var threshold = adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, channel);
+        //   var index = getPixelIndex(w, x, y, channel);
+        //   data[index] = data[index] >= threshold ? threshold : data[index];
+        // }
+        var threshold = adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, 0);
+        var index = getPixelIndex(w, x, y, 0);
+        var d = data[index] >= threshold ? threshold : data[index];
+        data[index] = d;
+        data[index+1] = d;
+        data[index+2] = d;
+      }
+    }
+    return clone;
+  }
+
+  function tozeroAdaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C) {
+    var clone = copyImageData(imageData);
+    var data = clone.data;
+    var w = imageData.width;
+    var h = imageData.height;
+
+    for (var x = 0; x < w; x++) {
+      for (var y = 0; y < h; y ++) {
+        // for(var channel = 0; channel < 3; channel += 1) {
+        //   var threshold = adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, channel);
+        //   var index = getPixelIndex(w, x, y, channel);
+        //   data[index] = data[index] >= threshold ? data[index] : 0;
+        // }
+        var threshold = adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, 0);
+        var index = getPixelIndex(w, x, y, 0);
+        var d = data[index] >= threshold ? data[index] : 0;
+        data[index] = d;
+        data[index+1] = d;
+        data[index+2] = d;
+      }
+    }
+    return clone;
+  }
+
+  function tozeroInvAdaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C) {
+    var clone = copyImageData(imageData);
+    var data = clone.data;
+    var w = imageData.width;
+    var h = imageData.height;
+
+    for (var x = 0; x < w; x++) {
+      for (var y = 0; y < h; y ++) {
+        // for(var channel = 0; channel < 3; channel += 1) {
+        //   var threshold = adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, channel);
+        //   var index = getPixelIndex(w, x, y, channel);
+        //   data[index] = data[index] >= threshold ? 0 : data[index];
+        // }
+        var threshold = adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, 0);
+        var index = getPixelIndex(w, x, y, 0);
+        var d = data[index] >= threshold ? 0 : data[index];
+        data[index] = d;
+        data[index+1] = d;
+        data[index+2] = d;
+      }
+    }
+    return clone;
+  }
+
+  function adaptiveThresholdingTest(image, value, blocksize, C, x, y) {
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0);
+
+    var imageData = ctx.getImageData(0, 0, image.width, image.height);
+    binaryAdaptiveThresholdTest(imageData, value, blocksize, C, x, y);
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+  }
+
+  function binaryAdaptiveThresholdTest(imageData, value, blocksize, C, x, y) {
+    // var clone = copyImageData(imageData);
+    // var data = clone.data;
+    var data = imageData.data;
+    var w = imageData.width;
+    var h = imageData.height;
+
+    for(var j = 0; j < 3; j += 1) {
+      var threshold = adaptiveThresholdTest(imageData, value, blocksize, C, x, y, j);
+      var index = getPixelIndex(w, x, y, j); 
+      data[index] = data[index] >= threshold ? value : 0;      
+    }
+    // return clone;
+  }
+
+  function adaptiveThresholdTest(imageData, blocksize, C, x, y, channel) {
+    var threshold;
+    var data = imageData.data;
+    var w = imageData.width;
+    var h = imageData.height;
+    var sum = 0;
+    var cnt = 0;
+
+    var offset = Math.floor(blocksize * 0.5);
+    var start = -offset;
+    var end = blocksize - offset;
+
+    for (var i = start; i < end; i++) {
+      for (var j = start; j < end; j++) {
+        if (x + i < 0 ||
+            y + j < 0 ||
+            x + i > w ||
+            y + j > h) {
+          continue;
+        }
+        var index = getPixelIndex(w, x + i, y + j, channel);          
+        cnt ++
+        sum += data[index];
+        // data[index] = 0;
+      }
+    }
+    threshold = sum / cnt - C;
+    return threshold;
+  }
+
   return {
     'constant': constant,
     'grayscale': grayscale,
@@ -528,5 +795,7 @@ var CanvasTools = (function() {
     'threshold': threshold,
     'mask': mask,
     'masking': masking,
+    'adaptiveThresholding': adaptiveThresholding,
+    'adaptiveThresholdingTest': adaptiveThresholdingTest,
   };
 })();

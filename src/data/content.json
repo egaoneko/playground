@@ -70,6 +70,13 @@
     "isExternal": false
   },
   {
+    "category": "Canvas",
+    "name": "Adaptive Thresholding",
+    "url": "/pages/canvas/adaptive-thresholding/index.html",
+    "id": "canvas-adaptive-thresholding",
+    "isExternal": false
+  },
+  {
     "category": "Mapbox",
     "name": "quick-start",
     "url": "/pages/mapbox/quick-start/index.html",
