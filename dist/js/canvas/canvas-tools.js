@@ -2,6 +2,7 @@ var CanvasTools = (function() {
   var constant = {};
   var offscreenCanvas = document.createElement('canvas');
   var offscreenCtx = offscreenCanvas.getContext('2d');
+  var gaussianCache;
 
   constant.GRAYSCALE_AVERAGE = 'GRAYSCALE_AVERAGE';
   constant.GRAYSCALE_YUV = 'GRAYSCALE_YUV';
@@ -522,7 +523,7 @@ var CanvasTools = (function() {
   constant.ADAPTIVE_THRESH_MEAN_C = 'ADAPTIVE_THRESH_MEAN_C';
   constant.ADAPTIVE_THRESH_GAUSSIAN_C = 'ADAPTIVE_THRESH_GAUSSIAN_C';
 
-  function adaptiveThresholding(image, value, adaptiveMethodFlag, flag, blocksize, C) {
+  function adaptiveThresholding(image, value, adaptiveMethodFlag, flag, blocksize, C, radius) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
     canvas.width = image.width;
@@ -532,7 +533,16 @@ var CanvasTools = (function() {
     var imageData = ctx.getImageData(0, 0, image.width, image.height);
 
     if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_GAUSSIAN_C) {
-      return canvas;
+      if (!window.StackBlur) {
+        return canvas;
+      }
+
+      var cloneImageData = copyImageData(imageData);
+      gaussianCache = window.StackBlur.imageDataRGB(cloneImageData, 0, 0, cloneImageData.width, cloneImageData.height, radius);
+    }
+
+    if (blocksize % 2 === 0) {
+      blocksize++;
     }
 
     switch (flag) {
@@ -555,6 +565,7 @@ var CanvasTools = (function() {
         break;
     }
     ctx.putImageData(imageData, 0, 0);
+    gaussianCache = null;
     return canvas;
   }
 
@@ -589,7 +600,14 @@ var CanvasTools = (function() {
   }
 
   function adaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, channel) {
-    var threshold;
+    if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_MEAN_C) {
+      return getMeanThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, channel);
+    } else if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_GAUSSIAN_C) {
+      return getGaussianThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, channel);
+    }
+  }
+
+  function getMeanThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, channel) {
     var data = imageData.data;
     var w = imageData.width;
     var h = imageData.height;
@@ -608,26 +626,22 @@ var CanvasTools = (function() {
             y + j > h) {
           continue;
         }
-        var index = getPixelIndex(w, x + i, y + j, channel);          
-        cnt++
-        
-        if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_MEAN_C) {
-          sum += data[index];
-        } else if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_GAUSSIAN_C) {
-        }
+        var index = getPixelIndex(w, x + i, y + j, channel);
+        cnt++;
+        sum += data[index];
       }
     }
-
-    if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_MEAN_C) {
-      threshold = sum / cnt - C;
-    } else if (adaptiveMethodFlag === constant.ADAPTIVE_THRESH_GAUSSIAN_C) {
-    }
     
-    return threshold;
+    return sum / cnt - C;
   }
 
   function getPixelIndex(width, x, y, channel) {
     return (y * width + x) * 4 + channel;
+  }
+
+  function getGaussianThreshold(imageData, adaptiveMethodFlag, blocksize, C, x, y, channel) {
+    var index = getPixelIndex(imageData.width, x, y, channel);
+    return gaussianCache.data[index];
   }
 
   function binaryInvAdaptiveThreshold(imageData, adaptiveMethodFlag, blocksize, C, value) {

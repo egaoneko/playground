@@ -68,10 +68,16 @@ window.addEventListener('load', function(){
     gaussianCanvas.width = width;
     gaussianCanvas.height = height;
 
+    var radiusElement = document.querySelector('#radius');
+    radiusElement.addEventListener('input', function(e) {
+      var value = parseInt(e.target.value, 10) ;
+      gaussianCtx.drawImage(CanvasTools.adaptiveThresholding(grayScaleImage, 255, CanvasTools.constant.ADAPTIVE_THRESH_GAUSSIAN_C, CanvasTools.constant[thresholdFlag], 11, 2, value), 0, 0, width, height);
+    });
+
     var grayScaleImage = CanvasTools.grayscale(image, CanvasTools.constant[grayscaleFlag]);
     originalCtx.drawImage(grayScaleImage, 0, 0, width, height);
     binaryCtx.drawImage(CanvasTools.threshold(grayScaleImage, 127, 255, CanvasTools.constant[thresholdFlag]), 0, 0, width, height);
     meanCtx.drawImage(CanvasTools.adaptiveThresholding(grayScaleImage, 255, CanvasTools.constant.ADAPTIVE_THRESH_MEAN_C, CanvasTools.constant[thresholdFlag], 11, 2), 0, 0, width, height);
-    gaussianCtx.drawImage(CanvasTools.adaptiveThresholding(grayScaleImage, 255, CanvasTools.constant.ADAPTIVE_THRESH_GAUSSIAN_C, CanvasTools.constant[thresholdFlag], 11, 2), 0, 0, width, height);
+    gaussianCtx.drawImage(CanvasTools.adaptiveThresholding(grayScaleImage, 255, CanvasTools.constant.ADAPTIVE_THRESH_GAUSSIAN_C, CanvasTools.constant[thresholdFlag], 11, 2, 1), 0, 0, width, height);
   }
 });
