@@ -84,6 +84,27 @@
     "isExternal": false
   },
   {
+    "category": "Mapbox",
+    "name": "Tutorial / Choropleth",
+    "url": "/pages/mapbox/choropleth/index.html",
+    "id": "mapbox-tutorial-choropleth",
+    "isExternal": false
+  },
+  {
+    "category": "Mapbox",
+    "name": "Tutorial / Points",
+    "url": "/pages/mapbox/points/index.html",
+    "id": "mapbox-tutorial-points",
+    "isExternal": false
+  },
+  {
+    "category": "Naver Map",
+    "name": "Tutorial / Hello World",
+    "url": "/pages/naver-map/tutorial/hello-world/index.html",
+    "id": "naver-map-tutorial-hello-world",
+    "isExternal": false
+  },
+  {
     "category": "WebGL",
     "name": "Draw01",
     "url": "/pages/webgl/draws/draw01/index.html",
