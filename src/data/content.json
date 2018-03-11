@@ -166,5 +166,12 @@
     "url": "https://egaoneko.github.io/angular-tour-of-heroes",
     "id": "angular-tour-of-heroes",
     "isExternal": true
+  },
+  {
+    "category": "CSS",
+    "name": "Image Cursor",
+    "url": "/pages/css/image-cursor/index.html",
+    "id": "css-image-cursor",
+    "isExternal": false
   }
 ]
