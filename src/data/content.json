@@ -173,5 +173,40 @@
     "url": "/pages/css/image-cursor/index.html",
     "id": "css-image-cursor",
     "isExternal": false
+  },
+  {
+    "category": "CodeSpitz",
+    "name": "72-1.1",
+    "url": "/pages/codespitz/72-1.1/index.html",
+    "id": "codespitz-72-1.1",
+    "isExternal": false
+  },
+  {
+    "category": "CodeSpitz",
+    "name": "72-1.2",
+    "url": "/pages/codespitz/72-1.2/index.html",
+    "id": "codespitz-72-1.2",
+    "isExternal": false
+  },
+  {
+    "category": "CodeSpitz",
+    "name": "72-1.3",
+    "url": "/pages/codespitz/72-1.3/index.html",
+    "id": "codespitz-72-1.3",
+    "isExternal": false
+  },
+  {
+    "category": "CodeSpitz",
+    "name": "72-1.4",
+    "url": "/pages/codespitz/72-1.4/index.html",
+    "id": "codespitz-72-1.4",
+    "isExternal": false
+  },
+  {
+    "category": "CodeSpitz",
+    "name": "72-1.5",
+    "url": "/pages/codespitz/72-1.5/index.html",
+    "id": "codespitz-72-1.5",
+    "isExternal": false
   }
 ]
