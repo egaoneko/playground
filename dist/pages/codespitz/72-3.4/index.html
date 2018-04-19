@@ -18,12 +18,33 @@
       overflow: hidden;
     }
   </style>
-  <style id="s"> .test{background:#ff0} </style>
+  <style></style>
 </head>
 
 <body>
   <h1>Show console</h1>
+  <div class="test">test</div>
+  <div id="test"></div>
   <script src="./index.js"></script>
+  <script>
+    const css = new CSS(document.styleSheets[1]);
+    const bodyRule = css.add('body');
+    bodyRule.background = '#f00';
+    css.add('.test').cssText = `width:200px;border:1px solid #fff;
+      color:#fff;line-height:40px;text-align:center`;
+    const test = css.get('.test')[0];
+    test.background = 'rgba(255, 255, 255, 0.5)';
+    css.add('.test2')
+    css.log();
+    css.remove('.test2');
+    css.log();
+  </script>
+  <script>
+    // const test2 = new Style(document.getElementById('test').style);
+    // test2.set('cssText', 'width:300px;background:blue;height:20px');
+    // const rule = new Rule(document.getElementById('test'));
+    // rule.cssText = 'width:200px;background:blue;height:50px';
+  </script>
 </body>
 
 </html>
