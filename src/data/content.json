@@ -474,5 +474,33 @@
     "url": "/pages/codespitz/72-3.5/index.html",
     "id": "codespitz-72-3.5",
     "isExternal": false
+  },
+  {
+    "category": "CodeSpitz",
+    "name": "72-4.1",
+    "url": "/pages/codespitz/72-4.1/index.html",
+    "id": "codespitz-72-4.1",
+    "isExternal": false
+  },
+  {
+    "category": "CodeSpitz",
+    "name": "72-4.2",
+    "url": "/pages/codespitz/72-4.2/index.html",
+    "id": "codespitz-72-4.2",
+    "isExternal": false
+  },
+  {
+    "category": "CodeSpitz",
+    "name": "72-4.3",
+    "url": "/pages/codespitz/72-4.3/index.html",
+    "id": "codespitz-72-4.3",
+    "isExternal": false
+  },
+  {
+    "category": "CodeSpitz",
+    "name": "72-4.4",
+    "url": "/pages/codespitz/72-4.4/index.html",
+    "id": "codespitz-72-4.4",
+    "isExternal": false
   }
 ]
