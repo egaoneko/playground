@@ -35,7 +35,7 @@ window.addEventListener('load', function(){
     "https://dummyimage.com/600x400/075247DAAB1C"
   ];
   preloadImageBox.style.backgroundImage = getBackgroundImage(imageSet2[preloadImageBoxIndex]);
-  preloadImages(imageSet2);
+  // preloadImages(imageSet2);
 
   addClickEvent('preload-image-box-prev-btn', function(){
     if(preloadImageBoxIndex < 1) {
