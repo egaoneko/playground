@@ -17,18 +17,44 @@ var styleFunction = function(feature) {
     ];
 
     var step = getCoordinateStepFromPixel(map, 10);
+    var prev = 0;
+    var extent = map.getView().calculateExtent(map.getSize());
 
+    var segment = 0;
+    var arrows = 0;
     geometry.forEachSegment(function(start, end) {
+        segment++;
+
         var dx = end[0] - start[0];
         var dy = end[1] - start[1];
         var rotation = Math.atan2(dy, dx);
         // arrows
 
-        var fracStep = step / Math.sqrt((dx*dx) + (dy*dy));
+        var distance = Math.sqrt((dx*dx) + (dy*dy));
+        var fracStep = step / distance;
+        var prevFrac = prev / distance;
+        var point;
 
-        for(var frac = 0; frac <= 1; frac += fracStep) {
+        styles.push(new ol.style.Style({
+            geometry: new ol.geom.Point(end),
+            image: new ol.style.Circle({
+                radius: 3,
+                fill: new ol.style.Fill({
+                    color: '#0ff000'
+                })
+            })
+        }));
+
+        for(var frac = prevFrac; frac <= 1; frac += fracStep) {
+            point = interpolate(start, end, frac);
+            
+            if (!ol.extent.containsCoordinate(extent, point)) {
+                continue;
+            }
+            arrows++;            
+
             styles.push(new ol.style.Style({
-                geometry: new ol.geom.Point(interpolate(start, end, frac)),
+                geometry: new ol.geom.Point(point),
                 image: new ol.style.Icon({
                     src: 'arrow2.png',
                     anchor: [0.75, 0.5],
@@ -37,7 +63,22 @@ var styleFunction = function(feature) {
                 })
             }));
         }
+
+        if (point) {
+            var lastDx = end[0] - point[0];
+            var lastDy = end[1] - point[1];
+            var lastDistance = Math.sqrt((lastDx*lastDx) + (lastDy*lastDy));
+
+            if (lastDistance > 0) {
+                prev = step - lastDistance;
+            } else {
+                prev = 0;
+            }
+        } else {
+            prev += distance - step;
+        }
     });
+    console.log(segment, arrows);
 
     // geometry.forEachSegment(function(start, end) {
     //     var dx = end[0] - start[0];
