@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-62717870-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-62717870-1');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
+    <link rel="stylesheet" href="./resources/layout.css" type="text/css">
+    
+    <link rel="stylesheet" href="lazy-load-image-io.css">
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+    <title>Lazy load image with IntersectionObserver</title>
+  </head>
+  <body>
+
+    <header class="navbar" role="navigation">
+      <div class="container">
+        <div class="display-table pull-left" id="navbar-logo-container">
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground Examples</a>
+        </div>
+        <!-- menu items that get hidden below 768px width -->
+        <nav class='collapse navbar-collapse navbar-responsive-collapse'>
+          <ul class="nav navbar-nav pull-right">
+            <li><a class="active" href="index.html">Examples</a></li>
+            <li><a href="../apidoc">API</a></li>
+            <li><a href="https://github.com/egaoneko/playground">Code</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container-fluid">
+
+      <div id="latest-check" class="alert alert-warning alert-dismissible" role="alert" style="display:none">
+        <button id="latest-dismiss" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        This example uses Playground v<span>0.0.1</span>. The <a id="latest-link" href="#" class="alert-link">latest</a> is v<span id="latest-version"></span>.
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <h4 id="title">Lazy load image with IntersectionObserver</h4>
+          <div id="container" class="main">
+  <div class="scroll-box" id="scroll-box">
+    <div class="scroll-inner-box" id="image-box">
+    </div>
+  </div>
+</div>
+
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <p id="shortdesc">Lazily load images with IntersectionObserver.</p>
+          <div id="docs"><p>This page&#39;s try to lazily load images with <a href="https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API"><code>IntersectionObserver</code></a>. It is supported limited browsers, but its <a href="https://github.com/w3c/IntersectionObserver/tree/master/polyfill">polyfill</a> exist.</p>
+</div>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div id="source-controls">
+          <a id="copy-button" data-clipboard-target="#example-source"><i class="fa fa-clipboard"></i> Copy</a>
+          <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
+        </div>
+        <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
+          <textarea class="hidden" name="title">Lazy load image with IntersectionObserver</textarea>
+          <textarea class="hidden" name="description">Lazily load images with IntersectionObserver.</textarea>
+          <textarea class="hidden" name="js">import {getRandomDummyImages} from &quot;../src/pg/utils/image&quot;;
+
+var scrollBox &#x3D; document.getElementById(&#x27;scroll-box&#x27;);
+var imageBox &#x3D; document.getElementById(&#x27;image-box&#x27;);
+var imageSet &#x3D; getRandomDummyImages(200, 100, 300);
+var io &#x3D; new IntersectionObserver(function (entries, observer) {
+  entries.forEach(function (entry) {
+    if (!entry.isIntersecting) {
+      return;
+    }
+
+    var target &#x3D; entry.target;
+
+    loadImage(target);
+    observer.unobserve(target);
+  });
+});
+
+loadImagesBlock(imageSet);
+scrollBox.scrollTop &#x3D; 1000;
+scrollBox.scrollLeft &#x3D; 1500;
+
+var lazyLoadImageSet &#x3D; Array.from(document.querySelectorAll(&#x27;.image-block &gt; img&#x27;));
+
+lazyLoadImageSet.forEach(function (el) {
+  io.observe(el);
+});
+
+function loadImagesBlock(images) {
+  var frag &#x3D; document.createDocumentFragment();
+  images.forEach(function (src) {
+    frag.appendChild(getImages(src));
+  });
+  imageBox.appendChild(frag);
+}
+
+function loadImage(image) {
+  image.src &#x3D; image.getAttribute(&#x27;data-src&#x27;);
+}
+
+function getImages(src) {
+  var image &#x3D; new Image();
+  image.setAttribute(&#x27;data-src&#x27;, src);
+
+  var div &#x3D; document.createElement(&#x27;div&#x27;);
+  div.className &#x3D; &#x27;image-block&#x27;;
+  div.appendChild(image);
+  return div;
+}
+</textarea>
+          <textarea class="hidden" name="css">.scroll-box {
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+}
+
+.scroll-inner-box {
+  width: 3000px;
+  height: 2000px;
+}
+
+.image-block {
+  width: 200px;
+  height: 100px;
+  display: inline-block;
+}
+
+.image-block &gt; img {
+  width: 200px;
+  height: 100px;
+}
+</textarea>
+          <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+  &lt;div class&#x3D;&quot;scroll-box&quot; id&#x3D;&quot;scroll-box&quot;&gt;
+    &lt;div class&#x3D;&quot;scroll-inner-box&quot; id&#x3D;&quot;image-box&quot;&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</textarea>
+          <input type="hidden" name="data">
+        </form>
+        <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Lazy load image with IntersectionObserver&lt;/title&gt;
+    &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
+    &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
+    &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"&gt;&lt;/script&gt;
+
+    &lt;style&gt;
+      .scroll-box {
+        width: 100%;
+        height: 100%;
+        overflow: scroll;
+      }
+
+      .scroll-inner-box {
+        width: 3000px;
+        height: 2000px;
+      }
+
+      .image-block {
+        width: 200px;
+        height: 100px;
+        display: inline-block;
+      }
+
+      .image-block &gt; img {
+        width: 200px;
+        height: 100px;
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+      &lt;div class&#x3D;&quot;scroll-box&quot; id&#x3D;&quot;scroll-box&quot;&gt;
+        &lt;div class&#x3D;&quot;scroll-inner-box&quot; id&#x3D;&quot;image-box&quot;&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+      import {getRandomDummyImages} from &quot;../src/pg/utils/image&quot;;
+
+      var scrollBox &#x3D; document.getElementById(&#x27;scroll-box&#x27;);
+      var imageBox &#x3D; document.getElementById(&#x27;image-box&#x27;);
+      var imageSet &#x3D; getRandomDummyImages(200, 100, 300);
+      var io &#x3D; new IntersectionObserver(function (entries, observer) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          var target &#x3D; entry.target;
+
+          loadImage(target);
+          observer.unobserve(target);
+        });
+      });
+
+      loadImagesBlock(imageSet);
+      scrollBox.scrollTop &#x3D; 1000;
+      scrollBox.scrollLeft &#x3D; 1500;
+
+      var lazyLoadImageSet &#x3D; Array.from(document.querySelectorAll(&#x27;.image-block &gt; img&#x27;));
+
+      lazyLoadImageSet.forEach(function (el) {
+        io.observe(el);
+      });
+
+      function loadImagesBlock(images) {
+        var frag &#x3D; document.createDocumentFragment();
+        images.forEach(function (src) {
+          frag.appendChild(getImages(src));
+        });
+        imageBox.appendChild(frag);
+      }
+
+      function loadImage(image) {
+        image.src &#x3D; image.getAttribute(&#x27;data-src&#x27;);
+      }
+
+      function getImages(src) {
+        var image &#x3D; new Image();
+        image.setAttribute(&#x27;data-src&#x27;, src);
+
+        var div &#x3D; document.createElement(&#x27;div&#x27;);
+        div.className &#x3D; &#x27;image-block&#x27;;
+        div.appendChild(image);
+        return div;
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      </div>
+    </div>
+
+    <script src="./resources/common.js"></script>
+    <script src="./resources/prism/prism.min.js"></script>
+    <script src="common.js"></script><script src="lazy-load-image-io.js"></script>
+  </body>
+  <script>
+  var packageUrl = 'https://raw.githubusercontent.com/openlayers/openlayers.github.io/build/package.json';
+  fetch(packageUrl).then(function(response) {
+    return response.json();
+  }).then(function(json) {
+    var latestVersion = json.version;
+    document.getElementById('latest-version').innerHTML = latestVersion;
+    var url = window.location.href;
+    var branchSearch = url.match(/\/([^\/]*)\/examples\//);
+    var cookieText = 'dismissed=-' + latestVersion + '-';
+    var dismissed = document.cookie.indexOf(cookieText) != -1;
+    if (branchSearch && !dismissed && /^v[0-9\.]*$/.test(branchSearch[1]) && '0.0.1' != latestVersion) {
+      var link = url.replace(branchSearch[0], '/latest/examples/');
+      fetch(link, {method: 'head'}).then(function(response) {
+        var a = document.getElementById('latest-link');
+        a.href = response.status == 200 ? link : '../../latest/examples/';
+      });
+      var latestCheck = document.getElementById('latest-check');
+      latestCheck.style.display = '';
+      document.getElementById('latest-dismiss').onclick = function() {
+        latestCheck.style.display = 'none';
+        document.cookie = cookieText;
+      }
+    }
+  });
+  </script>
+</html>
