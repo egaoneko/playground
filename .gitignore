@@ -1,11 +1,6 @@
-node_modules
-temp
-.tmp
-.idea
-.sass-cache
-app/bower_components
-test/bower_components
-package
-npm-debug.log
+/build/
 /coverage/
-*.iml
+/dist/
+node_modules/
+.idea/
+package-lock.json

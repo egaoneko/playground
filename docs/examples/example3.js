@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[3],[function(o,n,s){"use strict";n.a="HelloWorld"},,,function(o,n,s){"use strict";s.r(n);var c=s(0);console.log(c.a)}],[[3,0]]]);
+//# sourceMappingURL=example3.js.map

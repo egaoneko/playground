@@ -1,0 +1,1 @@
+{"version":3,"file":"HelloWorld.js","sources":["../../../src/pg/common/HelloWorld.js"],"sourcesContent":["/**\n * @module pg/common/HelloWorld\n */\n\nconst HelloWorld = 'HelloWorld';\n\nexport default HelloWorld;\n\n"],"names":["const"],"mappings":"AAAA;;;;AAIAA,GAAK,CAAC,UAAU,GAAG,YAAY,CAAC;;AAEhC,eAAe,UAAU,CAAC;;"}

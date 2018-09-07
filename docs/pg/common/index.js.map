@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sources":["../../../src/pg/common/index.js"],"sourcesContent":["/**\n * @module pg/common\n */\n\nexport {default as HelloWorld} from './HelloWorld';\n\n"],"names":[],"mappings":"AAAA;;;;AAIA,QAAQ,OAAO,IAAI,UAAU,OAAO,cAAc,CAAC;;"}

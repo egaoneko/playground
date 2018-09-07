@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sources":["../../src/pg/index.js"],"sourcesContent":["/**\n * @module pg\n */\n\nimport * as common from './common';\n\nexport {\n  common,\n}\n\nexport {getUid, VERSION} from './util.js';\n"],"names":[],"mappings":"AAAA;;;;AAIA,OAAO,KAAK,MAAM,MAAM,UAAU,CAAC;;AAEnC;EACE,MAAM;CACP;;AAED,QAAQ,MAAM,EAAE,OAAO,OAAO,WAAW,CAAC;"}

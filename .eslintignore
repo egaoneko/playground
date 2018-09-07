@@ -1,0 +1,8 @@
+test/index_test.js
+test/karma.config.js
+test/module-global.js
+test/test-extensions.js
+examples/webpack/
+examples/Jugl.js
+examples/resources/
+build/package/**/*webgl*

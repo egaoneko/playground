@@ -1,0 +1,22 @@
+{
+  "name": "playground",
+  "version": "0.0.1",
+  "description": "Playground",
+  "keywords": [
+    "playground"
+  ],
+  "homepage": "http://www.3daysofprogramming.com/playground",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/egaoneko/playground.git"
+  },
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/egaoneko/playground/issues"
+  },
+  "dependencies": {},
+  "sideEffects": [
+    "example.css"
+  ]
+}
