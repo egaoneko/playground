@@ -188,7 +188,7 @@ ExampleBuilder.prototype.render = async function(dir, chunk) {
     for (let i = 0, ii = data.resources.length; i < ii; ++i) {
       const resource = data.resources[i];
       const remoteResource = resource.indexOf('//') === -1 ?
-        `https://openlayers.org/en/v${pkg.version}/examples/${resource}` : resource;
+        `http://www.3daysofprogramming.com/playground/examples/${resource}` : resource;
       codePenResources[i] = remoteResource;
       if (isJsRegEx.test(resource)) {
         resources[i] = `<script src="${resource}"></script>`;

@@ -20,7 +20,10 @@
     "copy-css": "cp src/pg/pg.css build/pg/pg.css",
     "transpile": "rm -rf build/pg && mkdir -p build && buble --input src/pg --output build/pg --no modules --sourcemap",
     "typecheck": "tsc --pretty",
-    "apidoc": "jsdoc config/jsdoc/api/index.md -c config/jsdoc/api/conf.json -P package.json -d build/apidoc"
+    "apidoc": "jsdoc config/jsdoc/api/index.md -c config/jsdoc/api/conf.json -P package.json -d build/apidoc",
+    "predocs": "rm -rf docs",
+    "docs": "npm run build-legacy && npm run build-examples && npm run apidoc",
+    "postdocs": "mv build docs & cp index.html docs/index.html"
   },
   "main": "index.js",
   "repository": {
