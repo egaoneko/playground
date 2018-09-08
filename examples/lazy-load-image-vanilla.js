@@ -27,8 +27,8 @@ function loadImages(images) {
   const scrollRect = {
     top: scrollBox.scrollTop - offsetHeight,
     left: scrollBox.scrollLeft - offsetWidth,
-    right: scrollBox.scrollLeft + scrollBox.offsetWidth + offsetWidth,
-    bottom: scrollBox.scrollTop + scrollBox.offsetHeight + offsetHeight
+    right: scrollBox.scrollLeft + scrollBox.offsetWidth + offsetWidth * 2,
+    bottom: scrollBox.scrollTop + scrollBox.offsetHeight + offsetHeight * 2
   };
 
   images.slice().forEach(function (image) {
