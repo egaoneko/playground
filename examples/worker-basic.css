@@ -1,0 +1,19 @@
+.time-box {
+  margin: 20px 0px;
+  border: 1px solid #c8c8c8;
+  text-align: center;
+  width: 100%;
+  font-size: 28px;
+}
+
+.btn-box {
+  display: inline-block;
+}
+
+.sleep-btn {
+  font-size: 28px;
+}
+
+.log-area {
+  width: 100%;
+}

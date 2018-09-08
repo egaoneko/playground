@@ -1,0 +1,12 @@
+.content-box {
+  display: inline-block;
+}
+
+.btn {
+  font-size: 18px;
+}
+
+.image-box {
+  width: 400px;
+  height: 200px;
+}

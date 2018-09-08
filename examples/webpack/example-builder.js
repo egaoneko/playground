@@ -187,8 +187,13 @@ ExampleBuilder.prototype.render = async function(dir, chunk) {
     const codePenResources = [];
     for (let i = 0, ii = data.resources.length; i < ii; ++i) {
       const resource = data.resources[i];
-      const remoteResource = resource.indexOf('//') === -1 ?
+      let remoteResource = resource.indexOf('//') === -1 ?
         `http://www.3daysofprogramming.com/playground/examples/${resource}` : resource;
+      if (data.cloak) {
+        for (const entry of data.cloak) {
+          remoteResource = remoteResource.replace(new RegExp(entry.key, 'g'), entry.value);
+        }
+      }
       codePenResources[i] = remoteResource;
       if (isJsRegEx.test(resource)) {
         resources[i] = `<script src="${resource}"></script>`;

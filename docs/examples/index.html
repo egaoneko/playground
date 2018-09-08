@@ -26,6 +26,10 @@
         font-size: smaller;
         margin: 5px 0;
       }
+      .example p.tags {
+        font-size: smaller;
+        margin: 5px 0;
+      }
       .example:hover {
         background-color: #ddd;
       }
@@ -212,6 +216,10 @@
                 <small jugl:content="'(' + example.example + ')'"></small>
               </span>
               <p class="description" jugl:content="example.shortdesc"></p>
+              <p class="tags">
+                <span>Tags: </span>
+                <span jugl:content="example.tags"></span>
+              </p>
             </a>
           </div>
         </div>

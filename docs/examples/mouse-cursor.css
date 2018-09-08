@@ -10,7 +10,7 @@
   height: 300px;
   background: red;
   border-radius: 400px;
-  cursor: url(data/dot.png) 10 10, auto;
+  cursor: url(data/img/dot.png) 10 10, auto;
 }
 
 .element-svg {
@@ -21,7 +21,7 @@
   height: 300px;
   background: red;
   border-radius: 400px;
-  cursor: url(data/dot.png) 10 10, auto;
+  cursor: url(data/img/dot.png) 10 10, auto;
 }
 
 .element-svg-base64 {
