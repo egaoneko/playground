@@ -15,13 +15,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
     <link rel="stylesheet" href="./resources/layout.css" type="text/css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/96/three.min.js"></script>
-<script src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js"></script>
-<script src="resources/js/stats.js"></script>
-    <link rel="stylesheet" href="three-base.css">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/css/ol.css">
+<script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js"></script>
+    <link rel="stylesheet" href="openlayers-interactions.css">
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
-    <title>Three.js base example</title>
+    <title>Openlayers interactions</title>
   </head>
   <body>
 
@@ -50,8 +49,9 @@
 
       <div class="row-fluid">
         <div class="span12">
-          <h4 id="title">Three.js base example</h4>
+          <h4 id="title">Openlayers interactions</h4>
           <div id="container" class="main">
+  <div id="map" tabindex="0"></div>
 </div>
 
         </div>
@@ -59,10 +59,10 @@
 
       <div class="row-fluid">
         <div class="span12">
-          <p id="shortdesc">Three.js base example.</p>
-          <div id="docs"><p>This page&#39;s try to Three.js base example.</p>
+          <p id="shortdesc">Openlayers interactions example.</p>
+          <div id="docs"><p>This page&#39;s Openlayers interactions example.</p>
 </div>
-          <p id="tags">Tags: three.js</p>
+          <p id="tags">Tags: openlayers</p>
         </div>
       </div>
 
@@ -72,75 +72,73 @@
           <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
         </div>
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
-          <textarea class="hidden" name="title">Three.js base example</textarea>
-          <textarea class="hidden" name="description">Three.js base example.</textarea>
-          <textarea class="hidden" name="js">var renderer;
-var scene;
-var camera;
-var width;
-var height;
+          <textarea class="hidden" name="title">Openlayers interactions</textarea>
+          <textarea class="hidden" name="description">Openlayers interactions example.</textarea>
+          <textarea class="hidden" name="js">var raster &#x3D; new ol.layer.Tile({
+  source: new ol.source.OSM()
+});
 
-init();
-animate();
+var container &#x3D; document.querySelector(&#x27;#map&#x27;);
 
-function init() {
-  var container &#x3D; document.getElementById(&#x27;container&#x27;);
-  width &#x3D; container.clientWidth;
-  height &#x3D; container.clientHeight;
+var CustomFocus &#x3D; (function (superclass) {
+  function CustomFocus() {
+    superclass.call(this, {
+      handleDownEvent: handleDownEvent,
+    });
+  }
 
-  // scene
-  scene &#x3D; new THREE.Scene();
-  scene.background &#x3D; new THREE.Color(0xb0b0b0);
+  if ( superclass ) CustomFocus.__proto__ &#x3D; superclass;
+  CustomFocus.prototype &#x3D; Object.create( superclass &amp;&amp; superclass.prototype );
+  CustomFocus.prototype.constructor &#x3D; CustomFocus;
 
-  // camera
-  camera &#x3D; new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-  camera.position.set(500, 800, 1300);
-  camera.lookAt(0, 0, 0);
+  return CustomFocus;
+}(ol.interaction.Pointer));
 
-  // helper
-  var grid &#x3D; new THREE.GridHelper(2000, 20);
-  scene.add(grid);
-
-  var axes &#x3D; new THREE.AxesHelper(1000);
-  axes.position.set(0, 0, 0);
-  scene.add(axes);
-
-  // renderer
-  renderer &#x3D; new THREE.WebGLRenderer({antialias: true});
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(width, height);
-  container.appendChild(renderer.domElement);
-
-  // contorols
-  var controls &#x3D; new THREE.OrbitControls(camera, renderer.domElement);
-  controls.screenSpacePanning &#x3D; true;
-
-  window.addEventListener(&#x27;resize&#x27;, onWindowResize, false);
+function handleDownEvent() {
+  container.focus();
 }
 
-function onWindowResize() {
-  width &#x3D; container.clientWidth;
-  height &#x3D; container.clientHeight;
-  camera.aspect &#x3D; width / height;
-  camera.updateProjectionMatrix();
-  renderer.setSize(width, height);
-}
-
-function animate() {
-  requestAnimationFrame(animate);
-  render();
-}
-
-function render() {
-  renderer.render(scene, camera);
-}
+var map &#x3D; new ol.Map({
+  interactions: ol.interaction.defaults({
+    doubleClickZoom: false,
+    dragAndDrop: false,
+    dragPan: false,
+    keyboardPan: false,
+    keyboardZoom: false,
+    mouseWheelZoom: false,
+    pointer: false,
+    select: false
+  }).extend([
+    new CustomFocus({
+      condition: function () { return true; }
+    }),
+    new ol.interaction.DragPan({
+      kinetic: new ol.Kinetic(-0.02, 3 / 150, 100),
+      condition: function () { return true; }
+    }),
+    new ol.interaction.KeyboardPan({
+      condition: function () { return true; }
+    })
+  ]),
+  layers: [raster],
+  target: &#x27;map&#x27;,
+  view: new ol.View({
+    center: [-11000000, 4600000],
+    zoom: 4
+  }),
+  keyboardEventTarget: container
+});
 </textarea>
-          <textarea class="hidden" name="css">#container {
-  position: relative;
-  overflow: hidden;
+          <textarea class="hidden" name="css">/**
+  * Create a position for the map
+  * on the page */
+#map {
+  width: 100%;
+  height: 100%;
 }
 </textarea>
           <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+  &lt;div id&#x3D;&quot;map&quot; tabindex&#x3D;&quot;0&quot;&gt;&lt;/div&gt;
 &lt;/div&gt;
 </textarea>
           <input type="hidden" name="data">
@@ -148,84 +146,81 @@ function render() {
         <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
-    &lt;title&gt;Three.js base example&lt;/title&gt;
+    &lt;title&gt;Openlayers interactions&lt;/title&gt;
     &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
     &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"&gt;&lt;/script&gt;
-    &lt;script src&#x3D;&quot;https://cdnjs.cloudflare.com/ajax/libs/three.js/96/three.min.js&quot;&gt;&lt;/script&gt;
-    &lt;script src&#x3D;&quot;https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js&quot;&gt;&lt;/script&gt;
-    &lt;script src&#x3D;&quot;http://www.3daysofprogramming.com/playground/examples/resources/js/stats.js&quot;&gt;&lt;/script&gt;
+    &lt;link rel&#x3D;&quot;stylesheet&quot; href&#x3D;&quot;https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/css/ol.css&quot;&gt;
+    &lt;script src&#x3D;&quot;https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js&quot;&gt;&lt;/script&gt;
     &lt;style&gt;
-      #container {
-        position: relative;
-        overflow: hidden;
+      /**
+        * Create a position for the map
+        * on the page */
+      #map {
+        width: 100%;
+        height: 100%;
       }
     &lt;/style&gt;
   &lt;/head&gt;
   &lt;body&gt;
     &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+      &lt;div id&#x3D;&quot;map&quot; tabindex&#x3D;&quot;0&quot;&gt;&lt;/div&gt;
     &lt;/div&gt;
     &lt;script&gt;
-      var renderer;
-      var scene;
-      var camera;
-      var width;
-      var height;
+      var raster &#x3D; new ol.layer.Tile({
+        source: new ol.source.OSM()
+      });
 
-      init();
-      animate();
+      var container &#x3D; document.querySelector(&#x27;#map&#x27;);
 
-      function init() {
-        var container &#x3D; document.getElementById(&#x27;container&#x27;);
-        width &#x3D; container.clientWidth;
-        height &#x3D; container.clientHeight;
+      var CustomFocus &#x3D; (function (superclass) {
+        function CustomFocus() {
+          superclass.call(this, {
+            handleDownEvent: handleDownEvent,
+          });
+        }
 
-        // scene
-        scene &#x3D; new THREE.Scene();
-        scene.background &#x3D; new THREE.Color(0xb0b0b0);
+        if ( superclass ) CustomFocus.__proto__ &#x3D; superclass;
+        CustomFocus.prototype &#x3D; Object.create( superclass &amp;&amp; superclass.prototype );
+        CustomFocus.prototype.constructor &#x3D; CustomFocus;
 
-        // camera
-        camera &#x3D; new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-        camera.position.set(500, 800, 1300);
-        camera.lookAt(0, 0, 0);
+        return CustomFocus;
+      }(ol.interaction.Pointer));
 
-        // helper
-        var grid &#x3D; new THREE.GridHelper(2000, 20);
-        scene.add(grid);
-
-        var axes &#x3D; new THREE.AxesHelper(1000);
-        axes.position.set(0, 0, 0);
-        scene.add(axes);
-
-        // renderer
-        renderer &#x3D; new THREE.WebGLRenderer({antialias: true});
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(width, height);
-        container.appendChild(renderer.domElement);
-
-        // contorols
-        var controls &#x3D; new THREE.OrbitControls(camera, renderer.domElement);
-        controls.screenSpacePanning &#x3D; true;
-
-        window.addEventListener(&#x27;resize&#x27;, onWindowResize, false);
+      function handleDownEvent() {
+        container.focus();
       }
 
-      function onWindowResize() {
-        width &#x3D; container.clientWidth;
-        height &#x3D; container.clientHeight;
-        camera.aspect &#x3D; width / height;
-        camera.updateProjectionMatrix();
-        renderer.setSize(width, height);
-      }
-
-      function animate() {
-        requestAnimationFrame(animate);
-        render();
-      }
-
-      function render() {
-        renderer.render(scene, camera);
-      }
+      var map &#x3D; new ol.Map({
+        interactions: ol.interaction.defaults({
+          doubleClickZoom: false,
+          dragAndDrop: false,
+          dragPan: false,
+          keyboardPan: false,
+          keyboardZoom: false,
+          mouseWheelZoom: false,
+          pointer: false,
+          select: false
+        }).extend([
+          new CustomFocus({
+            condition: function () { return true; }
+          }),
+          new ol.interaction.DragPan({
+            kinetic: new ol.Kinetic(-0.02, 3 / 150, 100),
+            condition: function () { return true; }
+          }),
+          new ol.interaction.KeyboardPan({
+            condition: function () { return true; }
+          })
+        ]),
+        layers: [raster],
+        target: &#x27;map&#x27;,
+        view: new ol.View({
+          center: [-11000000, 4600000],
+          zoom: 4
+        }),
+        keyboardEventTarget: container
+      });
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
@@ -234,7 +229,7 @@ function render() {
 
     <script src="./resources/common.js"></script>
     <script src="./resources/prism/prism.min.js"></script>
-    <script src="common.js"></script><script src="three-base.js"></script>
+    <script src="common.js"></script><script src="openlayers-interactions.js"></script>
   </body>
   <script>
   var packageUrl = 'https://raw.githubusercontent.com/openlayers/openlayers.github.io/build/package.json';

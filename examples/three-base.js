@@ -1,5 +1,4 @@
 let renderer;
-let stats;
 let scene;
 let camera;
 let width;
@@ -40,19 +39,12 @@ function init() {
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.screenSpacePanning = true;
 
-  initStats();
   window.addEventListener('resize', onWindowResize, false);
 }
 
-function initStats() {
-  stats = new Stats();
-  stats.domElement.style.position = 'absolute';
-  stats.domElement.style.left = '0';
-  stats.domElement.style.top = '0';
-  container.appendChild(stats.domElement);
-}
-
 function onWindowResize() {
+  width = container.clientWidth;
+  height = container.clientHeight;
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
   renderer.setSize(width, height);
@@ -61,7 +53,6 @@ function onWindowResize() {
 function animate() {
   requestAnimationFrame(animate);
   render();
-  stats.update();
 }
 
 function render() {
