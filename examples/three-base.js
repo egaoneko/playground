@@ -1,14 +1,16 @@
+// three
 let renderer;
 let scene;
 let camera;
 let width;
 let height;
+let container;
 
 init();
 animate();
 
 function init() {
-  const container = document.getElementById('container');
+  container = document.getElementById('container');
   width = container.clientWidth;
   height = container.clientHeight;
 
@@ -17,15 +19,15 @@ function init() {
   scene.background = new THREE.Color(0xb0b0b0);
 
   // camera
-  camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-  camera.position.set(500, 800, 1300);
+  camera = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+  camera.position.set(50, 80, 130);
   camera.lookAt(0, 0, 0);
 
   // helper
-  const grid = new THREE.GridHelper(2000, 20);
+  const grid = new THREE.GridHelper(200, 20);
   scene.add(grid);
 
-  const axes = new THREE.AxesHelper(1000);
+  const axes = new THREE.AxesHelper(100);
   axes.position.set(0, 0, 0);
   scene.add(axes);
 
@@ -35,7 +37,7 @@ function init() {
   renderer.setSize(width, height);
   container.appendChild(renderer.domElement);
 
-  // contorols
+  // controls
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.screenSpacePanning = true;
 

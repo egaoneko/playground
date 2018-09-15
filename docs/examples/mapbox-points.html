@@ -27,7 +27,7 @@
     <header class="navbar" role="navigation">
       <div class="container">
         <div class="display-table pull-left" id="navbar-logo-container">
-          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground Examples</a>
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
         </div>
         <!-- menu items that get hidden below 768px width -->
         <nav class='collapse navbar-collapse navbar-responsive-collapse'>
@@ -80,11 +80,11 @@ mapboxgl.accessToken &#x3D; key;
 var map &#x3D; new mapboxgl.Map({
   container: &#x27;map&#x27;,
   style: &#x27;mapbox://styles/egaoneko/cjee9xi2e3rqk2snprvd1lqid&#x27;,
-  center: [-87.645,41.856],
+  center: [-87.645, 41.856],
   zoom: 8
 });
 
-map.on(&#x27;click&#x27;, function(e) {
+map.on(&#x27;click&#x27;, function (e) {
   var features &#x3D; map.queryRenderedFeatures(e.point, {
     layers: [&#x27;chicago-parks&#x27;] // replace this with the name of the layer
   });
@@ -95,7 +95,7 @@ map.on(&#x27;click&#x27;, function(e) {
 
   var feature &#x3D; features[0];
 
-  var popup &#x3D; new mapboxgl.Popup({ offset: [0, -15] })
+  new mapboxgl.Popup({offset: [0, -15]})
     .setLngLat(feature.geometry.coordinates)
     .setHTML(&#x27;&lt;h3&gt;&#x27; + feature.properties.title + &#x27;&lt;/h3&gt;&lt;p&gt;&#x27; + feature.properties.description + &#x27;&lt;/p&gt;&#x27;)
     .setLngLat(feature.geometry.coordinates)
@@ -146,11 +146,11 @@ map.on(&#x27;click&#x27;, function(e) {
       var map &#x3D; new mapboxgl.Map({
         container: &#x27;map&#x27;,
         style: &#x27;mapbox://styles/egaoneko/cjee9xi2e3rqk2snprvd1lqid&#x27;,
-        center: [-87.645,41.856],
+        center: [-87.645, 41.856],
         zoom: 8
       });
 
-      map.on(&#x27;click&#x27;, function(e) {
+      map.on(&#x27;click&#x27;, function (e) {
         var features &#x3D; map.queryRenderedFeatures(e.point, {
           layers: [&#x27;chicago-parks&#x27;] // replace this with the name of the layer
         });
@@ -161,7 +161,7 @@ map.on(&#x27;click&#x27;, function(e) {
 
         var feature &#x3D; features[0];
 
-        var popup &#x3D; new mapboxgl.Popup({ offset: [0, -15] })
+        new mapboxgl.Popup({offset: [0, -15]})
           .setLngLat(feature.geometry.coordinates)
           .setHTML(&#x27;&lt;h3&gt;&#x27; + feature.properties.title + &#x27;&lt;/h3&gt;&lt;p&gt;&#x27; + feature.properties.description + &#x27;&lt;/p&gt;&#x27;)
           .setLngLat(feature.geometry.coordinates)

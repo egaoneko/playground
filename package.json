@@ -21,7 +21,7 @@
     "transpile": "rm -rf build/pg && mkdir -p build && buble --input src/pg --output build/pg --no modules --sourcemap",
     "typecheck": "tsc --pretty",
     "apidoc": "jsdoc config/jsdoc/api/index.md -c config/jsdoc/api/conf.json -P package.json -d build/apidoc",
-    "predocs": "rm -rf docs",
+    "predocs": "rm -rf docs & mkdir -p docs",
     "docs": "npm run build-legacy && npm run build-examples && npm run apidoc",
     "postdocs": "mv build docs & cp index.html docs/index.html"
   },
@@ -34,7 +34,6 @@
   "bugs": {
     "url": "https://github.com/egaoneko/playground/issues"
   },
-  "dependencies": {},
   "devDependencies": {
     "buble": "^0.19.3",
     "buble-loader": "^0.5.1",
@@ -96,9 +95,20 @@
     "rules": {
       "valid-jsdoc": "off",
       "no-console": 0
+    },
+    "globals": {
+      "ol": true,
+      "mapboxgl": true,
+      "naver": true,
+      "THREE": true,
+      "math": true,
+      "dat": true
     }
   },
   "sideEffects": [
     "example.css"
-  ]
+  ],
+  "dependencies": {
+    "eventemitter3": "^3.1.0"
+  }
 }

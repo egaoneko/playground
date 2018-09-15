@@ -4,7 +4,7 @@ const raster = new ol.layer.Tile({
 
 const source = new ol.source.Vector();
 
-const styleFunction = function(feature) {
+const styleFunction = function (feature) {
   const geometry = feature.getGeometry();
   const styles = [
     // linestring
@@ -22,7 +22,7 @@ const styleFunction = function(feature) {
   let prev = 0;
   let segment = 0;
   let arrows = 0;
-  geometry.forEachSegment(function(start, end) {
+  geometry.forEachSegment(function (start, end) {
     segment++;
 
     const dx = end[0] - start[0];
@@ -30,7 +30,7 @@ const styleFunction = function(feature) {
     const rotation = Math.atan2(dy, dx);
 
     // arrows
-    const distance = Math.sqrt((dx*dx) + (dy*dy));
+    const distance = Math.sqrt((dx * dx) + (dy * dy));
     const fracStep = step / distance;
     const prevFrac = prev / distance;
     let point;
@@ -45,7 +45,7 @@ const styleFunction = function(feature) {
       })
     }));
 
-    for(let frac = prevFrac; frac <= 1; frac += fracStep) {
+    for (let frac = prevFrac; frac <= 1; frac += fracStep) {
       point = interpolate(start, end, frac);
 
       if (!ol.extent.containsCoordinate(extent, point)) {
@@ -67,7 +67,7 @@ const styleFunction = function(feature) {
     if (point) {
       const lastDx = end[0] - point[0];
       const lastDy = end[1] - point[1];
-      const lastDistance = Math.sqrt((lastDx*lastDx) + (lastDy*lastDy));
+      const lastDistance = Math.sqrt((lastDx * lastDx) + (lastDy * lastDy));
 
       if (lastDistance > 0) {
         prev = step - lastDistance;
@@ -119,11 +119,11 @@ map.addInteraction(new ol.interaction.Draw({
 
 function interpolate(a, b, frac) // points A and B, frac between 0 and 1
 {
-  const nx = a[0]+(b[0]-a[0])*frac;
-  const ny = a[1]+(b[1]-a[1])*frac;
+  const nx = a[0] + (b[0] - a[0]) * frac;
+  const ny = a[1] + (b[1] - a[1]) * frac;
   return [nx, ny];
 }
 
 function getCoordinateStepFromPixel(map, step) {
-  return Math.abs(map.getCoordinateFromPixel([step,0])[0] - map.getCoordinateFromPixel([0,0])[0]);
+  return Math.abs(map.getCoordinateFromPixel([step, 0])[0] - map.getCoordinateFromPixel([0, 0])[0]);
 }

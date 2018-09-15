@@ -1,4 +1,4 @@
-import {getRandomDummyImages} from "../src/pg/utils/image";
+import { getRandomDummyImages } from "../src/pg/utils/image";
 
 const offsetWidth = 200;
 const offsetHeight = 100;

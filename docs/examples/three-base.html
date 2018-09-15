@@ -28,7 +28,7 @@
     <header class="navbar" role="navigation">
       <div class="container">
         <div class="display-table pull-left" id="navbar-logo-container">
-          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground Examples</a>
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
         </div>
         <!-- menu items that get hidden below 768px width -->
         <nav class='collapse navbar-collapse navbar-responsive-collapse'>
@@ -74,17 +74,19 @@
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
           <textarea class="hidden" name="title">Three.js base example</textarea>
           <textarea class="hidden" name="description">Three.js base example.</textarea>
-          <textarea class="hidden" name="js">var renderer;
+          <textarea class="hidden" name="js">// three
+var renderer;
 var scene;
 var camera;
 var width;
 var height;
+var container;
 
 init();
 animate();
 
 function init() {
-  var container &#x3D; document.getElementById(&#x27;container&#x27;);
+  container &#x3D; document.getElementById(&#x27;container&#x27;);
   width &#x3D; container.clientWidth;
   height &#x3D; container.clientHeight;
 
@@ -93,15 +95,15 @@ function init() {
   scene.background &#x3D; new THREE.Color(0xb0b0b0);
 
   // camera
-  camera &#x3D; new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-  camera.position.set(500, 800, 1300);
+  camera &#x3D; new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+  camera.position.set(50, 80, 130);
   camera.lookAt(0, 0, 0);
 
   // helper
-  var grid &#x3D; new THREE.GridHelper(2000, 20);
+  var grid &#x3D; new THREE.GridHelper(200, 20);
   scene.add(grid);
 
-  var axes &#x3D; new THREE.AxesHelper(1000);
+  var axes &#x3D; new THREE.AxesHelper(100);
   axes.position.set(0, 0, 0);
   scene.add(axes);
 
@@ -111,7 +113,7 @@ function init() {
   renderer.setSize(width, height);
   container.appendChild(renderer.domElement);
 
-  // contorols
+  // controls
   var controls &#x3D; new THREE.OrbitControls(camera, renderer.domElement);
   controls.screenSpacePanning &#x3D; true;
 
@@ -166,17 +168,19 @@ function render() {
     &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
     &lt;/div&gt;
     &lt;script&gt;
+      // three
       var renderer;
       var scene;
       var camera;
       var width;
       var height;
+      var container;
 
       init();
       animate();
 
       function init() {
-        var container &#x3D; document.getElementById(&#x27;container&#x27;);
+        container &#x3D; document.getElementById(&#x27;container&#x27;);
         width &#x3D; container.clientWidth;
         height &#x3D; container.clientHeight;
 
@@ -185,15 +189,15 @@ function render() {
         scene.background &#x3D; new THREE.Color(0xb0b0b0);
 
         // camera
-        camera &#x3D; new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-        camera.position.set(500, 800, 1300);
+        camera &#x3D; new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+        camera.position.set(50, 80, 130);
         camera.lookAt(0, 0, 0);
 
         // helper
-        var grid &#x3D; new THREE.GridHelper(2000, 20);
+        var grid &#x3D; new THREE.GridHelper(200, 20);
         scene.add(grid);
 
-        var axes &#x3D; new THREE.AxesHelper(1000);
+        var axes &#x3D; new THREE.AxesHelper(100);
         axes.position.set(0, 0, 0);
         scene.add(axes);
 
@@ -203,7 +207,7 @@ function render() {
         renderer.setSize(width, height);
         container.appendChild(renderer.domElement);
 
-        // contorols
+        // controls
         var controls &#x3D; new THREE.OrbitControls(camera, renderer.domElement);
         controls.screenSpacePanning &#x3D; true;
 

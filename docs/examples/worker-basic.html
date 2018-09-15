@@ -26,7 +26,7 @@
     <header class="navbar" role="navigation">
       <div class="container">
         <div class="display-table pull-left" id="navbar-logo-container">
-          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground Examples</a>
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
         </div>
         <!-- menu items that get hidden below 768px width -->
         <nav class='collapse navbar-collapse navbar-responsive-collapse'>
@@ -94,6 +94,7 @@
 var timeBoxElement &#x3D; document.querySelector(&#x27;#time-box&#x27;);
 
 requestAnimationFrame(updateTimeBox);
+
 function updateTimeBox() {
   timeBoxElement.innerText &#x3D; new Date();
   requestAnimationFrame(updateTimeBox);
@@ -101,23 +102,23 @@ function updateTimeBox() {
 
 var sleep1BtnElement &#x3D; document.querySelector(&#x27;#sleep1-btn&#x27;);
 
-sleep1BtnElement.addEventListener(&#x27;click&#x27;, function(){
+sleep1BtnElement.addEventListener(&#x27;click&#x27;, function () {
   logAreaElement.innerHTML +&#x3D; &#x27;Sleep without worker!\n&#x27;;
   sleep(3000);
 });
 
-function sleep(delay, message) {
+function sleep(delay) {
   var start &#x3D; new Date().getTime();
   console.log(&#x27;Sleeping without worker!&#x27;);
-  while (new Date().getTime() &lt; start + delay) {}
+  while (new Date().getTime() &lt; start + delay){ ; }
 }
 
 var sleep2BtnElement &#x3D; document.querySelector(&#x27;#sleep2-btn&#x27;);
 
-sleep2BtnElement.addEventListener(&#x27;click&#x27;, function(){
+sleep2BtnElement.addEventListener(&#x27;click&#x27;, function () {
   logAreaElement.innerHTML +&#x3D; &#x27;Sleep with worker!\n&#x27;;
   var worker &#x3D; new Worker(&#x27;data/worker/basic.js&#x27;);
-  worker.addEventListener(&#x27;message&#x27;, function(e) {
+  worker.addEventListener(&#x27;message&#x27;, function (e) {
     console.log(e.data);
     worker.terminate();
   });
@@ -223,6 +224,7 @@ sleep2BtnElement.addEventListener(&#x27;click&#x27;, function(){
       var timeBoxElement &#x3D; document.querySelector(&#x27;#time-box&#x27;);
 
       requestAnimationFrame(updateTimeBox);
+
       function updateTimeBox() {
         timeBoxElement.innerText &#x3D; new Date();
         requestAnimationFrame(updateTimeBox);
@@ -230,23 +232,23 @@ sleep2BtnElement.addEventListener(&#x27;click&#x27;, function(){
 
       var sleep1BtnElement &#x3D; document.querySelector(&#x27;#sleep1-btn&#x27;);
 
-      sleep1BtnElement.addEventListener(&#x27;click&#x27;, function(){
+      sleep1BtnElement.addEventListener(&#x27;click&#x27;, function () {
         logAreaElement.innerHTML +&#x3D; &#x27;Sleep without worker!\n&#x27;;
         sleep(3000);
       });
 
-      function sleep(delay, message) {
+      function sleep(delay) {
         var start &#x3D; new Date().getTime();
         console.log(&#x27;Sleeping without worker!&#x27;);
-        while (new Date().getTime() &lt; start + delay) {}
+        while (new Date().getTime() &lt; start + delay){ ; }
       }
 
       var sleep2BtnElement &#x3D; document.querySelector(&#x27;#sleep2-btn&#x27;);
 
-      sleep2BtnElement.addEventListener(&#x27;click&#x27;, function(){
+      sleep2BtnElement.addEventListener(&#x27;click&#x27;, function () {
         logAreaElement.innerHTML +&#x3D; &#x27;Sleep with worker!\n&#x27;;
         var worker &#x3D; new Worker(&#x27;data/worker/basic.js&#x27;);
-        worker.addEventListener(&#x27;message&#x27;, function(e) {
+        worker.addEventListener(&#x27;message&#x27;, function (e) {
           console.log(e.data);
           worker.terminate();
         });

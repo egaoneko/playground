@@ -27,7 +27,7 @@
     <header class="navbar" role="navigation">
       <div class="container">
         <div class="display-table pull-left" id="navbar-logo-container">
-          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground Examples</a>
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
         </div>
         <!-- menu items that get hidden below 768px width -->
         <nav class='collapse navbar-collapse navbar-responsive-collapse'>
@@ -80,7 +80,7 @@
 
 var source &#x3D; new ol.source.Vector();
 
-var styleFunction &#x3D; function(feature) {
+var styleFunction &#x3D; function (feature) {
   var geometry &#x3D; feature.getGeometry();
   var styles &#x3D; [
     // linestring
@@ -98,7 +98,7 @@ var styleFunction &#x3D; function(feature) {
   var prev &#x3D; 0;
   var segment &#x3D; 0;
   var arrows &#x3D; 0;
-  geometry.forEachSegment(function(start, end) {
+  geometry.forEachSegment(function (start, end) {
     segment++;
 
     var dx &#x3D; end[0] - start[0];
@@ -106,7 +106,7 @@ var styleFunction &#x3D; function(feature) {
     var rotation &#x3D; Math.atan2(dy, dx);
 
     // arrows
-    var distance &#x3D; Math.sqrt((dx*dx) + (dy*dy));
+    var distance &#x3D; Math.sqrt((dx * dx) + (dy * dy));
     var fracStep &#x3D; step / distance;
     var prevFrac &#x3D; prev / distance;
     var point;
@@ -121,7 +121,7 @@ var styleFunction &#x3D; function(feature) {
       })
     }));
 
-    for(var frac &#x3D; prevFrac; frac &lt;&#x3D; 1; frac +&#x3D; fracStep) {
+    for (var frac &#x3D; prevFrac; frac &lt;&#x3D; 1; frac +&#x3D; fracStep) {
       point &#x3D; interpolate(start, end, frac);
 
       if (!ol.extent.containsCoordinate(extent, point)) {
@@ -143,7 +143,7 @@ var styleFunction &#x3D; function(feature) {
     if (point) {
       var lastDx &#x3D; end[0] - point[0];
       var lastDy &#x3D; end[1] - point[1];
-      var lastDistance &#x3D; Math.sqrt((lastDx*lastDx) + (lastDy*lastDy));
+      var lastDistance &#x3D; Math.sqrt((lastDx * lastDx) + (lastDy * lastDy));
 
       if (lastDistance &gt; 0) {
         prev &#x3D; step - lastDistance;
@@ -195,13 +195,13 @@ map.addInteraction(new ol.interaction.Draw({
 
 function interpolate(a, b, frac) // points A and B, frac between 0 and 1
 {
-  var nx &#x3D; a[0]+(b[0]-a[0])*frac;
-  var ny &#x3D; a[1]+(b[1]-a[1])*frac;
+  var nx &#x3D; a[0] + (b[0] - a[0]) * frac;
+  var ny &#x3D; a[1] + (b[1] - a[1]) * frac;
   return [nx, ny];
 }
 
 function getCoordinateStepFromPixel(map, step) {
-  return Math.abs(map.getCoordinateFromPixel([step,0])[0] - map.getCoordinateFromPixel([0,0])[0]);
+  return Math.abs(map.getCoordinateFromPixel([step, 0])[0] - map.getCoordinateFromPixel([0, 0])[0]);
 }
 </textarea>
           <textarea class="hidden" name="css">/**
@@ -248,7 +248,7 @@ function getCoordinateStepFromPixel(map, step) {
 
       var source &#x3D; new ol.source.Vector();
 
-      var styleFunction &#x3D; function(feature) {
+      var styleFunction &#x3D; function (feature) {
         var geometry &#x3D; feature.getGeometry();
         var styles &#x3D; [
           // linestring
@@ -266,7 +266,7 @@ function getCoordinateStepFromPixel(map, step) {
         var prev &#x3D; 0;
         var segment &#x3D; 0;
         var arrows &#x3D; 0;
-        geometry.forEachSegment(function(start, end) {
+        geometry.forEachSegment(function (start, end) {
           segment++;
 
           var dx &#x3D; end[0] - start[0];
@@ -274,7 +274,7 @@ function getCoordinateStepFromPixel(map, step) {
           var rotation &#x3D; Math.atan2(dy, dx);
 
           // arrows
-          var distance &#x3D; Math.sqrt((dx*dx) + (dy*dy));
+          var distance &#x3D; Math.sqrt((dx * dx) + (dy * dy));
           var fracStep &#x3D; step / distance;
           var prevFrac &#x3D; prev / distance;
           var point;
@@ -289,7 +289,7 @@ function getCoordinateStepFromPixel(map, step) {
             })
           }));
 
-          for(var frac &#x3D; prevFrac; frac &lt;&#x3D; 1; frac +&#x3D; fracStep) {
+          for (var frac &#x3D; prevFrac; frac &lt;&#x3D; 1; frac +&#x3D; fracStep) {
             point &#x3D; interpolate(start, end, frac);
 
             if (!ol.extent.containsCoordinate(extent, point)) {
@@ -311,7 +311,7 @@ function getCoordinateStepFromPixel(map, step) {
           if (point) {
             var lastDx &#x3D; end[0] - point[0];
             var lastDy &#x3D; end[1] - point[1];
-            var lastDistance &#x3D; Math.sqrt((lastDx*lastDx) + (lastDy*lastDy));
+            var lastDistance &#x3D; Math.sqrt((lastDx * lastDx) + (lastDy * lastDy));
 
             if (lastDistance &gt; 0) {
               prev &#x3D; step - lastDistance;
@@ -363,13 +363,13 @@ function getCoordinateStepFromPixel(map, step) {
 
       function interpolate(a, b, frac) // points A and B, frac between 0 and 1
       {
-        var nx &#x3D; a[0]+(b[0]-a[0])*frac;
-        var ny &#x3D; a[1]+(b[1]-a[1])*frac;
+        var nx &#x3D; a[0] + (b[0] - a[0]) * frac;
+        var ny &#x3D; a[1] + (b[1] - a[1]) * frac;
         return [nx, ny];
       }
 
       function getCoordinateStepFromPixel(map, step) {
-        return Math.abs(map.getCoordinateFromPixel([step,0])[0] - map.getCoordinateFromPixel([0,0])[0]);
+        return Math.abs(map.getCoordinateFromPixel([step, 0])[0] - map.getCoordinateFromPixel([0, 0])[0]);
       }
     &lt;/script&gt;
   &lt;/body&gt;

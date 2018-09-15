@@ -26,7 +26,7 @@
     <header class="navbar" role="navigation">
       <div class="container">
         <div class="display-table pull-left" id="navbar-logo-container">
-          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground Examples</a>
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
         </div>
         <!-- menu items that get hidden below 768px width -->
         <nav class='collapse navbar-collapse navbar-responsive-collapse'>
@@ -93,37 +93,37 @@ var jeju &#x3D; new naver.maps.LatLng(33.3590628, 126.534361),
     new naver.maps.LatLng(37.42829747263545, 126.76620435615891),
     new naver.maps.LatLng(37.7010174173061, 127.18379493229875));
 
-document.querySelector(&quot;#to-jeju&quot;).addEventListener(&quot;click&quot;, function(e) {
+document.querySelector(&quot;#to-jeju&quot;).addEventListener(&quot;click&quot;, function (e) {
   e.preventDefault();
 
   map.setCenter(jeju);
 });
 
-document.querySelector(&quot;#to-1&quot;).addEventListener(&quot;click&quot;, function(e) {
+document.querySelector(&quot;#to-1&quot;).addEventListener(&quot;click&quot;, function (e) {
   e.preventDefault();
 
   map.setZoom(1, true);
 });
 
-document.querySelector(&quot;#to-dokdo&quot;).addEventListener(&quot;click&quot;, function(e) {
+document.querySelector(&quot;#to-dokdo&quot;).addEventListener(&quot;click&quot;, function (e) {
   e.preventDefault();
 
   map.fitBounds(dokdo);
 });
 
-document.querySelector(&quot;#to-busan&quot;).addEventListener(&quot;click&quot;, function(e) {
+document.querySelector(&quot;#to-busan&quot;).addEventListener(&quot;click&quot;, function (e) {
   e.preventDefault();
 
   map.panTo(busan);
 });
 
-document.querySelector(&quot;#to-seoul&quot;).addEventListener(&quot;click&quot;, function(e) {
+document.querySelector(&quot;#to-seoul&quot;).addEventListener(&quot;click&quot;, function (e) {
   e.preventDefault();
 
   map.panToBounds(seoul);
 });
 
-document.querySelector(&quot;#panBy&quot;).addEventListener(&quot;click&quot;, function(e) {
+document.querySelector(&quot;#panBy&quot;).addEventListener(&quot;click&quot;, function (e) {
   e.preventDefault();
 
   map.panBy(new naver.maps.Point(10, 10));
@@ -192,37 +192,37 @@ document.querySelector(&quot;#panBy&quot;).addEventListener(&quot;click&quot;, f
           new naver.maps.LatLng(37.42829747263545, 126.76620435615891),
           new naver.maps.LatLng(37.7010174173061, 127.18379493229875));
 
-      document.querySelector(&quot;#to-jeju&quot;).addEventListener(&quot;click&quot;, function(e) {
+      document.querySelector(&quot;#to-jeju&quot;).addEventListener(&quot;click&quot;, function (e) {
         e.preventDefault();
 
         map.setCenter(jeju);
       });
 
-      document.querySelector(&quot;#to-1&quot;).addEventListener(&quot;click&quot;, function(e) {
+      document.querySelector(&quot;#to-1&quot;).addEventListener(&quot;click&quot;, function (e) {
         e.preventDefault();
 
         map.setZoom(1, true);
       });
 
-      document.querySelector(&quot;#to-dokdo&quot;).addEventListener(&quot;click&quot;, function(e) {
+      document.querySelector(&quot;#to-dokdo&quot;).addEventListener(&quot;click&quot;, function (e) {
         e.preventDefault();
 
         map.fitBounds(dokdo);
       });
 
-      document.querySelector(&quot;#to-busan&quot;).addEventListener(&quot;click&quot;, function(e) {
+      document.querySelector(&quot;#to-busan&quot;).addEventListener(&quot;click&quot;, function (e) {
         e.preventDefault();
 
         map.panTo(busan);
       });
 
-      document.querySelector(&quot;#to-seoul&quot;).addEventListener(&quot;click&quot;, function(e) {
+      document.querySelector(&quot;#to-seoul&quot;).addEventListener(&quot;click&quot;, function (e) {
         e.preventDefault();
 
         map.panToBounds(seoul);
       });
 
-      document.querySelector(&quot;#panBy&quot;).addEventListener(&quot;click&quot;, function(e) {
+      document.querySelector(&quot;#panBy&quot;).addEventListener(&quot;click&quot;, function (e) {
         e.preventDefault();
 
         map.panBy(new naver.maps.Point(10, 10));

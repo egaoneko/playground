@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-62717870-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-62717870-1');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
+    <link rel="stylesheet" href="./resources/layout.css" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/96/three.min.js"></script>
+<script src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/5.1.2/math.min.js"></script>
+<script src="resources/js/stats.js"></script>
+    <link rel="stylesheet" href="three-math02.css">
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+    <title>Three.js math example 02</title>
+  </head>
+  <body>
+
+    <header class="navbar" role="navigation">
+      <div class="container">
+        <div class="display-table pull-left" id="navbar-logo-container">
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
+        </div>
+        <!-- menu items that get hidden below 768px width -->
+        <nav class='collapse navbar-collapse navbar-responsive-collapse'>
+          <ul class="nav navbar-nav pull-right">
+            <li><a class="active" href="index.html">Examples</a></li>
+            <li><a href="../apidoc">API</a></li>
+            <li><a href="https://github.com/egaoneko/playground">Code</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container-fluid">
+
+      <div id="latest-check" class="alert alert-warning alert-dismissible" role="alert" style="display:none">
+        <button id="latest-dismiss" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        This example uses Playground v<span>0.0.1</span>. The <a id="latest-link" href="#" class="alert-link">latest</a> is v<span id="latest-version"></span>.
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <h4 id="title">Three.js math example 02</h4>
+          <div id="container" class="main">
+</div>
+
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <p id="shortdesc">Three.js math example 02.</p>
+          <div id="docs"><p>This page&#39;s try to Three.js math example 02.</p>
+</div>
+          <p id="tags">Tags: three.js</p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div id="source-controls">
+          <a id="copy-button" data-clipboard-target="#example-source"><i class="fa fa-clipboard"></i> Copy</a>
+          <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
+        </div>
+        <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
+          <textarea class="hidden" name="title">Three.js math example 02</textarea>
+          <textarea class="hidden" name="description">Three.js math example 02.</textarea>
+          <textarea class="hidden" name="js">// three
+var renderer;
+var scene;
+var camera;
+var width;
+var height;
+var container;
+
+// math
+var props &#x3D; {
+  segments: 100,
+  xMin: -25,
+  xMax: 25,
+};
+
+init();
+animate();
+
+function init() {
+  container &#x3D; document.getElementById(&#x27;container&#x27;);
+  width &#x3D; container.clientWidth;
+  height &#x3D; container.clientHeight;
+
+  // scene
+  scene &#x3D; new THREE.Scene();
+  scene.background &#x3D; new THREE.Color(0x000000);
+
+  // camera
+  camera &#x3D; new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+  camera.position.set(50, 80, 130);
+  camera.lookAt(0, 0, 0);
+
+  // helper
+  var grid &#x3D; new THREE.GridHelper(200, 20);
+  scene.add(grid);
+
+  var axes &#x3D; new THREE.AxesHelper(100);
+  axes.position.set(0, 0, 0);
+  scene.add(axes);
+
+  // renderer
+  renderer &#x3D; new THREE.WebGLRenderer({antialias: true});
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(width, height);
+  container.appendChild(renderer.domElement);
+
+  // controls
+  var controls &#x3D; new THREE.OrbitControls(camera, renderer.domElement);
+  controls.screenSpacePanning &#x3D; true;
+
+  draw();
+
+  window.addEventListener(&#x27;resize&#x27;, onWindowResize, false);
+}
+
+function onWindowResize() {
+  width &#x3D; container.clientWidth;
+  height &#x3D; container.clientHeight;
+  camera.aspect &#x3D; width / height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  render();
+}
+
+function render() {
+  renderer.render(scene, camera);
+}
+
+function draw() {
+  createGraph([
+    [4, -1, 1]
+  ]);
+
+  createGraph([
+    [0, 1, 1]
+  ]);
+}
+
+function createGraph(A) {
+  var X &#x3D; generateX(
+    props.xMin,
+    props.xMax,
+    props.segments
+  );
+
+  A &#x3D; math.transpose(A);
+  X &#x3D; math.transpose(X);
+
+  var B &#x3D; math.transpose(math.multiply(A, X));
+  var geom &#x3D; new THREE.Geometry();
+  var material &#x3D; new THREE.PointsMaterial({color: 0xffff77, size: 2, sizeAttenuation: false});
+
+  console.log(A, X, B);
+
+  B.forEach(function (b) {
+    geom.vertices.push(new THREE.Vector3(b[0], b[1], b[2]));
+  });
+
+  var cloud &#x3D; new THREE.Points(geom, material);
+  scene.add(cloud)
+}
+
+function generateX(xMin, xMax, segments) {
+  var X &#x3D; [];
+  var xSegments &#x3D; (xMax - xMin) / segments;
+
+  for (var x &#x3D; xMin; x &lt;&#x3D; xMax; x +&#x3D; xSegments) {
+    X.push([x]);
+  }
+
+  return X;
+}
+</textarea>
+          <textarea class="hidden" name="css">#container {
+  position: relative;
+  overflow: hidden;
+}
+</textarea>
+          <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+&lt;/div&gt;
+</textarea>
+          <input type="hidden" name="data">
+        </form>
+        <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Three.js math example 02&lt;/title&gt;
+    &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
+    &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
+    &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://cdnjs.cloudflare.com/ajax/libs/three.js/96/three.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js&quot;&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://cdnjs.cloudflare.com/ajax/libs/mathjs/5.1.2/math.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;http://www.3daysofprogramming.com/playground/examples/resources/js/stats.js&quot;&gt;&lt;/script&gt;
+    &lt;style&gt;
+      #container {
+        position: relative;
+        overflow: hidden;
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+      // three
+      var renderer;
+      var scene;
+      var camera;
+      var width;
+      var height;
+      var container;
+
+      // math
+      var props &#x3D; {
+        segments: 100,
+        xMin: -25,
+        xMax: 25,
+      };
+
+      init();
+      animate();
+
+      function init() {
+        container &#x3D; document.getElementById(&#x27;container&#x27;);
+        width &#x3D; container.clientWidth;
+        height &#x3D; container.clientHeight;
+
+        // scene
+        scene &#x3D; new THREE.Scene();
+        scene.background &#x3D; new THREE.Color(0x000000);
+
+        // camera
+        camera &#x3D; new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+        camera.position.set(50, 80, 130);
+        camera.lookAt(0, 0, 0);
+
+        // helper
+        var grid &#x3D; new THREE.GridHelper(200, 20);
+        scene.add(grid);
+
+        var axes &#x3D; new THREE.AxesHelper(100);
+        axes.position.set(0, 0, 0);
+        scene.add(axes);
+
+        // renderer
+        renderer &#x3D; new THREE.WebGLRenderer({antialias: true});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(width, height);
+        container.appendChild(renderer.domElement);
+
+        // controls
+        var controls &#x3D; new THREE.OrbitControls(camera, renderer.domElement);
+        controls.screenSpacePanning &#x3D; true;
+
+        draw();
+
+        window.addEventListener(&#x27;resize&#x27;, onWindowResize, false);
+      }
+
+      function onWindowResize() {
+        width &#x3D; container.clientWidth;
+        height &#x3D; container.clientHeight;
+        camera.aspect &#x3D; width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        render();
+      }
+
+      function render() {
+        renderer.render(scene, camera);
+      }
+
+      function draw() {
+        createGraph([
+          [4, -1, 1]
+        ]);
+
+        createGraph([
+          [0, 1, 1]
+        ]);
+      }
+
+      function createGraph(A) {
+        var X &#x3D; generateX(
+          props.xMin,
+          props.xMax,
+          props.segments
+        );
+
+        A &#x3D; math.transpose(A);
+        X &#x3D; math.transpose(X);
+
+        var B &#x3D; math.transpose(math.multiply(A, X));
+        var geom &#x3D; new THREE.Geometry();
+        var material &#x3D; new THREE.PointsMaterial({color: 0xffff77, size: 2, sizeAttenuation: false});
+
+        console.log(A, X, B);
+
+        B.forEach(function (b) {
+          geom.vertices.push(new THREE.Vector3(b[0], b[1], b[2]));
+        });
+
+        var cloud &#x3D; new THREE.Points(geom, material);
+        scene.add(cloud)
+      }
+
+      function generateX(xMin, xMax, segments) {
+        var X &#x3D; [];
+        var xSegments &#x3D; (xMax - xMin) / segments;
+
+        for (var x &#x3D; xMin; x &lt;&#x3D; xMax; x +&#x3D; xSegments) {
+          X.push([x]);
+        }
+
+        return X;
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      </div>
+    </div>
+
+    <script src="./resources/common.js"></script>
+    <script src="./resources/prism/prism.min.js"></script>
+    <script src="common.js"></script><script src="three-math02.js"></script>
+  </body>
+  <script>
+  var packageUrl = 'https://raw.githubusercontent.com/openlayers/openlayers.github.io/build/package.json';
+  fetch(packageUrl).then(function(response) {
+    return response.json();
+  }).then(function(json) {
+    var latestVersion = json.version;
+    document.getElementById('latest-version').innerHTML = latestVersion;
+    var url = window.location.href;
+    var branchSearch = url.match(/\/([^\/]*)\/examples\//);
+    var cookieText = 'dismissed=-' + latestVersion + '-';
+    var dismissed = document.cookie.indexOf(cookieText) != -1;
+    if (branchSearch && !dismissed && /^v[0-9\.]*$/.test(branchSearch[1]) && '0.0.1' != latestVersion) {
+      var link = url.replace(branchSearch[0], '/latest/examples/');
+      fetch(link, {method: 'head'}).then(function(response) {
+        var a = document.getElementById('latest-link');
+        a.href = response.status == 200 ? link : '../../latest/examples/';
+      });
+      var latestCheck = document.getElementById('latest-check');
+      latestCheck.style.display = '';
+      document.getElementById('latest-dismiss').onclick = function() {
+        latestCheck.style.display = 'none';
+        document.cookie = cookieText;
+      }
+    }
+  });
+  </script>
+</html>

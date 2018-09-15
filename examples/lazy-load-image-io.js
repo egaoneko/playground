@@ -1,4 +1,4 @@
-import {getRandomDummyImages} from "../src/pg/utils/image";
+import { getRandomDummyImages } from "../src/pg/utils/image";
 
 const scrollBox = document.getElementById('scroll-box');
 const imageBox = document.getElementById('image-box');

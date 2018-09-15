@@ -70,7 +70,7 @@ ol.inline>li {
   padding-right: 5px;
 }
 
-.main {
+#container.main {
   height: 400px;
   width: 100%;
   background: url(background.jpg) repeat;
@@ -121,4 +121,14 @@ pre {
 #latest-check {
   margin-top: -10px;
   margin-bottom: 10px;
+}
+
+/**
+ * Hack for dat.gui
+ */
+.dg .c input[type=text] {
+  line-height:normal;
+}
+.dg .c div {
+  box-sizing: content-box;
 }

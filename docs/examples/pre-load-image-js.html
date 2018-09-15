@@ -26,7 +26,7 @@
     <header class="navbar" role="navigation">
       <div class="container">
         <div class="display-table pull-left" id="navbar-logo-container">
-          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground Examples</a>
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
         </div>
         <!-- menu items that get hidden below 768px width -->
         <nav class='collapse navbar-collapse navbar-responsive-collapse'>
@@ -85,7 +85,7 @@
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
           <textarea class="hidden" name="title">Pre load image with javascript</textarea>
           <textarea class="hidden" name="description">Previously load images with javascript.</textarea>
-          <textarea class="hidden" name="js">import {getRandomDummyImages} from &quot;../src/pg/utils/image&quot;;
+          <textarea class="hidden" name="js">import { getRandomDummyImages } from &quot;../src/pg/utils/image&quot;;
 
 var imageBox &#x3D; document.getElementById(&#x27;image-box&#x27;);
 var imageBoxIndex &#x3D; 0;
@@ -93,16 +93,16 @@ var imageSet1 &#x3D; getRandomDummyImages(400, 200, 10);
 
 imageBox.style.backgroundImage &#x3D; getBackgroundImage(imageSet1[imageBoxIndex]);
 
-addClickEvent(&#x27;image-box-prev-btn&#x27;, function(){
-  if(imageBoxIndex &lt; 1) {
+addClickEvent(&#x27;image-box-prev-btn&#x27;, function () {
+  if (imageBoxIndex &lt; 1) {
     return;
   }
   imageBoxIndex -&#x3D; 1;
   imageBox.style.backgroundImage &#x3D; getBackgroundImage(imageSet1[imageBoxIndex]);
 });
 
-addClickEvent(&#x27;image-box-next-btn&#x27;, function(){
-  if(imageBoxIndex &gt;&#x3D; imageSet1.length - 1) {
+addClickEvent(&#x27;image-box-next-btn&#x27;, function () {
+  if (imageBoxIndex &gt;&#x3D; imageSet1.length - 1) {
     return;
   }
   imageBoxIndex +&#x3D; 1;
@@ -116,16 +116,16 @@ var imageSet2 &#x3D; getRandomDummyImages(400, 200, 10);
 preloadImageBox.style.backgroundImage &#x3D; getBackgroundImage(imageSet2[preloadImageBoxIndex]);
 preloadImages(imageSet2);
 
-addClickEvent(&#x27;preload-image-box-prev-btn&#x27;, function(){
-  if(preloadImageBoxIndex &lt; 1) {
+addClickEvent(&#x27;preload-image-box-prev-btn&#x27;, function () {
+  if (preloadImageBoxIndex &lt; 1) {
     return;
   }
   preloadImageBoxIndex -&#x3D; 1;
   preloadImageBox.style.backgroundImage &#x3D; getBackgroundImage(imageSet2[preloadImageBoxIndex]);
 });
 
-addClickEvent(&#x27;preload-image-box-next-btn&#x27;, function(){
-  if(preloadImageBoxIndex &gt;&#x3D; imageSet2.length - 1) {
+addClickEvent(&#x27;preload-image-box-next-btn&#x27;, function () {
+  if (preloadImageBoxIndex &gt;&#x3D; imageSet2.length - 1) {
     return;
   }
   preloadImageBoxIndex +&#x3D; 1;
@@ -133,7 +133,7 @@ addClickEvent(&#x27;preload-image-box-next-btn&#x27;, function(){
 });
 
 function preloadImages(images) {
-  images.forEach(function(src) {
+  images.forEach(function (src) {
     setTimeout(function () {
       var img &#x3D; new Image();
       img.src &#x3D; src;
@@ -223,7 +223,7 @@ function addClickEvent(id, callback) {
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;script&gt;
-      import {getRandomDummyImages} from &quot;../src/pg/utils/image&quot;;
+      import { getRandomDummyImages } from &quot;../src/pg/utils/image&quot;;
 
       var imageBox &#x3D; document.getElementById(&#x27;image-box&#x27;);
       var imageBoxIndex &#x3D; 0;
@@ -231,16 +231,16 @@ function addClickEvent(id, callback) {
 
       imageBox.style.backgroundImage &#x3D; getBackgroundImage(imageSet1[imageBoxIndex]);
 
-      addClickEvent(&#x27;image-box-prev-btn&#x27;, function(){
-        if(imageBoxIndex &lt; 1) {
+      addClickEvent(&#x27;image-box-prev-btn&#x27;, function () {
+        if (imageBoxIndex &lt; 1) {
           return;
         }
         imageBoxIndex -&#x3D; 1;
         imageBox.style.backgroundImage &#x3D; getBackgroundImage(imageSet1[imageBoxIndex]);
       });
 
-      addClickEvent(&#x27;image-box-next-btn&#x27;, function(){
-        if(imageBoxIndex &gt;&#x3D; imageSet1.length - 1) {
+      addClickEvent(&#x27;image-box-next-btn&#x27;, function () {
+        if (imageBoxIndex &gt;&#x3D; imageSet1.length - 1) {
           return;
         }
         imageBoxIndex +&#x3D; 1;
@@ -254,16 +254,16 @@ function addClickEvent(id, callback) {
       preloadImageBox.style.backgroundImage &#x3D; getBackgroundImage(imageSet2[preloadImageBoxIndex]);
       preloadImages(imageSet2);
 
-      addClickEvent(&#x27;preload-image-box-prev-btn&#x27;, function(){
-        if(preloadImageBoxIndex &lt; 1) {
+      addClickEvent(&#x27;preload-image-box-prev-btn&#x27;, function () {
+        if (preloadImageBoxIndex &lt; 1) {
           return;
         }
         preloadImageBoxIndex -&#x3D; 1;
         preloadImageBox.style.backgroundImage &#x3D; getBackgroundImage(imageSet2[preloadImageBoxIndex]);
       });
 
-      addClickEvent(&#x27;preload-image-box-next-btn&#x27;, function(){
-        if(preloadImageBoxIndex &gt;&#x3D; imageSet2.length - 1) {
+      addClickEvent(&#x27;preload-image-box-next-btn&#x27;, function () {
+        if (preloadImageBoxIndex &gt;&#x3D; imageSet2.length - 1) {
           return;
         }
         preloadImageBoxIndex +&#x3D; 1;
@@ -271,7 +271,7 @@ function addClickEvent(id, callback) {
       });
 
       function preloadImages(images) {
-        images.forEach(function(src) {
+        images.forEach(function (src) {
           setTimeout(function () {
             var img &#x3D; new Image();
             img.src &#x3D; src;

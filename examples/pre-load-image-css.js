@@ -1,4 +1,4 @@
-import {getRandomDummyImages} from "../src/pg/utils/image";
+import { getRandomDummyImages } from "../src/pg/utils/image";
 
 const imageBox = document.getElementById('image-box');
 let imageBoxIndex = 0;

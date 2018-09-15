@@ -15,8 +15,10 @@
   "bugs": {
     "url": "https://github.com/egaoneko/playground/issues"
   },
-  "dependencies": {},
   "sideEffects": [
     "example.css"
-  ]
+  ],
+  "dependencies": {
+    "eventemitter3": "^3.1.0"
+  }
 }
