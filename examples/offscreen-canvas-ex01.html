@@ -1,0 +1,30 @@
+---
+layout: example.html
+title: OffscreenCanvas Example 01
+shortdesc: OffscreenCanvas Example 01.
+docs: >
+  This page's `OffscreenCanvas` Example 01. Ref [OffscreenCanvas — Speed up Your Canvas Operations with a Web Worker](https://developers.google.com/web/updates/2018/08/offscreen-canvas)
+
+tags: "OffscreenCanvas, canvas, worker"
+resources:
+  - resources/js/stats.js
+---
+<div id="container" class="main">
+  <div class="canvas-box">
+    <h2>Canvas on main thread</h2>
+    <canvas id="canvas-window">
+    </canvas>
+  </div>
+
+  <div class="canvas-box">
+    <h2>Canvas on worker Thread</h2>
+    <canvas id="canvas-worker">
+    </canvas>
+  </div>
+</div>
+
+<button id="interaction-btn">Interaction Count : <span id="interaction-count">0</span></button>
+<br/>
+<input type="checkbox" id="canvas-window-check"><label for="canvas-window-check">Turn on busy with Canvas Window</label>
+<br/>
+<input type="checkbox" id="canvas-worker-check"><label for="canvas-worker-check">Turn on busy with Canvas Worker</label>

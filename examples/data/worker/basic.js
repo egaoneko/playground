@@ -1,5 +1,5 @@
 function sleep(delay) {
-  var start = new Date().getTime();
+  const start = new Date().getTime();
   console.log('Sleeping with worker!');
   while (new Date().getTime() < start + delay);
 }

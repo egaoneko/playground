@@ -102,7 +102,8 @@
       "naver": true,
       "THREE": true,
       "math": true,
-      "dat": true
+      "dat": true,
+      "olcs": true
     }
   },
   "sideEffects": [
