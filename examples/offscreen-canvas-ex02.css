@@ -1,0 +1,26 @@
+#container {
+  position: relative;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.canvas-box {
+  display: inline-block;
+  background-color: #ffffff;
+  padding: 10px;
+}
+
+.canvas-box h2 {
+  border-bottom: 1px solid #d3d3d3;
+  text-align: center;
+}
+
+#canvas-window {
+  width: 300px;
+  height: 300px;
+}
+
+#canvas-worker {
+  width: 300px;
+  height: 300px;
+}
