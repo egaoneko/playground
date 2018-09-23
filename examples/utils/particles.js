@@ -29,6 +29,7 @@ export default class Particles {
 
     this.camera = new THREE.PerspectiveCamera(27, this.width / this.height, 5, 3500);
     this.camera.position.z = 2750;
+
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x050505);
     this.scene.fog = new THREE.Fog(0x050505, 2000, 3500);

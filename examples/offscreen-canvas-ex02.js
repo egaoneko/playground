@@ -1,4 +1,4 @@
-import Particles from "./utils/particles";
+import Particles from './utils/particles';
 
 const windowCanvas = document.getElementById('canvas-window');
 const workerCanvas = document.getElementById('canvas-worker');

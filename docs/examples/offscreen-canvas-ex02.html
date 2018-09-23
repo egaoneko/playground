@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/96/three.min.js"></script>
 <script src="resources/js/stats.js"></script>
     <link rel="stylesheet" href="offscreen-canvas-ex02.css">
-    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set"></script>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
     <title>OffscreenCanvas Example 02</title>
   </head>
@@ -90,7 +90,7 @@
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
           <textarea class="hidden" name="title">OffscreenCanvas Example 02</textarea>
           <textarea class="hidden" name="description">OffscreenCanvas Example 02.</textarea>
-          <textarea class="hidden" name="js">import Particles from &quot;./utils/particles&quot;;
+          <textarea class="hidden" name="js">import Particles from &#x27;./utils/particles&#x27;;
 
 var windowCanvas &#x3D; document.getElementById(&#x27;canvas-window&#x27;);
 var workerCanvas &#x3D; document.getElementById(&#x27;canvas-worker&#x27;);
@@ -186,7 +186,7 @@ document.getElementById(&#x27;interaction-btn&#x27;).addEventListener(&#x27;clic
     &lt;title&gt;OffscreenCanvas Example 02&lt;/title&gt;
     &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
     &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
-    &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set"&gt;&lt;/script&gt;
+    &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
     &lt;script src&#x3D;&quot;https://cdnjs.cloudflare.com/ajax/libs/three.js/96/three.min.js&quot;&gt;&lt;/script&gt;
     &lt;script src&#x3D;&quot;http://www.3daysofprogramming.com/playground/examples/resources/js/stats.js&quot;&gt;&lt;/script&gt;
     &lt;style&gt;
@@ -239,7 +239,7 @@ document.getElementById(&#x27;interaction-btn&#x27;).addEventListener(&#x27;clic
     &lt;br/&gt;
     &lt;input type&#x3D;&quot;checkbox&quot; id&#x3D;&quot;canvas-worker-check&quot;&gt;&lt;label for&#x3D;&quot;canvas-worker-check&quot;&gt;Turn on busy with Canvas Worker&lt;/label&gt;
     &lt;script&gt;
-      import Particles from &quot;./utils/particles&quot;;
+      import Particles from &#x27;./utils/particles&#x27;;
 
       var windowCanvas &#x3D; document.getElementById(&#x27;canvas-window&#x27;);
       var workerCanvas &#x3D; document.getElementById(&#x27;canvas-worker&#x27;);
