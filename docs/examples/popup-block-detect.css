@@ -1,0 +1,14 @@
+#container {
+  position: relative;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.btn-box {
+  display: inline-block;
+}
+
+.btn-box button {
+  font-size: 28px;
+}
