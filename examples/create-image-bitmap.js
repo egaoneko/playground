@@ -56,7 +56,7 @@ function getSpritesFromCanvas(spriteSheet, sprites) {
     const loadedSpriteSheet = new Image();
 
     loadedSpriteSheet.src = spriteSheet;
-    loadedSpriteSheet.onload = _ => {
+    loadedSpriteSheet.onload = () => {
       Object
         .keys(sprites)
         .forEach(name => {
@@ -102,7 +102,7 @@ function getSpritesFromImageBitmap(spriteSheet, sprites) {
     const loadedSpriteSheet = new Image();
 
     loadedSpriteSheet.src = spriteSheet;
-    loadedSpriteSheet.onload = _ => {
+    loadedSpriteSheet.onload = () => {
       Object
         .keys(sprites)
         .forEach(name => {
