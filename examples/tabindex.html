@@ -1,0 +1,15 @@
+---
+layout: example.html
+title: tabindex
+shortdesc: tabindex example.
+docs: >
+  This page's tabindex example. Ref [Is it possible to focus on a div using JavaScript focus() function?](https://stackoverflow.com/questions/3656467/is-it-possible-to-focus-on-a-div-using-javascript-focus-function).
+
+tags: "tabindex"
+---
+<div id="container" class="main">
+  <div>Element X (not focusable)</div>
+  <div tabindex="0">Element Y (user or script focusable)</div>
+  <div tabindex="-1" id="scripted">Element Z (script-only focusable)</div>
+  <div id="test">Set Focus To Element Z</div>
+</div>
