@@ -170,7 +170,6 @@ const map = new ol.Map({
 
 //Apply a filter on "postcompose" events.
 raster.on('postcompose', function(event) {
-  console.log(event);
   greyscale(event.context);
 });
 

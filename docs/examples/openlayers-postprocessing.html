@@ -246,7 +246,6 @@ var map &#x3D; new ol.Map({
 
 //Apply a filter on &quot;postcompose&quot; events.
 raster.on(&#x27;postcompose&#x27;, function(event) {
-  console.log(event);
   greyscale(event.context);
 });
 
@@ -478,7 +477,6 @@ function greyscale(context) {
 
       //Apply a filter on &quot;postcompose&quot; events.
       raster.on(&#x27;postcompose&#x27;, function(event) {
-        console.log(event);
         greyscale(event.context);
       });
 
