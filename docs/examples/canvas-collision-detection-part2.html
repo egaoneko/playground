@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
     <link rel="stylesheet" href="./resources/layout-full.css" type="text/css">
     <script src="resources/js/stats.js"></script>
-    <link rel="stylesheet" href="canvas-becoming-pro-ep4.css">
+    <link rel="stylesheet" href="canvas-collision-detection-part2.css">
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
     <script
@@ -24,7 +24,7 @@
       integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
       crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <title>Canvas becoming a Pro EP4</title>
+    <title>Canvas Collision Detection Part 2</title>
   </head>
   <body>
   <header class="navbar dropdown" role="navigation">
@@ -52,13 +52,13 @@
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-          <h4 class="modal-title" id="modalLabel">Canvas becoming a Pro EP4</h4>
+          <h4 class="modal-title" id="modalLabel">Canvas Collision Detection Part 2</h4>
         </div>
         <div class="modal-body">
           <div class="row-fluid">
             <div class="span12">
-              <p id="shortdesc">Interacting with The Canvas.</p>
-              <div id="docs"><p>Interacting with The Canvas. Ref <a href="https://www.youtube.com/playlist?list=PLpPnRKq7eNW3We9VdCfx9fprhqXHwTPXL">HTML5 Canvas Tutorials for Beginners | Become a Canvas Pro</a>.</p>
+              <p id="shortdesc">How to Code Collision Detection.</p>
+              <div id="docs"><p>How to Code Collision Detection. Ref <a href="https://www.youtube.com/playlist?list=PLpPnRKq7eNW3We9VdCfx9fprhqXHwTPXL">HTML5 Canvas Tutorials for Beginners | Become a Canvas Pro</a>.</p>
 </div>
               <p id="tags">Tags: canvas</p>
             </div>
@@ -70,13 +70,15 @@
               <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
             </div>
             <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
-              <textarea class="hidden" name="title">Canvas becoming a Pro EP4</textarea>
-              <textarea class="hidden" name="description">Interacting with The Canvas.</textarea>
-              <textarea class="hidden" name="js">var canvas &#x3D; document.querySelector(&#x27;canvas&#x27;);
+              <textarea class="hidden" name="title">Canvas Collision Detection Part 2</textarea>
+              <textarea class="hidden" name="description">How to Code Collision Detection.</textarea>
+              <textarea class="hidden" name="js">import {randomInt, resolveCollision} from &#x27;pg/utils/math&#x27;;
+
+var canvas &#x3D; document.querySelector(&#x27;canvas&#x27;);
 var ctx &#x3D; canvas.getContext(&#x27;2d&#x27;);
 var mouse &#x3D; {
-  x: undefined,
-  y: undefined
+  x: 10,
+  y: 10
 };
 var colorSet &#x3D; [
   &#x27;#8be9fd&#x27;,
@@ -96,33 +98,56 @@ window.addEventListener(&#x27;resize&#x27;, function () {
   resize();
 });
 
-var Circle &#x3D; function Circle(x, y, dx, dy, radius, color) {
-  this.maxRadius &#x3D; 60;
-  this.minRadius &#x3D; radius;
-  this.interactiveSize &#x3D; 100;
+var Particle &#x3D; function Particle(x, y, dx, dy, radius, color, mass) {
+  this.interactiveSize &#x3D; 80;
 
   this.x &#x3D; x;
   this.y &#x3D; y;
-  this.dx &#x3D; dx;
-  this.dy &#x3D; dy;
+  this.velocity &#x3D; {
+    x: dx,
+    y: dy
+  };
   this.radius &#x3D; radius;
   this.color &#x3D; color;
+  this.mass &#x3D; mass;
+  this.opacity &#x3D; 0;
 };
 
-Circle.prototype.draw &#x3D; function draw () {
+Particle.prototype.draw &#x3D; function draw () {
   ctx.beginPath();
   ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+  ctx.globalAlpha &#x3D; this.opacity;
   ctx.fillStyle &#x3D; this.color;
   ctx.fill();
+  ctx.globalAlpha &#x3D; 1;
+  ctx.strokeStyle &#x3D; this.color;
+  ctx.stroke();
 };
 
-Circle.prototype.update &#x3D; function update () {
+Particle.prototype.update &#x3D; function update (particles) {
+    var this$1 &#x3D; this;
+
+  this.draw();
+
+  // check collided
+  particles.forEach(function (particle) {
+    if (this$1 &#x3D;&#x3D;&#x3D; particle) {
+      return;
+    }
+
+    if (!this$1.isCollided(particle)) {
+      return;
+    }
+
+    resolveCollision(this$1, particle);
+  });
+
   if (this.x + this.radius &gt;&#x3D; window.innerWidth || this.x - this.radius &lt;&#x3D; 0) {
-    this.dx *&#x3D; -1;
+    this.velocity.x *&#x3D; -1;
   }
 
   if (this.y + this.radius &gt;&#x3D; window.innerHeight || this.y - this.radius &lt;&#x3D; 0) {
-    this.dy *&#x3D; -1;
+    this.velocity.y *&#x3D; -1;
   }
 
   if (this.x - this.radius &lt; 0) {
@@ -141,42 +166,64 @@ Circle.prototype.update &#x3D; function update () {
     this.y &#x3D; window.innerHeight - this.radius;
   }
 
-  this.x +&#x3D; this.dx;
-  this.y +&#x3D; this.dy;
+  this.x +&#x3D; this.velocity.x;
+  this.y +&#x3D; this.velocity.y;
 
-  // interactivity
+  // mouse collide
   if (
     mouse.x - this.x &lt; this.interactiveSize &amp;&amp;
     mouse.x - this.x &gt; -this.interactiveSize &amp;&amp;
     mouse.y - this.y &lt; this.interactiveSize &amp;&amp;
-    mouse.y - this.y &gt; -this.interactiveSize
+    mouse.y - this.y &gt; -this.interactiveSize &amp;&amp;
+    this.opacity &lt; 0.5
   ) {
-    if (this.radius &lt; this.maxRadius) {
-      this.radius +&#x3D; 1;
-    }
-  } else if (this.radius &gt; this.minRadius) {
-    this.radius -&#x3D; 1;
+    this.opacity +&#x3D; 0.02
+  } else if (this.opacity &gt; 0) {
+    this.opacity -&#x3D; 0.02;
+    this.opacity &#x3D; Math.max(0, this.opacity);
   }
-
-  this.draw();
 };
 
-var balls &#x3D; [];
+Particle.prototype.isCollided &#x3D; function isCollided (particle) {
+  var x &#x3D; this.x - particle.x;
+  var y &#x3D; this.y - particle.y;
+  return (Math.pow(x, 2) + Math.pow(y, 2)) &lt;&#x3D; Math.pow((this.radius + particle.radius), 2);
+};
+
+var particles &#x3D; [];
+var cnt &#x3D; 0;
 
 function init() {
 
-  balls &#x3D; [];
+  particles &#x3D; [];
 
-  for (var i &#x3D; 0; i &lt; 800; i++) {
-    var radius &#x3D; Math.random() * 10 + 1;
-    var x &#x3D; Math.random() * (canvas.width - radius * 2) + radius;
-    var dx &#x3D; (Math.random() - 0.5) * 5; // for if random 0
-    var y &#x3D; Math.random() * (canvas.height - radius * 2) + radius;
-    var dy &#x3D; (Math.random() - 0.5) * 5;
-    var color &#x3D; colorSet[Math.floor(Math.random() * (colorSet.length - 1))];
+  var loop &#x3D; function ( i$1 ) {
+    var radius &#x3D; randomInt(8, 50);
+    var x &#x3D; randomInt(radius, canvas.width - radius);
+    var dx &#x3D; randomInt(-0.5, 0.5) * 5;
+    var y &#x3D; randomInt(radius, canvas.height - radius);
+    var dy &#x3D; randomInt(-0.5, 0.5) * 5;
+    var color &#x3D; colorSet[randomInt(0, colorSet.length)];
+    var mass &#x3D; 1;
+    var particle &#x3D; new Particle(x, y, dx, dy, radius, color, mass);
 
-    balls.push(new Circle(x, y, dx, dy, radius, color));
-  }
+    if (particles.some(function (p) { return particle.isCollided(p); })) {
+      cnt +&#x3D; 1;
+
+      if (cnt &gt; 100) {
+        return;
+      }
+
+      i$1 -&#x3D; 1;
+    } else {
+      cnt &#x3D; 0;
+      particles.push(particle);
+    }
+
+    i &#x3D; i$1;
+  };
+
+  for (var i &#x3D; 0; i &lt; 100; i++) loop( i );
 }
 
 function resize() {
@@ -188,7 +235,7 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle &#x3D; &#x27;#282a36&#x27;;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  balls.forEach(function (ball) { return ball.update(); });
+  particles.forEach(function (particle) { return particle.update(particles); });
   requestAnimationFrame(animate);
 }
 
@@ -212,7 +259,7 @@ animate();
             <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
-    &lt;title&gt;Canvas becoming a Pro EP4&lt;/title&gt;
+    &lt;title&gt;Canvas Collision Detection Part 2&lt;/title&gt;
     &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
     &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
@@ -231,11 +278,13 @@ animate();
       &lt;canvas&gt;&lt;/canvas&gt;
     &lt;/div&gt;
     &lt;script&gt;
+      import {randomInt, resolveCollision} from &#x27;pg/utils/math&#x27;;
+
       var canvas &#x3D; document.querySelector(&#x27;canvas&#x27;);
       var ctx &#x3D; canvas.getContext(&#x27;2d&#x27;);
       var mouse &#x3D; {
-        x: undefined,
-        y: undefined
+        x: 10,
+        y: 10
       };
       var colorSet &#x3D; [
         &#x27;#8be9fd&#x27;,
@@ -255,33 +304,56 @@ animate();
         resize();
       });
 
-      var Circle &#x3D; function Circle(x, y, dx, dy, radius, color) {
-        this.maxRadius &#x3D; 60;
-        this.minRadius &#x3D; radius;
-        this.interactiveSize &#x3D; 100;
+      var Particle &#x3D; function Particle(x, y, dx, dy, radius, color, mass) {
+        this.interactiveSize &#x3D; 80;
 
         this.x &#x3D; x;
         this.y &#x3D; y;
-        this.dx &#x3D; dx;
-        this.dy &#x3D; dy;
+        this.velocity &#x3D; {
+          x: dx,
+          y: dy
+        };
         this.radius &#x3D; radius;
         this.color &#x3D; color;
+        this.mass &#x3D; mass;
+        this.opacity &#x3D; 0;
       };
 
-      Circle.prototype.draw &#x3D; function draw () {
+      Particle.prototype.draw &#x3D; function draw () {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.globalAlpha &#x3D; this.opacity;
         ctx.fillStyle &#x3D; this.color;
         ctx.fill();
+        ctx.globalAlpha &#x3D; 1;
+        ctx.strokeStyle &#x3D; this.color;
+        ctx.stroke();
       };
 
-      Circle.prototype.update &#x3D; function update () {
+      Particle.prototype.update &#x3D; function update (particles) {
+          var this$1 &#x3D; this;
+
+        this.draw();
+
+        // check collided
+        particles.forEach(function (particle) {
+          if (this$1 &#x3D;&#x3D;&#x3D; particle) {
+            return;
+          }
+
+          if (!this$1.isCollided(particle)) {
+            return;
+          }
+
+          resolveCollision(this$1, particle);
+        });
+
         if (this.x + this.radius &gt;&#x3D; window.innerWidth || this.x - this.radius &lt;&#x3D; 0) {
-          this.dx *&#x3D; -1;
+          this.velocity.x *&#x3D; -1;
         }
 
         if (this.y + this.radius &gt;&#x3D; window.innerHeight || this.y - this.radius &lt;&#x3D; 0) {
-          this.dy *&#x3D; -1;
+          this.velocity.y *&#x3D; -1;
         }
 
         if (this.x - this.radius &lt; 0) {
@@ -300,42 +372,64 @@ animate();
           this.y &#x3D; window.innerHeight - this.radius;
         }
 
-        this.x +&#x3D; this.dx;
-        this.y +&#x3D; this.dy;
+        this.x +&#x3D; this.velocity.x;
+        this.y +&#x3D; this.velocity.y;
 
-        // interactivity
+        // mouse collide
         if (
           mouse.x - this.x &lt; this.interactiveSize &amp;&amp;
           mouse.x - this.x &gt; -this.interactiveSize &amp;&amp;
           mouse.y - this.y &lt; this.interactiveSize &amp;&amp;
-          mouse.y - this.y &gt; -this.interactiveSize
+          mouse.y - this.y &gt; -this.interactiveSize &amp;&amp;
+          this.opacity &lt; 0.5
         ) {
-          if (this.radius &lt; this.maxRadius) {
-            this.radius +&#x3D; 1;
-          }
-        } else if (this.radius &gt; this.minRadius) {
-          this.radius -&#x3D; 1;
+          this.opacity +&#x3D; 0.02
+        } else if (this.opacity &gt; 0) {
+          this.opacity -&#x3D; 0.02;
+          this.opacity &#x3D; Math.max(0, this.opacity);
         }
-
-        this.draw();
       };
 
-      var balls &#x3D; [];
+      Particle.prototype.isCollided &#x3D; function isCollided (particle) {
+        var x &#x3D; this.x - particle.x;
+        var y &#x3D; this.y - particle.y;
+        return (Math.pow(x, 2) + Math.pow(y, 2)) &lt;&#x3D; Math.pow((this.radius + particle.radius), 2);
+      };
+
+      var particles &#x3D; [];
+      var cnt &#x3D; 0;
 
       function init() {
 
-        balls &#x3D; [];
+        particles &#x3D; [];
 
-        for (var i &#x3D; 0; i &lt; 800; i++) {
-          var radius &#x3D; Math.random() * 10 + 1;
-          var x &#x3D; Math.random() * (canvas.width - radius * 2) + radius;
-          var dx &#x3D; (Math.random() - 0.5) * 5; // for if random 0
-          var y &#x3D; Math.random() * (canvas.height - radius * 2) + radius;
-          var dy &#x3D; (Math.random() - 0.5) * 5;
-          var color &#x3D; colorSet[Math.floor(Math.random() * (colorSet.length - 1))];
+        var loop &#x3D; function ( i$1 ) {
+          var radius &#x3D; randomInt(8, 50);
+          var x &#x3D; randomInt(radius, canvas.width - radius);
+          var dx &#x3D; randomInt(-0.5, 0.5) * 5;
+          var y &#x3D; randomInt(radius, canvas.height - radius);
+          var dy &#x3D; randomInt(-0.5, 0.5) * 5;
+          var color &#x3D; colorSet[randomInt(0, colorSet.length)];
+          var mass &#x3D; 1;
+          var particle &#x3D; new Particle(x, y, dx, dy, radius, color, mass);
 
-          balls.push(new Circle(x, y, dx, dy, radius, color));
-        }
+          if (particles.some(function (p) { return particle.isCollided(p); })) {
+            cnt +&#x3D; 1;
+
+            if (cnt &gt; 100) {
+              return;
+            }
+
+            i$1 -&#x3D; 1;
+          } else {
+            cnt &#x3D; 0;
+            particles.push(particle);
+          }
+
+          i &#x3D; i$1;
+        };
+
+        for (var i &#x3D; 0; i &lt; 100; i++) loop( i );
       }
 
       function resize() {
@@ -347,7 +441,7 @@ animate();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle &#x3D; &#x27;#282a36&#x27;;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        balls.forEach(function (ball) { return ball.update(); });
+        particles.forEach(function (particle) { return particle.update(particles); });
         requestAnimationFrame(animate);
       }
 
@@ -366,6 +460,6 @@ animate();
 
   <script src="./resources/common.js"></script>
   <script src="./resources/prism/prism.min.js"></script>
-  <script src="common.js"></script><script src="canvas-becoming-pro-ep4.js"></script>
+  <script src="common.js"></script><script src="canvas-collision-detection-part2.js"></script>
   </body>
 </html>

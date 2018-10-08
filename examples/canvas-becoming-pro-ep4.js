@@ -117,7 +117,7 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#282a36';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  balls.forEach(circle => circle.update());
+  balls.forEach(ball => ball.update());
   requestAnimationFrame(animate);
 }
 
