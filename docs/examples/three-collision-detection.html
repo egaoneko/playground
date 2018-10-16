@@ -119,18 +119,22 @@ var Particle &#x3D; function Particle(x, y, z, dx, dy, dz, radius, color, mass) 
 };
 
 Particle.prototype.update &#x3D; function update (particles) {
+    var this$1 &#x3D; this;
+
   // check collided
-  // particles.forEach(particle &#x3D;&gt; {
-  // if (this &#x3D;&#x3D;&#x3D; particle) {
-  //   return;
-  // }
-  //
-  // if (!this.isCollided(particle)) {
-  //   return;
-  // }
-  //
-  // resolveCollision(this, particle);
-  // });
+  particles.forEach(function (particle) {
+    if (this$1 &#x3D;&#x3D;&#x3D; particle) {
+      return;
+    }
+
+    if (!this$1.isCollided(particle)) {
+      return;
+    }
+
+    var temp &#x3D; this$1.velocity;
+    this$1.velocity &#x3D; particle.velocity;
+    particle.velocity &#x3D; temp;
+  });
 
   this.x +&#x3D; this.velocity.x;
   this.y +&#x3D; this.velocity.y;
@@ -167,6 +171,18 @@ Particle.prototype.update &#x3D; function update (particles) {
 
   if (this.z - this.radius &lt; -boundary) {
     this.z &#x3D; this.radius
+  }
+
+  if (this.x + this.radius &gt; boundary) {
+    this.x &#x3D; boundary - this.radius;
+  }
+
+  if (this.y + this.radius &gt; boundary) {
+    this.y &#x3D; boundary - this.radius;
+  }
+
+  if (this.z + this.radius &gt; boundary) {
+    this.z &#x3D; boundary - this.radius;
   }
 
   this.mesh.position.set(this.x, this.y, this.z);
@@ -234,7 +250,7 @@ function animate() {
 
 function render() {
   renderer.render(scene, camera);
-  particles.forEach(function (particle) { return particle.update(); });
+  particles.forEach(function (particle) { return particle.update(particles); });
 }
 
 function draw() {
@@ -274,7 +290,7 @@ function draw() {
     i &#x3D; i$1;
   };
 
-  for (var i &#x3D; 0; i &lt; 10; i++) loop( i );
+  for (var i &#x3D; 0; i &lt; 100; i++) loop( i );
 }
 </textarea>
               <textarea class="hidden" name="css">#container {
@@ -354,18 +370,22 @@ function draw() {
       };
 
       Particle.prototype.update &#x3D; function update (particles) {
+          var this$1 &#x3D; this;
+
         // check collided
-        // particles.forEach(particle &#x3D;&gt; {
-        // if (this &#x3D;&#x3D;&#x3D; particle) {
-        //   return;
-        // }
-        //
-        // if (!this.isCollided(particle)) {
-        //   return;
-        // }
-        //
-        // resolveCollision(this, particle);
-        // });
+        particles.forEach(function (particle) {
+          if (this$1 &#x3D;&#x3D;&#x3D; particle) {
+            return;
+          }
+
+          if (!this$1.isCollided(particle)) {
+            return;
+          }
+
+          var temp &#x3D; this$1.velocity;
+          this$1.velocity &#x3D; particle.velocity;
+          particle.velocity &#x3D; temp;
+        });
 
         this.x +&#x3D; this.velocity.x;
         this.y +&#x3D; this.velocity.y;
@@ -402,6 +422,18 @@ function draw() {
 
         if (this.z - this.radius &lt; -boundary) {
           this.z &#x3D; this.radius
+        }
+
+        if (this.x + this.radius &gt; boundary) {
+          this.x &#x3D; boundary - this.radius;
+        }
+
+        if (this.y + this.radius &gt; boundary) {
+          this.y &#x3D; boundary - this.radius;
+        }
+
+        if (this.z + this.radius &gt; boundary) {
+          this.z &#x3D; boundary - this.radius;
         }
 
         this.mesh.position.set(this.x, this.y, this.z);
@@ -469,7 +501,7 @@ function draw() {
 
       function render() {
         renderer.render(scene, camera);
-        particles.forEach(function (particle) { return particle.update(); });
+        particles.forEach(function (particle) { return particle.update(particles); });
       }
 
       function draw() {
@@ -509,7 +541,7 @@ function draw() {
           i &#x3D; i$1;
         };
 
-        for (var i &#x3D; 0; i &lt; 10; i++) loop( i );
+        for (var i &#x3D; 0; i &lt; 100; i++) loop( i );
       }
     &lt;/script&gt;
   &lt;/body&gt;

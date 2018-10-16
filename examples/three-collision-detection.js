@@ -45,17 +45,19 @@ class Particle {
 
   update(particles) {
     // check collided
-    // particles.forEach(particle => {
-    //   if (this === particle) {
-    //     return;
-    //   }
-    //
-    //   if (!this.isCollided(particle)) {
-    //     return;
-    //   }
-    //
-    //   resolveCollision(this, particle);
-    // });
+    particles.forEach(particle => {
+      if (this === particle) {
+        return;
+      }
+
+      if (!this.isCollided(particle)) {
+        return;
+      }
+
+      const temp = this.velocity;
+      this.velocity = particle.velocity;
+      particle.velocity = temp;
+    });
 
     this.x += this.velocity.x;
     this.y += this.velocity.y;
@@ -92,6 +94,18 @@ class Particle {
 
     if (this.z - this.radius < -boundary) {
       this.z = this.radius
+    }
+
+    if (this.x + this.radius > boundary) {
+      this.x = boundary - this.radius;
+    }
+
+    if (this.y + this.radius > boundary) {
+      this.y = boundary - this.radius;
+    }
+
+    if (this.z + this.radius > boundary) {
+      this.z = boundary - this.radius;
     }
 
     this.mesh.position.set(this.x, this.y, this.z);
@@ -160,7 +174,7 @@ function animate() {
 
 function render() {
   renderer.render(scene, camera);
-  particles.forEach(particle => particle.update());
+  particles.forEach(particle => particle.update(particles));
 }
 
 function draw() {
@@ -171,7 +185,7 @@ function draw() {
   scene.add(cube);
 
   let cnt = 0;
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 100; i++) {
     const radius = randomInt(1, 5);
     const x = randomInt(-boundary + radius, boundary - radius);
     const dx = randomInt(-0.5, 0.5);

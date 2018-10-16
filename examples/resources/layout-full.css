@@ -19,6 +19,7 @@ body{
   top: 0;
   right: 0;
   min-height: auto;
+  z-index: 10;
 }
 
 .navbar-brand {
