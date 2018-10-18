@@ -1,3 +1,7 @@
+#container {
+  overflow: auto;
+}
+
 .cursor-box {
   display: inline-block;
 }

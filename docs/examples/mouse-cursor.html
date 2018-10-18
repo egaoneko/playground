@@ -93,7 +93,11 @@
           <textarea class="hidden" name="title">Mouse Cursor</textarea>
           <textarea class="hidden" name="description">Mouse cursors using image, svg, svg-base64.</textarea>
           <textarea class="hidden" name="js"></textarea>
-          <textarea class="hidden" name="css">.cursor-box {
+          <textarea class="hidden" name="css">#container {
+  overflow: auto;
+}
+
+.cursor-box {
   display: inline-block;
 }
 
@@ -164,6 +168,10 @@
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
 
     &lt;style&gt;
+      #container {
+        overflow: auto;
+      }
+
       .cursor-box {
         display: inline-block;
       }

@@ -1,3 +1,7 @@
+#container {
+  overflow: auto;
+}
+
 .time-box {
   margin: 20px 0px;
   border: 1px solid #c8c8c8;

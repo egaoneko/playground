@@ -75,7 +75,6 @@ ol.inline>li {
   width: 100%;
   background: url(background.jpg) repeat;
   margin-bottom: 10px;
-  overflow: scroll;
 }
 
 .iframe-info iframe {

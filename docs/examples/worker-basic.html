@@ -125,7 +125,11 @@ sleep2BtnElement.addEventListener(&#x27;click&#x27;, function () {
   worker.postMessage(&#x27;Main to Worker message.&#x27;);
 });
 </textarea>
-          <textarea class="hidden" name="css">.time-box {
+          <textarea class="hidden" name="css">#container {
+  overflow: auto;
+}
+
+.time-box {
   margin: 20px 0px;
   border: 1px solid #c8c8c8;
   text-align: center;
@@ -177,6 +181,10 @@ sleep2BtnElement.addEventListener(&#x27;click&#x27;, function () {
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
 
     &lt;style&gt;
+      #container {
+        overflow: auto;
+      }
+
       .time-box {
         margin: 20px 0px;
         border: 1px solid #c8c8c8;
