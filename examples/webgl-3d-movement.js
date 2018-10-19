@@ -18,6 +18,9 @@ window.addEventListener('load', initWebGL);
 
 function initWebGL() {
   canvas = document.querySelector('#canvas');
+  container = document.querySelector('#container');
+  canvas.width = container.clientWidth;
+  canvas.height = container.clientHeight;
 
   try {
     gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -46,7 +49,7 @@ function setupWebGL() {
   gl.viewport(0, 0, canvas.width, canvas.height);
   mat4.perspective(pMatrix, 45, canvas.width / canvas.height, 0.1, 100.0);
   mat4.identity(mvMatrix);
-  mat4.translate(mvMatrix, mvMatrix, [0, 0, -2.0]);
+  mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -2.0]);
 }
 
 function initShaders() {
@@ -138,14 +141,14 @@ function setupDynamicBuffers() {
 
   const triangleVertices = [
     // left triangle
-    -0.5, 0.5, 0.0 + zTranslation,
-    0.0, 0.0, 0.0 + zTranslation,
-    -0.5, -0.5, 0.0 + zTranslation,
+    -1.0, 0.5, 0.0 + zTranslation,
+    -0.5, 0.0, 0.0 + zTranslation,
+    -1.0, -0.5, 0.0 + zTranslation,
 
     // right triangle
-    0.5, 0.5, 0.0 - zTranslation,
-    0.0, 0.0, 0.0 - zTranslation,
-    0.5, -0.5, 0.0 - zTranslation,
+    1.0, 0.5, 0.0 - zTranslation,
+    0.5, 0.0, 0.0 - zTranslation,
+    1.0, -0.5, 0.0 - zTranslation,
   ];
   angle += 0.01;
 

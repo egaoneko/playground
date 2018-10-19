@@ -94,6 +94,9 @@ window.addEventListener(&#x27;load&#x27;, initWebGL);
 
 function initWebGL() {
   canvas &#x3D; document.querySelector(&#x27;#canvas&#x27;);
+  container &#x3D; document.querySelector(&#x27;#container&#x27;);
+  canvas.width &#x3D; container.clientWidth;
+  canvas.height &#x3D; container.clientHeight;
 
   try {
     gl &#x3D; canvas.getContext(&#x27;webgl&#x27;) || canvas.getContext(&#x27;experimental-webgl&#x27;);
@@ -122,7 +125,7 @@ function setupWebGL() {
   gl.viewport(0, 0, canvas.width, canvas.height);
   mat4.perspective(pMatrix, 45, canvas.width / canvas.height, 0.1, 100.0);
   mat4.identity(mvMatrix);
-  mat4.translate(mvMatrix, mvMatrix, [0, 0, -2.0]);
+  mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -2.0]);
 }
 
 function initShaders() {
@@ -194,14 +197,14 @@ function setupDynamicBuffers() {
 
   var triangleVertices &#x3D; [
     // left triangle
-    -0.5, 0.5, 0.0 + zTranslation,
-    0.0, 0.0, 0.0 + zTranslation,
-    -0.5, -0.5, 0.0 + zTranslation,
+    -1.0, 0.5, 0.0 + zTranslation,
+    -0.5, 0.0, 0.0 + zTranslation,
+    -1.0, -0.5, 0.0 + zTranslation,
 
     // right triangle
-    0.5, 0.5, 0.0 - zTranslation,
-    0.0, 0.0, 0.0 - zTranslation,
-    0.5, -0.5, 0.0 - zTranslation ];
+    1.0, 0.5, 0.0 - zTranslation,
+    0.5, 0.0, 0.0 - zTranslation,
+    1.0, -0.5, 0.0 - zTranslation ];
   angle +&#x3D; 0.01;
 
   trianglesVerticesBuffer &#x3D; gl.createBuffer();
@@ -295,6 +298,9 @@ function setMatrixUniforms() {
 
       function initWebGL() {
         canvas &#x3D; document.querySelector(&#x27;#canvas&#x27;);
+        container &#x3D; document.querySelector(&#x27;#container&#x27;);
+        canvas.width &#x3D; container.clientWidth;
+        canvas.height &#x3D; container.clientHeight;
 
         try {
           gl &#x3D; canvas.getContext(&#x27;webgl&#x27;) || canvas.getContext(&#x27;experimental-webgl&#x27;);
@@ -323,7 +329,7 @@ function setMatrixUniforms() {
         gl.viewport(0, 0, canvas.width, canvas.height);
         mat4.perspective(pMatrix, 45, canvas.width / canvas.height, 0.1, 100.0);
         mat4.identity(mvMatrix);
-        mat4.translate(mvMatrix, mvMatrix, [0, 0, -2.0]);
+        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -2.0]);
       }
 
       function initShaders() {
@@ -395,14 +401,14 @@ function setMatrixUniforms() {
 
         var triangleVertices &#x3D; [
           // left triangle
-          -0.5, 0.5, 0.0 + zTranslation,
-          0.0, 0.0, 0.0 + zTranslation,
-          -0.5, -0.5, 0.0 + zTranslation,
+          -1.0, 0.5, 0.0 + zTranslation,
+          -0.5, 0.0, 0.0 + zTranslation,
+          -1.0, -0.5, 0.0 + zTranslation,
 
           // right triangle
-          0.5, 0.5, 0.0 - zTranslation,
-          0.0, 0.0, 0.0 - zTranslation,
-          0.5, -0.5, 0.0 - zTranslation ];
+          1.0, 0.5, 0.0 - zTranslation,
+          0.5, 0.0, 0.0 - zTranslation,
+          1.0, -0.5, 0.0 - zTranslation ];
         angle +&#x3D; 0.01;
 
         trianglesVerticesBuffer &#x3D; gl.createBuffer();

@@ -17,10 +17,10 @@
     <link rel="stylesheet" href="./resources/layout.css" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js"></script>
 <script src="resources/js/stats.js"></script>
-    <link rel="stylesheet" href="webgl-2d-movement.css">
+    <link rel="stylesheet" href="webgl-triangular-prism.css">
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
-    <title>WebGL 2d movement</title>
+    <title>WebGL triangular prism</title>
   </head>
   <body>
 
@@ -49,7 +49,7 @@
 
       <div class="row-fluid">
         <div class="span12">
-          <h4 id="title">WebGL 2d movement</h4>
+          <h4 id="title">WebGL triangular prism</h4>
           <div id="container" class="main">
   <canvas id="canvas"></canvas>
 </div>
@@ -59,8 +59,8 @@
 
       <div class="row-fluid">
         <div class="span12">
-          <p id="shortdesc">WebGL 2d movement.</p>
-          <div id="docs"><p>This page&#39;s try to WebGL 2d movement.</p>
+          <p id="shortdesc">WebGL triangular prism.</p>
+          <div id="docs"><p>This page&#39;s try to WebGL triangular prism.</p>
 </div>
           <p id="tags">Tags: webgl</p>
         </div>
@@ -72,8 +72,8 @@
           <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
         </div>
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
-          <textarea class="hidden" name="title">WebGL 2d movement</textarea>
-          <textarea class="hidden" name="description">WebGL 2d movement.</textarea>
+          <textarea class="hidden" name="title">WebGL triangular prism</textarea>
+          <textarea class="hidden" name="description">WebGL triangular prism.</textarea>
           <textarea class="hidden" name="js">var gl &#x3D; null;
 var canvas &#x3D; null;
 var glProgram &#x3D; null;
@@ -84,6 +84,10 @@ var vertexPositionAttribute &#x3D; null;
 var trianglesVerticesBuffer &#x3D; null;
 var vertexColorAttribute &#x3D; null;
 var trianglesColorBuffer &#x3D; null;
+var triangleVerticesIndexBuffer &#x3D; null;
+
+var pMatrix &#x3D; mat4.create();
+var mvMatrix &#x3D; mat4.create();
 
 var angle &#x3D; 0.0;
 
@@ -103,9 +107,10 @@ function initWebGL() {
   if (gl) {
     initShaders();
     setupBuffers();
+    getMatrixUniforms();
     (function animLoop() {
       setupWebGL();
-      setupDynamicBuffers();
+      setMatrixUniforms();
       drawScene();
       requestAnimationFrame(animLoop);
     })();
@@ -116,8 +121,14 @@ function setupWebGL() {
   // set the clear color to a shade of green
   gl.clearColor(0.1, 0.5, 0.1, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
 
   gl.viewport(0, 0, canvas.width, canvas.height);
+  mat4.perspective(pMatrix, 45, canvas.width / canvas.height, 0.1, 100.0);
+  mat4.identity(mvMatrix);
+  mat4.translate(mvMatrix, mvMatrix, [-1.0, -1.0, -7.0]);
+  mat4.rotate(mvMatrix, mvMatrix, angle, [0.0, 1.0, 0.0]);
+  angle +&#x3D; 0.01;
 }
 
 function initShaders() {
@@ -159,7 +170,7 @@ function makeShader(source, type) {
 }
 
 function vertexShaderSource() {
-  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    \n    varying highp vec4 vColor;\n    \n    void main(void) {\n      gl_Position &#x3D; vec4(aVertexPosition, 1.0);\n      vColor &#x3D; vec4(aVertexColor, 1.0);\n    }\n  &quot;;
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    \n    varying highp vec4 vColor;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      vColor &#x3D; vec4(aVertexColor, 1.0);\n    }\n  &quot;;
 }
 
 function fragmentShaderSource() {
@@ -168,40 +179,82 @@ function fragmentShaderSource() {
 
 function setupBuffers() {
   var triangleVerticesColors &#x3D; [
-    // left triangle
-    1.0, 0.0, 0.0,
-    1.0, 1.0, 1.0,
-    1.0, 0.0, 0.0,
-
-    // right triangle
+    // front face
     0.0, 0.0, 1.0,
     1.0, 1.0, 1.0,
-    0.0, 0.0, 1.0 ];
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0,
+    1.0, 1.0, 1.0,
+
+    // real face
+    0.0, 1.0, 1.0,
+    1.0, 1.0, 1.0,
+    0.0, 1.0, 1.0,
+    0.0, 1.0, 1.0,
+    0.0, 1.0, 1.0,
+    1.0, 1.0, 1.0 ];
 
   trianglesColorBuffer &#x3D; gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVerticesColors), gl.STATIC_DRAW);
-}
 
-function setupDynamicBuffers() {
-  // limit translation amount to -0.5 to 0.5
-  var xTranslation &#x3D; Math.sin(angle) / 2.0;
-
+  // 12 vertices
   var triangleVertices &#x3D; [
-    // left triangle
-    -0.5 + xTranslation, 0.5, 0.0,
-    0.0 + xTranslation, 0.0, 0.0,
-    -0.5 + xTranslation, -0.5, 0.0,
+    // front face
+    // bottom left to right, to top
+    0.0, 0.0, 0.0,
+    1.0, 0.0, 0.0,
+    2.0, 0.0, 0.0,
+    0.5, 1.0, 0.0,
+    1.5, 1.0, 0.0,
+    1.0, 2.0, 0.0,
 
-    // right triangle
-    0.5 + xTranslation, 0.5, 0.0,
-    0.0 + xTranslation, 0.0, 0.0,
-    0.5 + xTranslation, -0.5, 0.0 ];
-  angle +&#x3D; 0.01;
-
+    // rear face
+    0.0, 0.0, -2.0,
+    1.0, 0.0, -2.0,
+    2.0, 0.0, -2.0,
+    0.5, 1.0, -2.0,
+    1.5, 1.0, -2.0,
+    1.0, 2.0, -2.0 ];
   trianglesVerticesBuffer &#x3D; gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticesBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVertices), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVertices), gl.STATIC_DRAW);
+
+  // setup vertices buffer
+  // 18 triangles
+  var triangleVertexIndices &#x3D; [
+    // front face
+    0, 1, 3,
+    1, 3, 4,
+    1, 2, 4,
+    3, 4, 5,
+
+    // rear face
+    6, 7, 9,
+    7, 9, 10,
+    7, 8, 10,
+    9, 10, 11,
+
+    // left face
+    0, 3, 6,
+    3, 6, 9,
+    3, 5, 9,
+    5, 9, 11,
+
+    // right face
+    2, 4, 8,
+    4, 8, 10,
+    4, 5, 10,
+    5, 10, 11,
+
+    // bottom face
+    0, 6, 8,
+    8, 2, 0 ];
+  triangleVerticesIndexBuffer &#x3D; gl.createBuffer();
+  triangleVerticesIndexBuffer.numberVertexPoints &#x3D; triangleVertexIndices.length;
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleVerticesIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(triangleVertexIndices), gl.STATIC_DRAW);
 }
 
 function drawScene() {
@@ -215,7 +268,18 @@ function drawScene() {
   gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffer);
   gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
 
-  gl.drawArrays(gl.TRIANGLES, 0, 6);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleVerticesIndexBuffer);
+  gl.drawElements(gl.TRIANGLES, triangleVerticesIndexBuffer.numberVertexPoints, gl.UNSIGNED_SHORT, 0);
+}
+
+function getMatrixUniforms() {
+  glProgram.pMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uPMatrix&#x27;);
+  glProgram.mvMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uMVMatrix&#x27;);
+}
+
+function setMatrixUniforms() {
+  gl.uniformMatrix4fv(glProgram.pMatrixUniform, false, pMatrix);
+  gl.uniformMatrix4fv(glProgram.mvMatrixUniform, false, mvMatrix);
 }
 </textarea>
           <textarea class="hidden" name="css">#container {
@@ -237,7 +301,7 @@ function drawScene() {
         <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
-    &lt;title&gt;WebGL 2d movement&lt;/title&gt;
+    &lt;title&gt;WebGL triangular prism&lt;/title&gt;
     &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
     &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
@@ -270,6 +334,10 @@ function drawScene() {
       var trianglesVerticesBuffer &#x3D; null;
       var vertexColorAttribute &#x3D; null;
       var trianglesColorBuffer &#x3D; null;
+      var triangleVerticesIndexBuffer &#x3D; null;
+
+      var pMatrix &#x3D; mat4.create();
+      var mvMatrix &#x3D; mat4.create();
 
       var angle &#x3D; 0.0;
 
@@ -289,9 +357,10 @@ function drawScene() {
         if (gl) {
           initShaders();
           setupBuffers();
+          getMatrixUniforms();
           (function animLoop() {
             setupWebGL();
-            setupDynamicBuffers();
+            setMatrixUniforms();
             drawScene();
             requestAnimationFrame(animLoop);
           })();
@@ -302,8 +371,14 @@ function drawScene() {
         // set the clear color to a shade of green
         gl.clearColor(0.1, 0.5, 0.1, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.enable(gl.DEPTH_TEST);
 
         gl.viewport(0, 0, canvas.width, canvas.height);
+        mat4.perspective(pMatrix, 45, canvas.width / canvas.height, 0.1, 100.0);
+        mat4.identity(mvMatrix);
+        mat4.translate(mvMatrix, mvMatrix, [-1.0, -1.0, -7.0]);
+        mat4.rotate(mvMatrix, mvMatrix, angle, [0.0, 1.0, 0.0]);
+        angle +&#x3D; 0.01;
       }
 
       function initShaders() {
@@ -345,7 +420,7 @@ function drawScene() {
       }
 
       function vertexShaderSource() {
-        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    \n    varying highp vec4 vColor;\n    \n    void main(void) {\n      gl_Position &#x3D; vec4(aVertexPosition, 1.0);\n      vColor &#x3D; vec4(aVertexColor, 1.0);\n    }\n  &quot;;
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    \n    varying highp vec4 vColor;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      vColor &#x3D; vec4(aVertexColor, 1.0);\n    }\n  &quot;;
       }
 
       function fragmentShaderSource() {
@@ -354,40 +429,82 @@ function drawScene() {
 
       function setupBuffers() {
         var triangleVerticesColors &#x3D; [
-          // left triangle
-          1.0, 0.0, 0.0,
-          1.0, 1.0, 1.0,
-          1.0, 0.0, 0.0,
-
-          // right triangle
+          // front face
           0.0, 0.0, 1.0,
           1.0, 1.0, 1.0,
-          0.0, 0.0, 1.0 ];
+          0.0, 0.0, 1.0,
+          0.0, 0.0, 1.0,
+          0.0, 0.0, 1.0,
+          1.0, 1.0, 1.0,
+
+          // real face
+          0.0, 1.0, 1.0,
+          1.0, 1.0, 1.0,
+          0.0, 1.0, 1.0,
+          0.0, 1.0, 1.0,
+          0.0, 1.0, 1.0,
+          1.0, 1.0, 1.0 ];
 
         trianglesColorBuffer &#x3D; gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVerticesColors), gl.STATIC_DRAW);
-      }
 
-      function setupDynamicBuffers() {
-        // limit translation amount to -0.5 to 0.5
-        var xTranslation &#x3D; Math.sin(angle) / 2.0;
-
+        // 12 vertices
         var triangleVertices &#x3D; [
-          // left triangle
-          -0.5 + xTranslation, 0.5, 0.0,
-          0.0 + xTranslation, 0.0, 0.0,
-          -0.5 + xTranslation, -0.5, 0.0,
+          // front face
+          // bottom left to right, to top
+          0.0, 0.0, 0.0,
+          1.0, 0.0, 0.0,
+          2.0, 0.0, 0.0,
+          0.5, 1.0, 0.0,
+          1.5, 1.0, 0.0,
+          1.0, 2.0, 0.0,
 
-          // right triangle
-          0.5 + xTranslation, 0.5, 0.0,
-          0.0 + xTranslation, 0.0, 0.0,
-          0.5 + xTranslation, -0.5, 0.0 ];
-        angle +&#x3D; 0.01;
-
+          // rear face
+          0.0, 0.0, -2.0,
+          1.0, 0.0, -2.0,
+          2.0, 0.0, -2.0,
+          0.5, 1.0, -2.0,
+          1.5, 1.0, -2.0,
+          1.0, 2.0, -2.0 ];
         trianglesVerticesBuffer &#x3D; gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticesBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVertices), gl.DYNAMIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVertices), gl.STATIC_DRAW);
+
+        // setup vertices buffer
+        // 18 triangles
+        var triangleVertexIndices &#x3D; [
+          // front face
+          0, 1, 3,
+          1, 3, 4,
+          1, 2, 4,
+          3, 4, 5,
+
+          // rear face
+          6, 7, 9,
+          7, 9, 10,
+          7, 8, 10,
+          9, 10, 11,
+
+          // left face
+          0, 3, 6,
+          3, 6, 9,
+          3, 5, 9,
+          5, 9, 11,
+
+          // right face
+          2, 4, 8,
+          4, 8, 10,
+          4, 5, 10,
+          5, 10, 11,
+
+          // bottom face
+          0, 6, 8,
+          8, 2, 0 ];
+        triangleVerticesIndexBuffer &#x3D; gl.createBuffer();
+        triangleVerticesIndexBuffer.numberVertexPoints &#x3D; triangleVertexIndices.length;
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleVerticesIndexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(triangleVertexIndices), gl.STATIC_DRAW);
       }
 
       function drawScene() {
@@ -401,7 +518,18 @@ function drawScene() {
         gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffer);
         gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
 
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleVerticesIndexBuffer);
+        gl.drawElements(gl.TRIANGLES, triangleVerticesIndexBuffer.numberVertexPoints, gl.UNSIGNED_SHORT, 0);
+      }
+
+      function getMatrixUniforms() {
+        glProgram.pMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uPMatrix&#x27;);
+        glProgram.mvMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uMVMatrix&#x27;);
+      }
+
+      function setMatrixUniforms() {
+        gl.uniformMatrix4fv(glProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(glProgram.mvMatrixUniform, false, mvMatrix);
       }
     &lt;/script&gt;
   &lt;/body&gt;
@@ -411,6 +539,6 @@ function drawScene() {
 
     <script src="./resources/common.js"></script>
     <script src="./resources/prism/prism.min.js"></script>
-    <script src="common.js"></script><script src="webgl-2d-movement.js"></script>
+    <script src="common.js"></script><script src="webgl-triangular-prism.js"></script>
   </body>
 </html>
