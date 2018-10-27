@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-62717870-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-62717870-1');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
+    <link rel="stylesheet" href="./resources/layout.css" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js"></script>
+<script src="resources/js/stats.js"></script>
+    <link rel="stylesheet" href="webgl-triangular-prism-texture.css">
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+    <title>WebGL triangular prism with texture</title>
+  </head>
+  <body>
+
+    <header class="navbar" role="navigation">
+      <div class="container">
+        <div class="display-table pull-left" id="navbar-logo-container">
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
+        </div>
+        <!-- menu items that get hidden below 768px width -->
+        <nav class='collapse navbar-collapse navbar-responsive-collapse'>
+          <ul class="nav navbar-nav pull-right">
+            <li><a class="active" href="index.html">Examples</a></li>
+            <li><a href="../apidoc">API</a></li>
+            <li><a href="https://github.com/egaoneko/playground">Code</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container-fluid">
+
+      <div id="latest-check" class="alert alert-warning alert-dismissible" role="alert" style="display:none">
+        <button id="latest-dismiss" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        This example uses Playground v<span>0.0.1</span>. The <a id="latest-link" href="#" class="alert-link">latest</a> is v<span id="latest-version"></span>.
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <h4 id="title">WebGL triangular prism with texture</h4>
+          <div id="container" class="main">
+  <canvas id="canvas"></canvas>
+</div>
+
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <p id="shortdesc">WebGL triangular prism with texture.</p>
+          <div id="docs"><p>This page&#39;s try to WebGL triangular prism texture.</p>
+</div>
+          <p id="tags">Tags: webgl</p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div id="source-controls">
+          <a id="copy-button" data-clipboard-target="#example-source"><i class="fa fa-clipboard"></i> Copy</a>
+          <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
+        </div>
+        <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
+          <textarea class="hidden" name="title">WebGL triangular prism with texture</textarea>
+          <textarea class="hidden" name="description">WebGL triangular prism with texture.</textarea>
+          <textarea class="hidden" name="js">var gl &#x3D; null;
+var canvas &#x3D; null;
+var glProgram &#x3D; null;
+var fragmentShader &#x3D; null;
+var vertexShader &#x3D; null;
+
+var vertexPositionAttribute &#x3D; null;
+var trianglesVerticesBuffer &#x3D; null;
+var vertexTexCoordAttribute &#x3D; null;
+var trianglesTexCoordBuffer &#x3D; null;
+var vertexNormalAttribute &#x3D; null;
+var trianglesNormalBuffer &#x3D; null;
+
+var STONE_TEXTURE &#x3D; 0;
+var WEBGL_LOGO_TEXTURE &#x3D; 1;
+var textures &#x3D; [];
+var textureImages &#x3D; [];
+
+var pMatrix &#x3D; mat4.create();
+var mvMatrix &#x3D; mat4.create();
+var normalMatrix &#x3D; mat3.create();
+
+var angle &#x3D; 0.0;
+
+var paused &#x3D; false;
+var useTexture &#x3D; false;
+var useLighting &#x3D; false;
+
+window.addEventListener(&#x27;load&#x27;, initWebGL);
+document.addEventListener(&#x27;keyup&#x27;, function (evt) {
+  switch (evt.keyCode) {
+    case 80: // &#x27;p&#x27;
+      paused &#x3D; !paused;
+      break;
+    case 84: // &#x27;t&#x27;
+      useTexture &#x3D; !useTexture;
+
+      if (useTexture) {
+        gl.uniform1i(glProgram.uDoTexturing, 1);
+      } else {
+        gl.uniform1i(glProgram.uDoTexturing, 0);
+      }
+      break;
+    case 76: // &#x27;l&#x27;
+      useLighting &#x3D; !useLighting;
+      break;
+    default:
+      break;
+  }
+});
+
+function initWebGL() {
+  canvas &#x3D; document.querySelector(&#x27;#canvas&#x27;);
+  container &#x3D; document.querySelector(&#x27;#container&#x27;);
+  canvas.width &#x3D; container.clientWidth;
+  canvas.height &#x3D; container.clientHeight;
+
+  try {
+    gl &#x3D; canvas.getContext(&#x27;webgl&#x27;) || canvas.getContext(&#x27;experimental-webgl&#x27;);
+  } catch (e) {
+  }
+
+  if (gl) {
+    initShaders();
+    setupBuffers();
+    getMatrixUniforms();
+    loadTexture();
+
+    (function animLoop() {
+
+      if (!paused) {
+        setupWebGL();
+        setMatrixUniforms();
+        drawScene();
+      }
+
+      requestAnimationFrame(animLoop);
+    })();
+  }
+}
+
+function setupWebGL() {
+  // set the clear color to a shade of green
+  gl.clearColor(0.1, 0.5, 0.1, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  mat4.perspective(pMatrix, 45, canvas.width / canvas.height, 0.1, 100.0);
+  mat4.identity(mvMatrix);
+  mat4.translate(mvMatrix, mvMatrix, [-1.0, -1.0, -7.0]);
+  mat4.rotate(mvMatrix, mvMatrix, angle, [0.0, 1.0, 0.0]);
+  angle +&#x3D; 0.01;
+
+  var invertedMatrix &#x3D; mat3.create();
+  mat3.fromMat4(invertedMatrix, mvMatrix);
+  mat3.invert(normalMatrix, invertedMatrix);
+  mat3.transpose(normalMatrix, normalMatrix);
+}
+
+function initShaders() {
+  // get shader source
+  var vsSource &#x3D; vertexShaderSource();
+  var fsSource &#x3D; fragmentShaderSource();
+
+  // compile shaders
+  vertexShader &#x3D; makeShader(vsSource, gl.VERTEX_SHADER);
+  fragmentShader &#x3D; makeShader(fsSource, gl.FRAGMENT_SHADER);
+
+  // create program
+  glProgram &#x3D; gl.createProgram();
+
+  // attach and link shaders to the program
+  gl.attachShader(glProgram, vertexShader);
+  gl.attachShader(glProgram, fragmentShader);
+  gl.linkProgram(glProgram);
+
+  if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
+    alert(&#x27;Unable to initialize the shader program.&#x27;);
+  }
+
+  // use program
+  gl.useProgram(glProgram);
+}
+
+function makeShader(source, type) {
+  // compile the shader
+  var shader &#x3D; gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    alert((&quot;Error compiling shader: &quot; + (gl.getShaderInfoLog(shader))));
+  }
+
+  return shader;
+}
+
+function vertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec2 aVertexTexCoord;\n    attribute vec3 aVertexNormal;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    uniform mat3 uNormalMatrix;\n    \n    varying highp vec2 vTextureCoord;\n    varying highp vec3 vLight;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      vTextureCoord &#x3D; aVertexTexCoord;\n      \n      // lighting\n      vec3 ambientLight &#x3D; vec3(0.3, 0.3, 0.3);\n      vec3 transformedNormal &#x3D; uNormalMatrix * aVertexNormal;\n      vec3 lightColor &#x3D; vec3(0.5, 0.5, 0.5);\n      \n      // vec3 directionalLightPosition &#x3D; normalize(vec3(10.0, 10.0, 5.0));\n      // vec3 light &#x3D; vec3(uPMatrix * uMVMatrix * vec4(directionalLightPosition, 1.0));\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0,2.0,-1.0);\n      vec3 pointLightDirection &#x3D; normalize(vec3(pointLightPosition.xyz - aVertexPosition.xyz));\n      vec3 light &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      \n      float diffuseLightAmount &#x3D; max(dot(normalize(transformedNormal), normalize(light)), 0.0);\n      vLight &#x3D; ambientLight + (diffuseLightAmount * lightColor);\n    }\n  &quot;;
+}
+
+function fragmentShaderSource() {
+  return &quot;\n    varying highp vec2 vTextureCoord;\n    varying highp vec3 vLight;\n    \n    uniform sampler2D uSampler0;\n    uniform sampler2D uSampler1;\n    uniform int uDoTexturing;\n    \n    void main(void) {\n      if (uDoTexturing &#x3D;&#x3D; 1) {\n        highp vec4 stoneColor &#x3D; texture2D(uSampler0, vec2(vTextureCoord.st));\n        highp vec4 webglLogoColor &#x3D; texture2D(uSampler1, vec2(vTextureCoord.st));\n        \n        // highp vec4 vColor &#x3D; mix(stoneColor, webglLogoColor, 0.5);\n        highp vec4 vColor &#x3D; mix(stoneColor, webglLogoColor, webglLogoColor.a);\n        // highp vec4 vColor &#x3D; mix(stoneColor, webglLogoColor, 1.0 - webglLogoColor.a);\n        \n        gl_FragColor &#x3D; vec4(vColor.xyz * vLight, vColor.a);\n      } else {\n        gl_FragColor &#x3D; vec4(vec3(1.0, 0.1, 0.1) * vLight, 1.0);\n      }\n    }\n  &quot;;
+}
+
+function setupBuffers() {
+  // 12 vertices
+  var triangleVerticesOriginal &#x3D; [
+    // front face
+    // bottom left to right, to top
+    0.0, 0.0, 0.0,
+    1.0, 0.0, 0.0,
+    2.0, 0.0, 0.0,
+    0.5, 1.0, 0.0,
+    1.5, 1.0, 0.0,
+    1.0, 2.0, 0.0,
+
+    // rear face
+    0.0, 0.0, -2.0,
+    1.0, 0.0, -2.0,
+    2.0, 0.0, -2.0,
+    0.5, 1.0, -2.0,
+    1.5, 1.0, -2.0,
+    1.0, 2.0, -2.0 ];
+
+  // setup vertices buffer
+  // 16 triangles
+  var triangleVertexIndices &#x3D; [
+    //front face
+    0, 1, 3,
+    1, 4, 3, //flipped
+    1, 2, 4,
+    3, 4, 5,
+
+    //rear face
+    6, 9, 7,
+    7, 9, 10, //flipped
+    7, 10, 8,
+    9, 11, 10,
+
+    //left side
+    0, 3, 6,
+    3, 9, 6, //flipped
+    3, 5, 9,
+    5, 11, 9, //flipped
+
+    //right side
+    2, 8, 4, //flipped
+    4, 8, 10,
+    4, 10, 5, //flipped
+    5, 10, 11 ];
+
+  //48 vertices
+  var triangleVertices &#x3D; [];
+  var triangleTexCoords &#x3D; [];
+  for (var i &#x3D; 0; i &lt; triangleVertexIndices.length; ++i) {
+    var a &#x3D; triangleVertexIndices[i];
+    triangleVertices.push(triangleVerticesOriginal[a * 3]);
+    triangleVertices.push(triangleVerticesOriginal[a * 3 + 1]);
+    triangleVertices.push(triangleVerticesOriginal[a * 3 + 2]);
+    if (i &gt;&#x3D; 24) {
+      triangleTexCoords.push(triangleVerticesOriginal[a * 3 + 1]);
+      triangleTexCoords.push(triangleVerticesOriginal[a * 3 + 2]);
+    } else {
+      triangleTexCoords.push(triangleVerticesOriginal[a * 3]);
+      triangleTexCoords.push(triangleVerticesOriginal[a * 3 + 1]);
+    }
+  }
+
+  trianglesVerticesBuffer &#x3D; gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticesBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVertices), gl.STATIC_DRAW);
+  trianglesTexCoordBuffer &#x3D; gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesTexCoordBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleTexCoords), gl.STATIC_DRAW);
+
+  var triangleNormals &#x3D; [];
+  for (var i$1 &#x3D; 0; i$1 &lt; triangleVertexIndices.length; i$1 +&#x3D; 3) {
+    var a$1 &#x3D; triangleVertexIndices[i$1];
+    var b &#x3D; triangleVertexIndices[i$1 + 1];
+    var c &#x3D; triangleVertexIndices[i$1 + 2];
+    //normal is the cross product
+    var v1 &#x3D; [
+      triangleVerticesOriginal[a$1 * 3] - triangleVerticesOriginal[b * 3],
+      triangleVerticesOriginal[a$1 * 3 + 1] - triangleVerticesOriginal[b * 3 + 1],
+      triangleVerticesOriginal[a$1 * 3 + 2] - triangleVerticesOriginal[b * 3 + 2] ];
+    var v2 &#x3D; [
+      triangleVerticesOriginal[a$1 * 3] - triangleVerticesOriginal[c * 3],
+      triangleVerticesOriginal[a$1 * 3 + 1] - triangleVerticesOriginal[c * 3 + 1],
+      triangleVerticesOriginal[a$1 * 3 + 2] - triangleVerticesOriginal[c * 3 + 2] ];
+    var cross &#x3D; [
+      v1[1] * v2[2] - v1[2] * v2[1],
+      v1[2] * v2[0] - v1[0] * v2[2],
+      v1[0] * v2[1] - v1[1] * v2[0]
+    ];
+    //same value for each of the three vertices
+    triangleNormals.push.apply(triangleNormals, cross);
+    triangleNormals.push.apply(triangleNormals, cross);
+    triangleNormals.push.apply(triangleNormals, cross);
+  }
+
+  trianglesNormalBuffer &#x3D; gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleNormals), gl.STATIC_DRAW);
+}
+
+function drawScene() {
+  vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &#x27;aVertexPosition&#x27;);
+  gl.enableVertexAttribArray(vertexPositionAttribute);
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticesBuffer);
+  gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+  vertexTexCoordAttribute &#x3D; gl.getAttribLocation(glProgram, &#x27;aVertexTexCoord&#x27;);
+  gl.enableVertexAttribArray(vertexTexCoordAttribute);
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesTexCoordBuffer);
+  gl.vertexAttribPointer(vertexTexCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+
+  vertexNormalAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexNormal&quot;);
+  gl.enableVertexAttribArray(vertexNormalAttribute);
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffer);
+  gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+
+  gl.drawArrays(gl.TRIANGLES, 0, 16 * 3);
+}
+
+function getMatrixUniforms() {
+  glProgram.pMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uPMatrix&#x27;);
+  glProgram.mvMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uMVMatrix&#x27;);
+  glProgram.samplerUnifrom0 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler0&#x27;);
+  glProgram.samplerUnifrom1 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler1&#x27;);
+  glProgram.normalMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &quot;uNormalMatrix&quot;);
+}
+
+function setMatrixUniforms() {
+  gl.uniformMatrix4fv(glProgram.pMatrixUniform, false, pMatrix);
+  gl.uniformMatrix4fv(glProgram.mvMatrixUniform, false, mvMatrix);
+  gl.uniformMatrix3fv(glProgram.normalMatrixUniform, false, normalMatrix);
+}
+
+function loadTexture() {
+  textureImages[STONE_TEXTURE] &#x3D; new Image();
+  textureImages[STONE_TEXTURE].onload &#x3D; function () {
+    setupTexture(0);
+    gl.uniform1i(glProgram.samplerUnifrom0, 0);
+  };
+  textureImages[STONE_TEXTURE].src &#x3D; &#x27;data/img/stone-128px.jpg&#x27;;
+
+  textureImages[WEBGL_LOGO_TEXTURE] &#x3D; new Image();
+  textureImages[WEBGL_LOGO_TEXTURE].onload &#x3D; function () {
+    setupTexture(1);
+    gl.uniform1i(glProgram.samplerUnifrom1, 1);
+  };
+  textureImages[WEBGL_LOGO_TEXTURE].src &#x3D; &#x27;data/img/webgl_logo-512px.png&#x27;;
+}
+
+function setupTexture(i) {
+  gl.activeTexture(gl.TEXTURE0 + i);
+  textures[i] &#x3D; gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, textures[i]);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImages[i]);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+
+
+  glProgram.uDoTexturing &#x3D; gl.getUniformLocation(glProgram, &#x27;uDoTexturing&#x27;);
+  gl.uniform1i(glProgram.uDoTexturing, 1);
+
+  if (!gl.isTexture(textures[i])) {
+    console.error(&#x27;Error: Texture is invalid&#x27;);
+  }
+
+}
+</textarea>
+          <textarea class="hidden" name="css">#container {
+  position: relative;
+  overflow: hidden;
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+}
+</textarea>
+          <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+  &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
+&lt;/div&gt;
+</textarea>
+          <input type="hidden" name="data">
+        </form>
+        <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;WebGL triangular prism with texture&lt;/title&gt;
+    &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
+    &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
+    &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;http://www.3daysofprogramming.com/playground/examples/resources/js/stats.js&quot;&gt;&lt;/script&gt;
+    &lt;style&gt;
+      #container {
+        position: relative;
+        overflow: hidden;
+      }
+
+      #canvas {
+        width: 100%;
+        height: 100%;
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+      &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+      var gl &#x3D; null;
+      var canvas &#x3D; null;
+      var glProgram &#x3D; null;
+      var fragmentShader &#x3D; null;
+      var vertexShader &#x3D; null;
+
+      var vertexPositionAttribute &#x3D; null;
+      var trianglesVerticesBuffer &#x3D; null;
+      var vertexTexCoordAttribute &#x3D; null;
+      var trianglesTexCoordBuffer &#x3D; null;
+      var vertexNormalAttribute &#x3D; null;
+      var trianglesNormalBuffer &#x3D; null;
+
+      var STONE_TEXTURE &#x3D; 0;
+      var WEBGL_LOGO_TEXTURE &#x3D; 1;
+      var textures &#x3D; [];
+      var textureImages &#x3D; [];
+
+      var pMatrix &#x3D; mat4.create();
+      var mvMatrix &#x3D; mat4.create();
+      var normalMatrix &#x3D; mat3.create();
+
+      var angle &#x3D; 0.0;
+
+      var paused &#x3D; false;
+      var useTexture &#x3D; false;
+      var useLighting &#x3D; false;
+
+      window.addEventListener(&#x27;load&#x27;, initWebGL);
+      document.addEventListener(&#x27;keyup&#x27;, function (evt) {
+        switch (evt.keyCode) {
+          case 80: // &#x27;p&#x27;
+            paused &#x3D; !paused;
+            break;
+          case 84: // &#x27;t&#x27;
+            useTexture &#x3D; !useTexture;
+
+            if (useTexture) {
+              gl.uniform1i(glProgram.uDoTexturing, 1);
+            } else {
+              gl.uniform1i(glProgram.uDoTexturing, 0);
+            }
+            break;
+          case 76: // &#x27;l&#x27;
+            useLighting &#x3D; !useLighting;
+            break;
+          default:
+            break;
+        }
+      });
+
+      function initWebGL() {
+        canvas &#x3D; document.querySelector(&#x27;#canvas&#x27;);
+        container &#x3D; document.querySelector(&#x27;#container&#x27;);
+        canvas.width &#x3D; container.clientWidth;
+        canvas.height &#x3D; container.clientHeight;
+
+        try {
+          gl &#x3D; canvas.getContext(&#x27;webgl&#x27;) || canvas.getContext(&#x27;experimental-webgl&#x27;);
+        } catch (e) {
+        }
+
+        if (gl) {
+          initShaders();
+          setupBuffers();
+          getMatrixUniforms();
+          loadTexture();
+
+          (function animLoop() {
+
+            if (!paused) {
+              setupWebGL();
+              setMatrixUniforms();
+              drawScene();
+            }
+
+            requestAnimationFrame(animLoop);
+          })();
+        }
+      }
+
+      function setupWebGL() {
+        // set the clear color to a shade of green
+        gl.clearColor(0.1, 0.5, 0.1, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.enable(gl.DEPTH_TEST);
+
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        mat4.perspective(pMatrix, 45, canvas.width / canvas.height, 0.1, 100.0);
+        mat4.identity(mvMatrix);
+        mat4.translate(mvMatrix, mvMatrix, [-1.0, -1.0, -7.0]);
+        mat4.rotate(mvMatrix, mvMatrix, angle, [0.0, 1.0, 0.0]);
+        angle +&#x3D; 0.01;
+
+        var invertedMatrix &#x3D; mat3.create();
+        mat3.fromMat4(invertedMatrix, mvMatrix);
+        mat3.invert(normalMatrix, invertedMatrix);
+        mat3.transpose(normalMatrix, normalMatrix);
+      }
+
+      function initShaders() {
+        // get shader source
+        var vsSource &#x3D; vertexShaderSource();
+        var fsSource &#x3D; fragmentShaderSource();
+
+        // compile shaders
+        vertexShader &#x3D; makeShader(vsSource, gl.VERTEX_SHADER);
+        fragmentShader &#x3D; makeShader(fsSource, gl.FRAGMENT_SHADER);
+
+        // create program
+        glProgram &#x3D; gl.createProgram();
+
+        // attach and link shaders to the program
+        gl.attachShader(glProgram, vertexShader);
+        gl.attachShader(glProgram, fragmentShader);
+        gl.linkProgram(glProgram);
+
+        if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
+          alert(&#x27;Unable to initialize the shader program.&#x27;);
+        }
+
+        // use program
+        gl.useProgram(glProgram);
+      }
+
+      function makeShader(source, type) {
+        // compile the shader
+        var shader &#x3D; gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          alert((&quot;Error compiling shader: &quot; + (gl.getShaderInfoLog(shader))));
+        }
+
+        return shader;
+      }
+
+      function vertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec2 aVertexTexCoord;\n    attribute vec3 aVertexNormal;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    uniform mat3 uNormalMatrix;\n    \n    varying highp vec2 vTextureCoord;\n    varying highp vec3 vLight;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      vTextureCoord &#x3D; aVertexTexCoord;\n      \n      // lighting\n      vec3 ambientLight &#x3D; vec3(0.3, 0.3, 0.3);\n      vec3 transformedNormal &#x3D; uNormalMatrix * aVertexNormal;\n      vec3 lightColor &#x3D; vec3(0.5, 0.5, 0.5);\n      \n      // vec3 directionalLightPosition &#x3D; normalize(vec3(10.0, 10.0, 5.0));\n      // vec3 light &#x3D; vec3(uPMatrix * uMVMatrix * vec4(directionalLightPosition, 1.0));\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0,2.0,-1.0);\n      vec3 pointLightDirection &#x3D; normalize(vec3(pointLightPosition.xyz - aVertexPosition.xyz));\n      vec3 light &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      \n      float diffuseLightAmount &#x3D; max(dot(normalize(transformedNormal), normalize(light)), 0.0);\n      vLight &#x3D; ambientLight + (diffuseLightAmount * lightColor);\n    }\n  &quot;;
+      }
+
+      function fragmentShaderSource() {
+        return &quot;\n    varying highp vec2 vTextureCoord;\n    varying highp vec3 vLight;\n    \n    uniform sampler2D uSampler0;\n    uniform sampler2D uSampler1;\n    uniform int uDoTexturing;\n    \n    void main(void) {\n      if (uDoTexturing &#x3D;&#x3D; 1) {\n        highp vec4 stoneColor &#x3D; texture2D(uSampler0, vec2(vTextureCoord.st));\n        highp vec4 webglLogoColor &#x3D; texture2D(uSampler1, vec2(vTextureCoord.st));\n        \n        // highp vec4 vColor &#x3D; mix(stoneColor, webglLogoColor, 0.5);\n        highp vec4 vColor &#x3D; mix(stoneColor, webglLogoColor, webglLogoColor.a);\n        // highp vec4 vColor &#x3D; mix(stoneColor, webglLogoColor, 1.0 - webglLogoColor.a);\n        \n        gl_FragColor &#x3D; vec4(vColor.xyz * vLight, vColor.a);\n      } else {\n        gl_FragColor &#x3D; vec4(vec3(1.0, 0.1, 0.1) * vLight, 1.0);\n      }\n    }\n  &quot;;
+      }
+
+      function setupBuffers() {
+        // 12 vertices
+        var triangleVerticesOriginal &#x3D; [
+          // front face
+          // bottom left to right, to top
+          0.0, 0.0, 0.0,
+          1.0, 0.0, 0.0,
+          2.0, 0.0, 0.0,
+          0.5, 1.0, 0.0,
+          1.5, 1.0, 0.0,
+          1.0, 2.0, 0.0,
+
+          // rear face
+          0.0, 0.0, -2.0,
+          1.0, 0.0, -2.0,
+          2.0, 0.0, -2.0,
+          0.5, 1.0, -2.0,
+          1.5, 1.0, -2.0,
+          1.0, 2.0, -2.0 ];
+
+        // setup vertices buffer
+        // 16 triangles
+        var triangleVertexIndices &#x3D; [
+          //front face
+          0, 1, 3,
+          1, 4, 3, //flipped
+          1, 2, 4,
+          3, 4, 5,
+
+          //rear face
+          6, 9, 7,
+          7, 9, 10, //flipped
+          7, 10, 8,
+          9, 11, 10,
+
+          //left side
+          0, 3, 6,
+          3, 9, 6, //flipped
+          3, 5, 9,
+          5, 11, 9, //flipped
+
+          //right side
+          2, 8, 4, //flipped
+          4, 8, 10,
+          4, 10, 5, //flipped
+          5, 10, 11 ];
+
+        //48 vertices
+        var triangleVertices &#x3D; [];
+        var triangleTexCoords &#x3D; [];
+        for (var i &#x3D; 0; i &lt; triangleVertexIndices.length; ++i) {
+          var a &#x3D; triangleVertexIndices[i];
+          triangleVertices.push(triangleVerticesOriginal[a * 3]);
+          triangleVertices.push(triangleVerticesOriginal[a * 3 + 1]);
+          triangleVertices.push(triangleVerticesOriginal[a * 3 + 2]);
+          if (i &gt;&#x3D; 24) {
+            triangleTexCoords.push(triangleVerticesOriginal[a * 3 + 1]);
+            triangleTexCoords.push(triangleVerticesOriginal[a * 3 + 2]);
+          } else {
+            triangleTexCoords.push(triangleVerticesOriginal[a * 3]);
+            triangleTexCoords.push(triangleVerticesOriginal[a * 3 + 1]);
+          }
+        }
+
+        trianglesVerticesBuffer &#x3D; gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticesBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVertices), gl.STATIC_DRAW);
+        trianglesTexCoordBuffer &#x3D; gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesTexCoordBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleTexCoords), gl.STATIC_DRAW);
+
+        var triangleNormals &#x3D; [];
+        for (var i$1 &#x3D; 0; i$1 &lt; triangleVertexIndices.length; i$1 +&#x3D; 3) {
+          var a$1 &#x3D; triangleVertexIndices[i$1];
+          var b &#x3D; triangleVertexIndices[i$1 + 1];
+          var c &#x3D; triangleVertexIndices[i$1 + 2];
+          //normal is the cross product
+          var v1 &#x3D; [
+            triangleVerticesOriginal[a$1 * 3] - triangleVerticesOriginal[b * 3],
+            triangleVerticesOriginal[a$1 * 3 + 1] - triangleVerticesOriginal[b * 3 + 1],
+            triangleVerticesOriginal[a$1 * 3 + 2] - triangleVerticesOriginal[b * 3 + 2] ];
+          var v2 &#x3D; [
+            triangleVerticesOriginal[a$1 * 3] - triangleVerticesOriginal[c * 3],
+            triangleVerticesOriginal[a$1 * 3 + 1] - triangleVerticesOriginal[c * 3 + 1],
+            triangleVerticesOriginal[a$1 * 3 + 2] - triangleVerticesOriginal[c * 3 + 2] ];
+          var cross &#x3D; [
+            v1[1] * v2[2] - v1[2] * v2[1],
+            v1[2] * v2[0] - v1[0] * v2[2],
+            v1[0] * v2[1] - v1[1] * v2[0]
+          ];
+          //same value for each of the three vertices
+          triangleNormals.push.apply(triangleNormals, cross);
+          triangleNormals.push.apply(triangleNormals, cross);
+          triangleNormals.push.apply(triangleNormals, cross);
+        }
+
+        trianglesNormalBuffer &#x3D; gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleNormals), gl.STATIC_DRAW);
+      }
+
+      function drawScene() {
+        vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &#x27;aVertexPosition&#x27;);
+        gl.enableVertexAttribArray(vertexPositionAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticesBuffer);
+        gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+        vertexTexCoordAttribute &#x3D; gl.getAttribLocation(glProgram, &#x27;aVertexTexCoord&#x27;);
+        gl.enableVertexAttribArray(vertexTexCoordAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesTexCoordBuffer);
+        gl.vertexAttribPointer(vertexTexCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+
+        vertexNormalAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexNormal&quot;);
+        gl.enableVertexAttribArray(vertexNormalAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffer);
+        gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 16 * 3);
+      }
+
+      function getMatrixUniforms() {
+        glProgram.pMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uPMatrix&#x27;);
+        glProgram.mvMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uMVMatrix&#x27;);
+        glProgram.samplerUnifrom0 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler0&#x27;);
+        glProgram.samplerUnifrom1 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler1&#x27;);
+        glProgram.normalMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &quot;uNormalMatrix&quot;);
+      }
+
+      function setMatrixUniforms() {
+        gl.uniformMatrix4fv(glProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(glProgram.mvMatrixUniform, false, mvMatrix);
+        gl.uniformMatrix3fv(glProgram.normalMatrixUniform, false, normalMatrix);
+      }
+
+      function loadTexture() {
+        textureImages[STONE_TEXTURE] &#x3D; new Image();
+        textureImages[STONE_TEXTURE].onload &#x3D; function () {
+          setupTexture(0);
+          gl.uniform1i(glProgram.samplerUnifrom0, 0);
+        };
+        textureImages[STONE_TEXTURE].src &#x3D; &#x27;data/img/stone-128px.jpg&#x27;;
+
+        textureImages[WEBGL_LOGO_TEXTURE] &#x3D; new Image();
+        textureImages[WEBGL_LOGO_TEXTURE].onload &#x3D; function () {
+          setupTexture(1);
+          gl.uniform1i(glProgram.samplerUnifrom1, 1);
+        };
+        textureImages[WEBGL_LOGO_TEXTURE].src &#x3D; &#x27;data/img/webgl_logo-512px.png&#x27;;
+      }
+
+      function setupTexture(i) {
+        gl.activeTexture(gl.TEXTURE0 + i);
+        textures[i] &#x3D; gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, textures[i]);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImages[i]);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+
+
+        glProgram.uDoTexturing &#x3D; gl.getUniformLocation(glProgram, &#x27;uDoTexturing&#x27;);
+        gl.uniform1i(glProgram.uDoTexturing, 1);
+
+        if (!gl.isTexture(textures[i])) {
+          console.error(&#x27;Error: Texture is invalid&#x27;);
+        }
+
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      </div>
+    </div>
+
+    <script src="./resources/common.js"></script>
+    <script src="./resources/prism/prism.min.js"></script>
+    <script src="common.js"></script><script src="webgl-triangular-prism-texture.js"></script>
+  </body>
+</html>
