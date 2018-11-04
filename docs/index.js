@@ -6,13 +6,14 @@ var pg = window['pg'] = {};
 
 pg.graphics = {};
 pg.graphics.three = {};
+pg.math = {};
 pg.util = {};
 pg.utils = {};
 pg.utils.image = {};
 pg.utils.math = {};
 pg.graphics.three.three = $pg$graphics$three$three;
+pg.math.vector3 = $pg$math$vector3;
 pg.util.getUid = _pg_util.getUid;
 pg.utils.image.getRandomDummyImages = _pg_utils_image.getRandomDummyImages;
 pg.utils.image.getRandomHexColor = _pg_utils_image.getRandomHexColor;
-pg.utils.math.convex2d = _pg_utils_math.convex2d;
 pg.utils.math.randomInt = _pg_utils_math.randomInt;

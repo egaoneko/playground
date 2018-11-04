@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
     <link rel="stylesheet" href="./resources/layout-full.css" type="text/css">
     <script src="resources/js/stats.js"></script>
-    <link rel="stylesheet" href="canvas-gravity.css">
+    <link rel="stylesheet" href="canvas-gravity1.css">
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
     <script
@@ -24,7 +24,7 @@
       integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
       crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <title>Canvas Gravity</title>
+    <title>Canvas Gravity 1</title>
   </head>
   <body>
   <header class="navbar dropdown" role="navigation">
@@ -52,12 +52,12 @@
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-          <h4 class="modal-title" id="modalLabel">Canvas Gravity</h4>
+          <h4 class="modal-title" id="modalLabel">Canvas Gravity 1</h4>
         </div>
         <div class="modal-body">
           <div class="row-fluid">
             <div class="span12">
-              <p id="shortdesc">How to Code Gravity.</p>
+              <p id="shortdesc">How to Code Gravity 1.</p>
               <div id="docs"><p>How to Code Gravity. Ref <a href="https://www.youtube.com/playlist?list=PLpPnRKq7eNW3We9VdCfx9fprhqXHwTPXL">HTML5 Canvas Tutorials for Beginners | Become a Canvas Pro</a>.</p>
 </div>
               <p id="tags">Tags: canvas</p>
@@ -70,8 +70,8 @@
               <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
             </div>
             <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
-              <textarea class="hidden" name="title">Canvas Gravity</textarea>
-              <textarea class="hidden" name="description">How to Code Gravity.</textarea>
+              <textarea class="hidden" name="title">Canvas Gravity 1</textarea>
+              <textarea class="hidden" name="description">How to Code Gravity 1.</textarea>
               <textarea class="hidden" name="js">import {randomInt} from &#x27;pg/utils/math&#x27;;
 
 var GRAVITY &#x3D; 1;
@@ -138,11 +138,11 @@ Ball.prototype.update &#x3D; function update () {
   this.draw();
 };
 
-var circles &#x3D; [];
+var balls &#x3D; [];
 
 function init() {
 
-  circles &#x3D; [];
+  balls &#x3D; [];
 
   for (var i &#x3D; 0; i &lt; 500; i++) {
     var radius &#x3D; randomInt(8, 20);
@@ -152,7 +152,7 @@ function init() {
     var dy &#x3D; randomInt(-2, 2);
     var color &#x3D; colorSet[randomInt(0, colorSet.length)];
 
-    circles.push(new Ball(x, y, dx, dy, radius, color));
+    balls.push(new Ball(x, y, dx, dy, radius, color));
   }
 }
 
@@ -165,7 +165,7 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle &#x3D; &#x27;#282a36&#x27;;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  circles.forEach(function (circle) { return circle.update(); });
+  balls.forEach(function (circle) { return circle.update(); });
   requestAnimationFrame(animate);
 }
 
@@ -189,7 +189,7 @@ animate();
             <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
-    &lt;title&gt;Canvas Gravity&lt;/title&gt;
+    &lt;title&gt;Canvas Gravity 1&lt;/title&gt;
     &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
     &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
@@ -274,11 +274,11 @@ animate();
         this.draw();
       };
 
-      var circles &#x3D; [];
+      var balls &#x3D; [];
 
       function init() {
 
-        circles &#x3D; [];
+        balls &#x3D; [];
 
         for (var i &#x3D; 0; i &lt; 500; i++) {
           var radius &#x3D; randomInt(8, 20);
@@ -288,7 +288,7 @@ animate();
           var dy &#x3D; randomInt(-2, 2);
           var color &#x3D; colorSet[randomInt(0, colorSet.length)];
 
-          circles.push(new Ball(x, y, dx, dy, radius, color));
+          balls.push(new Ball(x, y, dx, dy, radius, color));
         }
       }
 
@@ -301,7 +301,7 @@ animate();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle &#x3D; &#x27;#282a36&#x27;;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        circles.forEach(function (circle) { return circle.update(); });
+        balls.forEach(function (circle) { return circle.update(); });
         requestAnimationFrame(animate);
       }
 
@@ -320,6 +320,6 @@ animate();
 
   <script src="./resources/common.js"></script>
   <script src="./resources/prism/prism.min.js"></script>
-  <script src="common.js"></script><script src="canvas-gravity.js"></script>
+  <script src="common.js"></script><script src="canvas-gravity1.js"></script>
   </body>
 </html>

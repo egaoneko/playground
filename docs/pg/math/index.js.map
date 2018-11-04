@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sources":["../../../src/pg/math/index.js"],"sourcesContent":["/**\n * @module pg/math\n */\n\n\nimport Vector3 from './vector3';\n\nexport default {\n  Vector3,\n}\n"],"names":[],"mappings":"AAAA;;;;;AAKA,OAAO,OAAO,MAAM,WAAW,CAAC;;AAEhC,eAAe;WACb,OAAO;CACR;"}

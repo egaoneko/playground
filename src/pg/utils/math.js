@@ -56,7 +56,7 @@ export function rotate(velocity, angle) {
  *
  * @param {object} particle A particle object with x and y coordinates, plus velocity
  * @param {object} otherParticle A particle object with x and y coordinates, plus velocity
- * @return {undefined} Does not return a value
+ * @return {boolean} success
  */
 export function resolveCollision(particle, otherParticle) {
   const xVelocityDiff = particle.velocity.x - otherParticle.velocity.x;
@@ -67,7 +67,7 @@ export function resolveCollision(particle, otherParticle) {
 
   // Prevent accidental overlap of particles
   if (xVelocityDiff * xDist + yVelocityDiff * yDist < 0) {
-    return;
+    return false;
   }
 
   // Grab angle between the two colliding particles
@@ -95,4 +95,5 @@ export function resolveCollision(particle, otherParticle) {
 
   otherParticle.velocity.x = vFinal2.x;
   otherParticle.velocity.y = vFinal2.y;
+  return true;
 }

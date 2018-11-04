@@ -67,11 +67,11 @@ class Ball {
   }
 }
 
-let circles = [];
+let balls = [];
 
 function init() {
 
-  circles = [];
+  balls = [];
 
   for (let i = 0; i < 500; i++) {
     const radius = randomInt(8, 20);
@@ -81,7 +81,7 @@ function init() {
     const dy = randomInt(-2, 2);
     const color = colorSet[randomInt(0, colorSet.length)];
 
-    circles.push(new Ball(x, y, dx, dy, radius, color));
+    balls.push(new Ball(x, y, dx, dy, radius, color));
   }
 }
 
@@ -94,7 +94,7 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#282a36';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  circles.forEach(circle => circle.update());
+  balls.forEach(circle => circle.update());
   requestAnimationFrame(animate);
 }
 
