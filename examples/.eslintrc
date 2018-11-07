@@ -13,7 +13,15 @@
     "toastr": false,
     "topojson": false,
     "topolis": false,
-    "turf": false
+    "turf": false,
+    "ol": true,
+    "naver": true,
+    "mapboxgl": true,
+    "math": false,
+    "dat": false,
+    "olcs": false,
+    "mat3": false,
+    "mat4": false
   },
   "rules": {
     "no-unused-vars": [2, {"varsIgnorePattern": "^map"}]

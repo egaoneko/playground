@@ -90,7 +90,7 @@
     },
     "parserOptions": {
       "sourceType": "module",
-      "ecmaVersion": 2017
+      "ecmaVersion": 2018
     },
     "plugins": [],
     "rules": {
@@ -98,13 +98,7 @@
       "no-console": 0
     },
     "globals": {
-      "ol": true,
-      "mapboxgl": true,
-      "naver": true,
-      "THREE": true,
-      "math": true,
-      "dat": true,
-      "olcs": true
+      "THREE": true
     }
   },
   "sideEffects": [

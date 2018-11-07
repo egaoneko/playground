@@ -1,5 +1,6 @@
 let gl = null;
 let canvas = null;
+let container = null;
 let glProgram = null;
 let fragmentShader = null;
 let vertexShader = null;
@@ -26,6 +27,7 @@ function initWebGL() {
   try {
     gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
   } catch (e) {
+    console.error(e);
   }
 
   if (gl) {
