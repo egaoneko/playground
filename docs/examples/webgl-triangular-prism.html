@@ -76,6 +76,7 @@
           <textarea class="hidden" name="description">WebGL triangular prism.</textarea>
           <textarea class="hidden" name="js">var gl &#x3D; null;
 var canvas &#x3D; null;
+var container &#x3D; null;
 var glProgram &#x3D; null;
 var fragmentShader &#x3D; null;
 var vertexShader &#x3D; null;
@@ -102,6 +103,7 @@ function initWebGL() {
   try {
     gl &#x3D; canvas.getContext(&#x27;webgl&#x27;) || canvas.getContext(&#x27;experimental-webgl&#x27;);
   } catch (e) {
+    console.error(e);
   }
 
   if (gl) {
@@ -326,6 +328,7 @@ function setMatrixUniforms() {
     &lt;script&gt;
       var gl &#x3D; null;
       var canvas &#x3D; null;
+      var container &#x3D; null;
       var glProgram &#x3D; null;
       var fragmentShader &#x3D; null;
       var vertexShader &#x3D; null;
@@ -352,6 +355,7 @@ function setMatrixUniforms() {
         try {
           gl &#x3D; canvas.getContext(&#x27;webgl&#x27;) || canvas.getContext(&#x27;experimental-webgl&#x27;);
         } catch (e) {
+          console.error(e);
         }
 
         if (gl) {

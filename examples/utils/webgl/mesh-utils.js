@@ -1,13 +1,12 @@
 import Vector3 from "../../../src/pg/math/vector3";
 
 export function setupPlaneMesh(gl, buffers, n, options) {
-  options = {
+  options = Object.assign({}, {
     size: 10.0,
     color: [0.5, 0.5, 1.0, 1.0],
     translation: [0.0, 0.0, 0.0],
     textured: false,
-    ...options
-  };
+  }, options);
 
   const size = options.size;
   const color = options.color;
@@ -96,25 +95,24 @@ export function setupPlaneMesh(gl, buffers, n, options) {
 }
 
 export function setupSphereMesh(gl, buffers, n, options) {
-  options = {
+  options = Object.assign({}, {
     color: [1.0, 0.0, 0.0, 1.0],
     translation: [0.0, 0.0, 0.0],
     radius: 1.0,
-    divisions: 30,
+    division: 30,
     smoothShading: true,
     textured: false,
-    ...options
-  };
+  }, options);
 
   const color = options.color;
   const translation = options.translation;
   const radius = options.radius;
-  const divisions = options.divisions;
+  const division = options.division;
   const smoothShading = options.smoothShading;
   const textured = options.textured;
 
-  let latitudeBands = divisions;
-  let longitudeBands = divisions;
+  let latitudeBands = division;
+  let longitudeBands = division;
 
   let vertexPositionData = [];
   let colorData = [];
