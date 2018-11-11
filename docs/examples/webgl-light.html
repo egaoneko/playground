@@ -53,6 +53,31 @@
           <div id="container" class="main">
   <canvas id="canvas"></canvas>
 </div>
+<div>
+  <input type="radio" id="light1" name="light" value="flat" checked>
+  <label for="light1">FLAT</label>
+
+  <input type="radio" id="light2" name="light" value="phong">
+  <label for="light2">PHONG</label>
+
+  <input type="radio" id="light3" name="light" value="gouraud_phong">
+  <label for="light3">GOURAUD PHONG</label>
+
+  <input type="radio" id="light4" name="light" value="phong_phong">
+  <label for="light4">PHONG PHONG</label>
+
+  <input type="radio" id="light5" name="light" value="attenuation">
+  <label for="light5">ATTENUATION</label>
+
+  <input type="radio" id="light6" name="light" value="spotlight">
+  <label for="light6">SPOTLIGHT</label>
+
+  <input type="radio" id="light7" name="light" value="fog">
+  <label for="light7">FOG</label>
+
+  <input type="radio" id="light8" name="light" value="fog_spotlight">
+  <label for="light8">FOG SPOTLIGHT</label>
+</div>
 
         </div>
       </div>
@@ -74,7 +99,7 @@
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
           <textarea class="hidden" name="title">WebGL light</textarea>
           <textarea class="hidden" name="description">WebGL light.</textarea>
-          <textarea class="hidden" name="js">import {setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
+          <textarea class="hidden" name="js">import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
 
 var gl &#x3D; null;
 var canvas &#x3D; null;
@@ -99,6 +124,43 @@ var angle &#x3D; 0.0;
 
 var paused &#x3D; false;
 
+var SHADER &#x3D; {
+  flat: {
+    vertexShader: flatVertexShaderSource(),
+    fragmentShader: flatFragmentShaderSource()
+  },
+  phong: {
+    vertexShader: phongVertexShaderSource(),
+    fragmentShader: phongFragmentShaderSource()
+  },
+  gouraud_phong: {
+    vertexShader: gouraudPhongVertexShaderSource(),
+    fragmentShader: gouraudPhongFragmentShaderSource()
+  },
+  phong_phong: {
+    vertexShader: phongPhongVertexShaderSource(),
+    fragmentShader: phongPhongFragmentShaderSource()
+  },
+  attenuation: {
+    vertexShader: attenuationVertexShaderSource(),
+    fragmentShader: attenuationFragmentShaderSource()
+  },
+  spotlight: {
+    vertexShader: spotlightVertexShaderSource(),
+    fragmentShader: spotlightFragmentShaderSource()
+  },
+  fog: {
+    vertexShader: fogVertexShaderSource(),
+    fragmentShader: fogFragmentShaderSource()
+  },
+  fog_spotlight: {
+    vertexShader: fogSpotlightVertexShaderSource(),
+    fragmentShader: fogSpotlightFragmentShaderSource()
+  }
+};
+
+var radios &#x3D; document.querySelectorAll(&#x27;input[type&#x3D;radio][name&#x3D;&quot;light&quot;]&#x27;);
+
 window.addEventListener(&#x27;load&#x27;, initWebGL);
 document.addEventListener(&#x27;keyup&#x27;, function (evt) {
   switch (evt.keyCode) {
@@ -108,6 +170,15 @@ document.addEventListener(&#x27;keyup&#x27;, function (evt) {
     default:
       break;
   }
+});
+
+function changeHandler() {
+  gl.deleteProgram(glProgram);
+  createProgram(this.value);
+}
+
+Array.prototype.forEach.call(radios, function(radio) {
+  radio.addEventListener(&#x27;change&#x27;, changeHandler);
 });
 
 function initWebGL() {
@@ -125,7 +196,6 @@ function initWebGL() {
   if (gl) {
     initShaders();
     setupMeshes();
-    getMatrixUniforms();
 
     (function animLoop() {
 
@@ -142,7 +212,7 @@ function initWebGL() {
 function setupWebGL() {
   // set the clear color to a shade of green
   gl.clearColor(0.7, 0.7, 0.7, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
 
   gl.viewport(0, 0, canvas.width, canvas.height);
@@ -150,16 +220,26 @@ function setupWebGL() {
 }
 
 function initShaders() {
+  createProgram(&#x27;flat&#x27;);
+}
+
+function createProgram(type) {
+  // create program
+  glProgram &#x3D; gl.createProgram();
+  attachShader(glProgram, type);
+  // use program
+  gl.useProgram(glProgram);
+  getMatrixUniforms();
+}
+
+function attachShader(glProgram, type) {
   // get shader source
-  var vsSource &#x3D; vertexShaderSource();
-  var fsSource &#x3D; fragmentShaderSource();
+  var vsSource &#x3D; SHADER[type].vertexShader;
+  var fsSource &#x3D; SHADER[type].fragmentShader;
 
   // compile shaders
   vertexShader &#x3D; makeShader(vsSource, gl.VERTEX_SHADER);
   fragmentShader &#x3D; makeShader(fsSource, gl.FRAGMENT_SHADER);
-
-  // create program
-  glProgram &#x3D; gl.createProgram();
 
   // attach and link shaders to the program
   gl.attachShader(glProgram, vertexShader);
@@ -169,9 +249,6 @@ function initShaders() {
   if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
     alert(&#x27;Unable to initialize the shader program.&#x27;);
   }
-
-  // use program
-  gl.useProgram(glProgram);
 }
 
 function makeShader(source, type) {
@@ -185,14 +262,6 @@ function makeShader(source, type) {
   }
 
   return shader;
-}
-
-function vertexShaderSource() {
-  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    uniform mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 L;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0, 2.0, -1.0);\n      vec3 pointLightDirection &#x3D; normalize(vec3(pointLightPosition.xyz - aVertexPosition.xyz));\n      vec3 ambientColor &#x3D; vec3(0.1, 0.1, 0.1);\n      \n      L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      N &#x3D; uNormalMatrix * aVertexNormal;\n      \n      vColor &#x3D; aVertexColor;\n    }\n  &quot;;
-}
-
-function fragmentShaderSource() {
-  return &quot;\n    varying highp vec3 vColor;\n    varying highp vec3 N;\n    varying highp vec3 L;\n    \n    void main(void) {\n      highp float lambert &#x3D; max(dot(normalize(N), normalize(L)), 0.0);\n      gl_FragColor &#x3D; vec4(vColor * lambert, 1.0);\n    }\n  &quot;;
 }
 
 function setupMeshes() {
@@ -257,6 +326,37 @@ function setupMeshes() {
     },
     3,
     {
+      translation: [-1.0, 1.0, -1.0],
+      color: [1.0, 0.0, 1.0, 1.0],
+    }
+  );
+
+  setupSphereMesh(
+    gl,
+    {
+      trianglesNormalBuffers: trianglesNormalBuffers,
+      trianglesColorBuffers: trianglesColorBuffers,
+      trianglesVerticeBuffers: trianglesVerticeBuffers,
+      vertexIndexBuffers: vertexIndexBuffers,
+    },
+    4,
+    {
+      translation: [-0.0, 1.75, -0.0],
+      color: [0.0, 1.0, 1.0, 1.0],
+    }
+  );
+
+
+  setupPlaneMesh(
+    gl,
+    {
+      trianglesNormalBuffers: trianglesNormalBuffers,
+      trianglesColorBuffers: trianglesColorBuffers,
+      trianglesVerticeBuffers: trianglesVerticeBuffers,
+      vertexIndexBuffers: vertexIndexBuffers,
+    },
+    5,
+    {
       translation: [0.0, -1.0, 0.0],
     }
   );
@@ -273,6 +373,7 @@ function drawScene() {
   // sphere
   mat4.identity(mvMatrix);
   mat4.translate(mvMatrix, mvMatrix, [0.0, 0.4, -6.5]);
+  mat4.rotate(mvMatrix, mvMatrix, -0.3, [-0.3, 0.0, 0.2]);
   mat4.rotate(mvMatrix, mvMatrix, angle, [0.0, 1.0, 0.0]);
 
   var invertedMatrix &#x3D; mat3.create();
@@ -290,8 +391,18 @@ function drawScene() {
     gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[i]);
     gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 
+    if (i &#x3D;&#x3D;&#x3D; 4) {
+      gl.disable(gl.DEPTH_TEST);
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+      gl.blendEquation(gl.FUNC_ADD);
+    } else {
+      gl.disable(gl.BLEND);
+      gl.enable(gl.DEPTH_TEST);
+    }
+
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[i]);
-    if (i &#x3D;&#x3D;&#x3D; 3) {
+    if (i &gt; 2) {
       gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
     } else {
       gl.drawArrays(gl.TRIANGLES, 0, trianglesVerticeBuffers[i].numItems);
@@ -310,6 +421,71 @@ function setMatrixUniforms() {
   gl.uniformMatrix4fv(glProgram.mvMatrixUniform, false, mvMatrix);
   gl.uniformMatrix3fv(glProgram.normalMatrixUniform, false, normalMatrix);
 }
+
+function flatVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    uniform mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 L;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0, 2.0, -1.0);\n      vec3 pointLightDirection &#x3D; normalize(vec3(pointLightPosition.xyz - aVertexPosition.xyz));\n      vec3 ambientColor &#x3D; vec3(0.1, 0.1, 0.1);\n      \n      L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      N &#x3D; uNormalMatrix * aVertexNormal;\n      \n      vColor &#x3D; aVertexColor;\n    }\n  &quot;;
+}
+
+function flatFragmentShaderSource() {
+  return &quot;\n    varying highp vec3 vColor;\n    varying highp vec3 N;\n    varying highp vec3 L;\n    \n    void main(void) {\n      highp float lambert &#x3D; max(dot(normalize(N), normalize(L)), 0.0);\n      gl_FragColor &#x3D; vec4(vColor * lambert, 1.0);\n    }\n  &quot;;
+}
+
+function phongVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n    }\n  &quot;;
+}
+
+function phongFragmentShaderSource() {
+  return &quot;\n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {\n      highp vec3 n &#x3D; uNormalMatrix * N;\n      \n      highp vec3 pointLightPosition &#x3D; vec3(1.0, 2.0, -1.0);\n      highp vec3 pointLightDirection &#x3D; normalize(vec3(pointLightPosition.xyz - vPosition.xyz));\n      \n      highp vec3 L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      \n      highp float lambert &#x3D; max(dot(normalize(n), normalize(L)), 0.0);\n      gl_FragColor &#x3D; vec4(vColor * lambert, 1.0);\n    }\n  &quot;;
+}
+
+function gouraudPhongVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp float diffuseLambert;\n    varying highp float specular;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      vColor &#x3D; aVertexColor;\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0, 2.0, -1.0);\n      vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - aVertexPosition.xyz);\n      \n      vec3 L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      vec3 N &#x3D; normalize(uNormalMatrix * aVertexNormal);\n      vec3 V &#x3D; -vec3(uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0));\n      \n      L &#x3D; normalize(L);\n      V &#x3D; normalize(V); \n      \n      vec3 R &#x3D; reflect(-L, N);\n      float shininess &#x3D; 128.0;\n      \n      specular &#x3D; pow(max(0.0, dot(R, V)), shininess);\n      diffuseLambert &#x3D; dot(L, N);\n    }\n  &quot;;
+}
+
+function gouraudPhongFragmentShaderSource() {
+  return &quot; \n    varying highp vec3 vColor;\n    varying highp float diffuseLambert;\n    varying highp float specular;\n    \n    void main(void) {\n      highp float AmbientIntensity &#x3D; 0.3;\n      highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n      highp float SpecularIntensity &#x3D; 0.5;\n      \n      highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1);\n      highp vec3 DiffuseMaterialColour &#x3D; vColor;\n      highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0);\n      \n      gl_FragColor &#x3D; vec4(AmbientColour * AmbientIntensity +\n        diffuseLambert * DiffuseMaterialColour * DiffuseLightIntensity +\n        SpecularColour * specular * SpecularIntensity, 1.0);\n    }\n  &quot;;
+}
+
+function phongPhongVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n    }\n  &quot;;
+}
+
+function phongPhongFragmentShaderSource() {
+  return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      highp float Roughness &#x3D; 1.0;\n      highp float AmbientIntensity &#x3D; 0.3;\n      highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n      highp float SpecularIntensity &#x3D; 0.5;\n      highp float shininess &#x3D; 128.0;\n\n      highp float specular &#x3D; pow( max(0.0,dot(R,v)), shininess);\n\n      highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1);\n      highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz;\n      highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0);\n    \n      gl_FragColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n        diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n        SpecularColour * specular*SpecularIntensity, 1.0);\n    }\n  &quot;;
+}
+
+function attenuationVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n    }\n  &quot;;
+}
+
+function attenuationFragmentShaderSource() {
+  return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      highp float d &#x3D; length(pointLightDirection);\n      highp float attenuation &#x3D; 1.0/(.01 + .01*d+.02*d*d);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      highp float Roughness &#x3D; 1.0;\n      highp float AmbientIntensity &#x3D; 0.3;\n      highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n      highp float SpecularIntensity &#x3D; 0.5;\n      highp float shininess &#x3D; 128.0;\n\n      highp float specular &#x3D; pow(max(0.0,dot(R,v)), shininess);\n\n      highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1) * attenuation;\n      highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz * attenuation;\n      highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0) * attenuation;\n    \n      gl_FragColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n        diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n        SpecularColour * specular*SpecularIntensity, 1.0);\n    }\n  &quot;;
+}
+
+function spotlightVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n    }\n  &quot;;
+}
+
+function spotlightFragmentShaderSource() {
+  return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      highp float d &#x3D; length(pointLightDirection);\n      highp float attenuation &#x3D; 1.0/(.01 + .01*d + .02*d*d);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      \n      // spotlight\n      highp float spotCosCutoff &#x3D; 0.6;\n      highp float spotExponent &#x3D; 2.0;\n      highp vec3 spotDirection &#x3D; vec3(0.5, 0.5, 0.5);\n      highp float spotEffect &#x3D; dot(normalize(spotDirection), l);\n      \n      if (diffuseLambert &gt; 0.0) {\n        if(spotEffect &gt; spotCosCutoff) {\n          highp float Roughness &#x3D; 1.0;\n          highp float AmbientIntensity &#x3D; 0.3;\n          highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n          highp float SpecularIntensity &#x3D; 0.5;\n          highp float shininess &#x3D; 32.0;\n\n          highp float specular &#x3D; pow(max(0.0,dot(R,v)), shininess);\n\n          highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1) * attenuation;\n          highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz * attenuation;\n          highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0) * attenuation;\n    \n          gl_FragColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n            diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n            SpecularColour * specular*SpecularIntensity, 1.0);\n        } else {\n          gl_FragColor &#x3D; vec4(0.0, 0.0, 0.0, 1.0);\n        }\n      } else {\n        gl_FragColor &#x3D; vec4(0.0, 0.0, 0.0, 1.0);\n      }\n    } \n  &quot;;
+}
+
+function fogVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    varying highp float fogZ;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n      fogZ &#x3D; length(gl_Position.xyz);\n    }\n  &quot;;
+}
+
+function fogFragmentShaderSource() {
+  return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    varying highp float fogZ;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      highp float d &#x3D; length(pointLightDirection);\n      highp float attenuation &#x3D; 68.0/(.31 + .01*d+.22*d*d);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      highp float Roughness &#x3D; 1.0;\n      highp float AmbientIntensity &#x3D; 0.75;\n      highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n      highp float SpecularIntensity &#x3D; 0.8;\n      highp float shininess &#x3D; 128.0;\n\n      highp float specular &#x3D; pow(max(0.0,dot(R,v)), shininess);\n\n      highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1) * attenuation;\n      highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz * attenuation;\n      highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0) * attenuation;\n      \n      // calculate fog\n      highp float fogDensity &#x3D; 0.25;\n      highp vec4 fogColor &#x3D; vec4(0.1, 0.2, 0.1, 0.6);\n      \n      highp float fogFactor &#x3D; exp(-fogDensity * fogDensity * fogZ * fogZ);\n      fogFactor &#x3D; clamp(fogFactor, 0.0, 1.0);\n    \n      highp vec4 materialColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n        diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n        SpecularColour * specular*SpecularIntensity, 1.0);\n      \n      gl_FragColor &#x3D; mix(fogColor, materialColor, fogFactor);\n    }\n  &quot;;
+}
+
+function fogSpotlightVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    varying highp float fogZ;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n      fogZ &#x3D; length(gl_Position.xyz);\n    }\n  &quot;;
+}
+
+function fogSpotlightFragmentShaderSource() {
+  return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    varying highp float fogZ;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      highp float d &#x3D; length(pointLightDirection);\n      highp float attenuation &#x3D; 1.0/(.01 + .01*d + .02*d*d);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      \n      // spotlight\n      highp float spotCosCutoff &#x3D; 0.6;\n      highp float spotExponent &#x3D; 2.0;\n      highp vec3 spotDirection &#x3D; vec3(0.5, 0.5, 0.5);\n      highp float spotEffect &#x3D; dot(normalize(spotDirection), l);\n      \n      // calculate fog\n      highp float fogDensity &#x3D; 0.075;\n      highp vec4 fogColor &#x3D; vec4(0.1, 0.2, 0.1, 0.6);\n      \n      highp float fogFactor &#x3D; exp(-fogDensity * fogDensity * fogZ * fogZ);\n      fogFactor &#x3D; clamp(fogFactor, 0.0, 1.0);\n      \n      highp vec4 materialColor &#x3D; vec4(0.0, 0.0, 0.0, 1.0);\n      \n      if (diffuseLambert &gt; 0.0) {\n        if(spotEffect &gt; spotCosCutoff) {\n          highp float Roughness &#x3D; 1.0;\n          highp float AmbientIntensity &#x3D; 0.3;\n          highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n          highp float SpecularIntensity &#x3D; 0.5;\n          highp float shininess &#x3D; 32.0;\n\n          highp float specular &#x3D; pow( max(0.0,dot(R,v)), shininess);\n\n          highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1) * attenuation;\n          highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz * attenuation;\n          highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0) * attenuation;\n    \n          materialColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n            diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n            SpecularColour * specular*SpecularIntensity, 1.0);\n        } \n      }\n      \n      gl_FragColor &#x3D; mix(fogColor, materialColor, fogFactor); \n    } \n  &quot;;
+}
+
 </textarea>
           <textarea class="hidden" name="css">#container {
   position: relative;
@@ -323,6 +499,31 @@ function setMatrixUniforms() {
 </textarea>
           <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
   &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
+&lt;/div&gt;
+&lt;div&gt;
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light1&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;flat&quot; checked&gt;
+  &lt;label for&#x3D;&quot;light1&quot;&gt;FLAT&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light2&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;phong&quot;&gt;
+  &lt;label for&#x3D;&quot;light2&quot;&gt;PHONG&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light3&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;gouraud_phong&quot;&gt;
+  &lt;label for&#x3D;&quot;light3&quot;&gt;GOURAUD PHONG&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light4&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;phong_phong&quot;&gt;
+  &lt;label for&#x3D;&quot;light4&quot;&gt;PHONG PHONG&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light5&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;attenuation&quot;&gt;
+  &lt;label for&#x3D;&quot;light5&quot;&gt;ATTENUATION&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light6&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;spotlight&quot;&gt;
+  &lt;label for&#x3D;&quot;light6&quot;&gt;SPOTLIGHT&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light7&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;fog&quot;&gt;
+  &lt;label for&#x3D;&quot;light7&quot;&gt;FOG&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light8&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;fog_spotlight&quot;&gt;
+  &lt;label for&#x3D;&quot;light8&quot;&gt;FOG SPOTLIGHT&lt;/label&gt;
 &lt;/div&gt;
 </textarea>
           <input type="hidden" name="data">
@@ -352,8 +553,33 @@ function setMatrixUniforms() {
     &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
       &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
     &lt;/div&gt;
+    &lt;div&gt;
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light1&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;flat&quot; checked&gt;
+      &lt;label for&#x3D;&quot;light1&quot;&gt;FLAT&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light2&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;phong&quot;&gt;
+      &lt;label for&#x3D;&quot;light2&quot;&gt;PHONG&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light3&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;gouraud_phong&quot;&gt;
+      &lt;label for&#x3D;&quot;light3&quot;&gt;GOURAUD PHONG&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light4&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;phong_phong&quot;&gt;
+      &lt;label for&#x3D;&quot;light4&quot;&gt;PHONG PHONG&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light5&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;attenuation&quot;&gt;
+      &lt;label for&#x3D;&quot;light5&quot;&gt;ATTENUATION&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light6&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;spotlight&quot;&gt;
+      &lt;label for&#x3D;&quot;light6&quot;&gt;SPOTLIGHT&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light7&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;fog&quot;&gt;
+      &lt;label for&#x3D;&quot;light7&quot;&gt;FOG&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light8&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;fog_spotlight&quot;&gt;
+      &lt;label for&#x3D;&quot;light8&quot;&gt;FOG SPOTLIGHT&lt;/label&gt;
+    &lt;/div&gt;
     &lt;script&gt;
-      import {setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
+      import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
 
       var gl &#x3D; null;
       var canvas &#x3D; null;
@@ -378,6 +604,43 @@ function setMatrixUniforms() {
 
       var paused &#x3D; false;
 
+      var SHADER &#x3D; {
+        flat: {
+          vertexShader: flatVertexShaderSource(),
+          fragmentShader: flatFragmentShaderSource()
+        },
+        phong: {
+          vertexShader: phongVertexShaderSource(),
+          fragmentShader: phongFragmentShaderSource()
+        },
+        gouraud_phong: {
+          vertexShader: gouraudPhongVertexShaderSource(),
+          fragmentShader: gouraudPhongFragmentShaderSource()
+        },
+        phong_phong: {
+          vertexShader: phongPhongVertexShaderSource(),
+          fragmentShader: phongPhongFragmentShaderSource()
+        },
+        attenuation: {
+          vertexShader: attenuationVertexShaderSource(),
+          fragmentShader: attenuationFragmentShaderSource()
+        },
+        spotlight: {
+          vertexShader: spotlightVertexShaderSource(),
+          fragmentShader: spotlightFragmentShaderSource()
+        },
+        fog: {
+          vertexShader: fogVertexShaderSource(),
+          fragmentShader: fogFragmentShaderSource()
+        },
+        fog_spotlight: {
+          vertexShader: fogSpotlightVertexShaderSource(),
+          fragmentShader: fogSpotlightFragmentShaderSource()
+        }
+      };
+
+      var radios &#x3D; document.querySelectorAll(&#x27;input[type&#x3D;radio][name&#x3D;&quot;light&quot;]&#x27;);
+
       window.addEventListener(&#x27;load&#x27;, initWebGL);
       document.addEventListener(&#x27;keyup&#x27;, function (evt) {
         switch (evt.keyCode) {
@@ -387,6 +650,15 @@ function setMatrixUniforms() {
           default:
             break;
         }
+      });
+
+      function changeHandler() {
+        gl.deleteProgram(glProgram);
+        createProgram(this.value);
+      }
+
+      Array.prototype.forEach.call(radios, function(radio) {
+        radio.addEventListener(&#x27;change&#x27;, changeHandler);
       });
 
       function initWebGL() {
@@ -404,7 +676,6 @@ function setMatrixUniforms() {
         if (gl) {
           initShaders();
           setupMeshes();
-          getMatrixUniforms();
 
           (function animLoop() {
 
@@ -421,7 +692,7 @@ function setMatrixUniforms() {
       function setupWebGL() {
         // set the clear color to a shade of green
         gl.clearColor(0.7, 0.7, 0.7, 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.enable(gl.DEPTH_TEST);
 
         gl.viewport(0, 0, canvas.width, canvas.height);
@@ -429,16 +700,26 @@ function setMatrixUniforms() {
       }
 
       function initShaders() {
+        createProgram(&#x27;flat&#x27;);
+      }
+
+      function createProgram(type) {
+        // create program
+        glProgram &#x3D; gl.createProgram();
+        attachShader(glProgram, type);
+        // use program
+        gl.useProgram(glProgram);
+        getMatrixUniforms();
+      }
+
+      function attachShader(glProgram, type) {
         // get shader source
-        var vsSource &#x3D; vertexShaderSource();
-        var fsSource &#x3D; fragmentShaderSource();
+        var vsSource &#x3D; SHADER[type].vertexShader;
+        var fsSource &#x3D; SHADER[type].fragmentShader;
 
         // compile shaders
         vertexShader &#x3D; makeShader(vsSource, gl.VERTEX_SHADER);
         fragmentShader &#x3D; makeShader(fsSource, gl.FRAGMENT_SHADER);
-
-        // create program
-        glProgram &#x3D; gl.createProgram();
 
         // attach and link shaders to the program
         gl.attachShader(glProgram, vertexShader);
@@ -448,9 +729,6 @@ function setMatrixUniforms() {
         if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
           alert(&#x27;Unable to initialize the shader program.&#x27;);
         }
-
-        // use program
-        gl.useProgram(glProgram);
       }
 
       function makeShader(source, type) {
@@ -464,14 +742,6 @@ function setMatrixUniforms() {
         }
 
         return shader;
-      }
-
-      function vertexShaderSource() {
-        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    uniform mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 L;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0, 2.0, -1.0);\n      vec3 pointLightDirection &#x3D; normalize(vec3(pointLightPosition.xyz - aVertexPosition.xyz));\n      vec3 ambientColor &#x3D; vec3(0.1, 0.1, 0.1);\n      \n      L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      N &#x3D; uNormalMatrix * aVertexNormal;\n      \n      vColor &#x3D; aVertexColor;\n    }\n  &quot;;
-      }
-
-      function fragmentShaderSource() {
-        return &quot;\n    varying highp vec3 vColor;\n    varying highp vec3 N;\n    varying highp vec3 L;\n    \n    void main(void) {\n      highp float lambert &#x3D; max(dot(normalize(N), normalize(L)), 0.0);\n      gl_FragColor &#x3D; vec4(vColor * lambert, 1.0);\n    }\n  &quot;;
       }
 
       function setupMeshes() {
@@ -536,6 +806,37 @@ function setMatrixUniforms() {
           },
           3,
           {
+            translation: [-1.0, 1.0, -1.0],
+            color: [1.0, 0.0, 1.0, 1.0],
+          }
+        );
+
+        setupSphereMesh(
+          gl,
+          {
+            trianglesNormalBuffers: trianglesNormalBuffers,
+            trianglesColorBuffers: trianglesColorBuffers,
+            trianglesVerticeBuffers: trianglesVerticeBuffers,
+            vertexIndexBuffers: vertexIndexBuffers,
+          },
+          4,
+          {
+            translation: [-0.0, 1.75, -0.0],
+            color: [0.0, 1.0, 1.0, 1.0],
+          }
+        );
+
+
+        setupPlaneMesh(
+          gl,
+          {
+            trianglesNormalBuffers: trianglesNormalBuffers,
+            trianglesColorBuffers: trianglesColorBuffers,
+            trianglesVerticeBuffers: trianglesVerticeBuffers,
+            vertexIndexBuffers: vertexIndexBuffers,
+          },
+          5,
+          {
             translation: [0.0, -1.0, 0.0],
           }
         );
@@ -552,6 +853,7 @@ function setMatrixUniforms() {
         // sphere
         mat4.identity(mvMatrix);
         mat4.translate(mvMatrix, mvMatrix, [0.0, 0.4, -6.5]);
+        mat4.rotate(mvMatrix, mvMatrix, -0.3, [-0.3, 0.0, 0.2]);
         mat4.rotate(mvMatrix, mvMatrix, angle, [0.0, 1.0, 0.0]);
 
         var invertedMatrix &#x3D; mat3.create();
@@ -569,8 +871,18 @@ function setMatrixUniforms() {
           gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[i]);
           gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 
+          if (i &#x3D;&#x3D;&#x3D; 4) {
+            gl.disable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+            gl.blendEquation(gl.FUNC_ADD);
+          } else {
+            gl.disable(gl.BLEND);
+            gl.enable(gl.DEPTH_TEST);
+          }
+
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[i]);
-          if (i &#x3D;&#x3D;&#x3D; 3) {
+          if (i &gt; 2) {
             gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
           } else {
             gl.drawArrays(gl.TRIANGLES, 0, trianglesVerticeBuffers[i].numItems);
@@ -589,6 +901,71 @@ function setMatrixUniforms() {
         gl.uniformMatrix4fv(glProgram.mvMatrixUniform, false, mvMatrix);
         gl.uniformMatrix3fv(glProgram.normalMatrixUniform, false, normalMatrix);
       }
+
+      function flatVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    uniform mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 L;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0, 2.0, -1.0);\n      vec3 pointLightDirection &#x3D; normalize(vec3(pointLightPosition.xyz - aVertexPosition.xyz));\n      vec3 ambientColor &#x3D; vec3(0.1, 0.1, 0.1);\n      \n      L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      N &#x3D; uNormalMatrix * aVertexNormal;\n      \n      vColor &#x3D; aVertexColor;\n    }\n  &quot;;
+      }
+
+      function flatFragmentShaderSource() {
+        return &quot;\n    varying highp vec3 vColor;\n    varying highp vec3 N;\n    varying highp vec3 L;\n    \n    void main(void) {\n      highp float lambert &#x3D; max(dot(normalize(N), normalize(L)), 0.0);\n      gl_FragColor &#x3D; vec4(vColor * lambert, 1.0);\n    }\n  &quot;;
+      }
+
+      function phongVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n    }\n  &quot;;
+      }
+
+      function phongFragmentShaderSource() {
+        return &quot;\n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {\n      highp vec3 n &#x3D; uNormalMatrix * N;\n      \n      highp vec3 pointLightPosition &#x3D; vec3(1.0, 2.0, -1.0);\n      highp vec3 pointLightDirection &#x3D; normalize(vec3(pointLightPosition.xyz - vPosition.xyz));\n      \n      highp vec3 L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      \n      highp float lambert &#x3D; max(dot(normalize(n), normalize(L)), 0.0);\n      gl_FragColor &#x3D; vec4(vColor * lambert, 1.0);\n    }\n  &quot;;
+      }
+
+      function gouraudPhongVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp float diffuseLambert;\n    varying highp float specular;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      vColor &#x3D; aVertexColor;\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0, 2.0, -1.0);\n      vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - aVertexPosition.xyz);\n      \n      vec3 L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      vec3 N &#x3D; normalize(uNormalMatrix * aVertexNormal);\n      vec3 V &#x3D; -vec3(uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0));\n      \n      L &#x3D; normalize(L);\n      V &#x3D; normalize(V); \n      \n      vec3 R &#x3D; reflect(-L, N);\n      float shininess &#x3D; 128.0;\n      \n      specular &#x3D; pow(max(0.0, dot(R, V)), shininess);\n      diffuseLambert &#x3D; dot(L, N);\n    }\n  &quot;;
+      }
+
+      function gouraudPhongFragmentShaderSource() {
+        return &quot; \n    varying highp vec3 vColor;\n    varying highp float diffuseLambert;\n    varying highp float specular;\n    \n    void main(void) {\n      highp float AmbientIntensity &#x3D; 0.3;\n      highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n      highp float SpecularIntensity &#x3D; 0.5;\n      \n      highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1);\n      highp vec3 DiffuseMaterialColour &#x3D; vColor;\n      highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0);\n      \n      gl_FragColor &#x3D; vec4(AmbientColour * AmbientIntensity +\n        diffuseLambert * DiffuseMaterialColour * DiffuseLightIntensity +\n        SpecularColour * specular * SpecularIntensity, 1.0);\n    }\n  &quot;;
+      }
+
+      function phongPhongVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n    }\n  &quot;;
+      }
+
+      function phongPhongFragmentShaderSource() {
+        return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      highp float Roughness &#x3D; 1.0;\n      highp float AmbientIntensity &#x3D; 0.3;\n      highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n      highp float SpecularIntensity &#x3D; 0.5;\n      highp float shininess &#x3D; 128.0;\n\n      highp float specular &#x3D; pow( max(0.0,dot(R,v)), shininess);\n\n      highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1);\n      highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz;\n      highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0);\n    \n      gl_FragColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n        diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n        SpecularColour * specular*SpecularIntensity, 1.0);\n    }\n  &quot;;
+      }
+
+      function attenuationVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n    }\n  &quot;;
+      }
+
+      function attenuationFragmentShaderSource() {
+        return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      highp float d &#x3D; length(pointLightDirection);\n      highp float attenuation &#x3D; 1.0/(.01 + .01*d+.02*d*d);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      highp float Roughness &#x3D; 1.0;\n      highp float AmbientIntensity &#x3D; 0.3;\n      highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n      highp float SpecularIntensity &#x3D; 0.5;\n      highp float shininess &#x3D; 128.0;\n\n      highp float specular &#x3D; pow(max(0.0,dot(R,v)), shininess);\n\n      highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1) * attenuation;\n      highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz * attenuation;\n      highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0) * attenuation;\n    \n      gl_FragColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n        diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n        SpecularColour * specular*SpecularIntensity, 1.0);\n    }\n  &quot;;
+      }
+
+      function spotlightVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n    }\n  &quot;;
+      }
+
+      function spotlightFragmentShaderSource() {
+        return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      highp float d &#x3D; length(pointLightDirection);\n      highp float attenuation &#x3D; 1.0/(.01 + .01*d + .02*d*d);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      \n      // spotlight\n      highp float spotCosCutoff &#x3D; 0.6;\n      highp float spotExponent &#x3D; 2.0;\n      highp vec3 spotDirection &#x3D; vec3(0.5, 0.5, 0.5);\n      highp float spotEffect &#x3D; dot(normalize(spotDirection), l);\n      \n      if (diffuseLambert &gt; 0.0) {\n        if(spotEffect &gt; spotCosCutoff) {\n          highp float Roughness &#x3D; 1.0;\n          highp float AmbientIntensity &#x3D; 0.3;\n          highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n          highp float SpecularIntensity &#x3D; 0.5;\n          highp float shininess &#x3D; 32.0;\n\n          highp float specular &#x3D; pow(max(0.0,dot(R,v)), shininess);\n\n          highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1) * attenuation;\n          highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz * attenuation;\n          highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0) * attenuation;\n    \n          gl_FragColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n            diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n            SpecularColour * specular*SpecularIntensity, 1.0);\n        } else {\n          gl_FragColor &#x3D; vec4(0.0, 0.0, 0.0, 1.0);\n        }\n      } else {\n        gl_FragColor &#x3D; vec4(0.0, 0.0, 0.0, 1.0);\n      }\n    } \n  &quot;;
+      }
+
+      function fogVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    varying highp float fogZ;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n      fogZ &#x3D; length(gl_Position.xyz);\n    }\n  &quot;;
+      }
+
+      function fogFragmentShaderSource() {
+        return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    varying highp float fogZ;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      highp float d &#x3D; length(pointLightDirection);\n      highp float attenuation &#x3D; 68.0/(.31 + .01*d+.22*d*d);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      highp float Roughness &#x3D; 1.0;\n      highp float AmbientIntensity &#x3D; 0.75;\n      highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n      highp float SpecularIntensity &#x3D; 0.8;\n      highp float shininess &#x3D; 128.0;\n\n      highp float specular &#x3D; pow(max(0.0,dot(R,v)), shininess);\n\n      highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1) * attenuation;\n      highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz * attenuation;\n      highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0) * attenuation;\n      \n      // calculate fog\n      highp float fogDensity &#x3D; 0.25;\n      highp vec4 fogColor &#x3D; vec4(0.1, 0.2, 0.1, 0.6);\n      \n      highp float fogFactor &#x3D; exp(-fogDensity * fogDensity * fogZ * fogZ);\n      fogFactor &#x3D; clamp(fogFactor, 0.0, 1.0);\n    \n      highp vec4 materialColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n        diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n        SpecularColour * specular*SpecularIntensity, 1.0);\n      \n      gl_FragColor &#x3D; mix(fogColor, materialColor, fogFactor);\n    }\n  &quot;;
+      }
+
+      function fogSpotlightVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform highp mat4 uPMatrix;    \n    uniform highp mat4 uMVMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    varying highp float fogZ;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;\n      fogZ &#x3D; length(gl_Position.xyz);\n    }\n  &quot;;
+      }
+
+      function fogSpotlightFragmentShaderSource() {
+        return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    varying highp float fogZ;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      highp float d &#x3D; length(pointLightDirection);\n      highp float attenuation &#x3D; 1.0/(.01 + .01*d + .02*d*d);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      \n      // spotlight\n      highp float spotCosCutoff &#x3D; 0.6;\n      highp float spotExponent &#x3D; 2.0;\n      highp vec3 spotDirection &#x3D; vec3(0.5, 0.5, 0.5);\n      highp float spotEffect &#x3D; dot(normalize(spotDirection), l);\n      \n      // calculate fog\n      highp float fogDensity &#x3D; 0.075;\n      highp vec4 fogColor &#x3D; vec4(0.1, 0.2, 0.1, 0.6);\n      \n      highp float fogFactor &#x3D; exp(-fogDensity * fogDensity * fogZ * fogZ);\n      fogFactor &#x3D; clamp(fogFactor, 0.0, 1.0);\n      \n      highp vec4 materialColor &#x3D; vec4(0.0, 0.0, 0.0, 1.0);\n      \n      if (diffuseLambert &gt; 0.0) {\n        if(spotEffect &gt; spotCosCutoff) {\n          highp float Roughness &#x3D; 1.0;\n          highp float AmbientIntensity &#x3D; 0.3;\n          highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n          highp float SpecularIntensity &#x3D; 0.5;\n          highp float shininess &#x3D; 32.0;\n\n          highp float specular &#x3D; pow( max(0.0,dot(R,v)), shininess);\n\n          highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1) * attenuation;\n          highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz * attenuation;\n          highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0) * attenuation;\n    \n          materialColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n            diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n            SpecularColour * specular*SpecularIntensity, 1.0);\n        } \n      }\n      \n      gl_FragColor &#x3D; mix(fogColor, materialColor, fogFactor); \n    } \n  &quot;;
+      }
+
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>

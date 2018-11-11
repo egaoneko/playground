@@ -23,7 +23,8 @@
     "apidoc": "jsdoc config/jsdoc/api/index.md -c config/jsdoc/api/conf.json -P package.json -d build/apidoc",
     "predocs": "rm -rf docs",
     "docs": "npm run build-legacy && npm run build-examples && npm run apidoc",
-    "postdocs": "mv build docs && cp index.html docs/"
+    "postdocs": "mv build docs && cp index.html docs/",
+    "examples": "npm run serve-examples"
   },
   "main": "index.js",
   "repository": {
