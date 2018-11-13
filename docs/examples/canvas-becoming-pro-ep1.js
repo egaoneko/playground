@@ -1,2 +1,2 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[1],{3:function(e,n){var i=document.querySelector("canvas");i.width=window.innerWidth,i.height=window.innerHeight;var t=i.getContext("2d");t.fillRect(100,100,100,100),t.fillRect(400,100,100,100),t.fillRect(300,300,100,100)}},[[3,0]]]);
+(window.webpackJsonp=window.webpackJsonp||[]).push([[1],{5:function(e,n){var i=document.querySelector("canvas");i.width=window.innerWidth,i.height=window.innerHeight;var t=i.getContext("2d");t.fillRect(100,100,100,100),t.fillRect(400,100,100,100),t.fillRect(300,300,100,100)}},[[5,0]]]);
 //# sourceMappingURL=canvas-becoming-pro-ep1.js.map
