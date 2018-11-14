@@ -1,5 +1,6 @@
 import {setupPlaneMesh, setupSphereMesh} from "./utils/webgl/mesh-utils";
 import {SphereObject} from "./utils/webgl/object-utils";
+import Vector3 from "../src/pg/math/vector3";
 
 let gl = null;
 let canvas = null;
@@ -35,6 +36,10 @@ let start = [];
 let angleX = 0;
 let angleY = 0;
 let zoom = 1.0;
+
+const INITIAL_HEIGHT_TRANSLATION_OF_SPHERES = 5.0;
+const GROUND_Y = -1.0;
+const ELASTICITY =  -0.8;
 
 window.addEventListener('load', initWebGL);
 document.addEventListener('keyup', (evt) => {
@@ -191,7 +196,6 @@ function setupMeshes() {
     },
     0,
     {
-      translation: [-1.0, -0.75, 0.0],
       color: [1.0, 0.0, 0.0, 1.0],
       division: 20,
       smoothShading: false
@@ -208,7 +212,6 @@ function setupMeshes() {
     },
     1,
     {
-      translation: [0.0, 0.0, 1.0],
       color: [0.0, 1.0, 0.0, 1.0],
       division: 10,
       smoothShading: false
@@ -225,7 +228,6 @@ function setupMeshes() {
     },
     2,
     {
-      translation: [1.0, 0.25, -1.0],
       color: [1.0, 1.0, 0.0, 1.0],
       division: 5,
       smoothShading: false
@@ -242,7 +244,6 @@ function setupMeshes() {
     },
     3,
     {
-      translation: [-1.0, 1.0, -1.0],
       color: [1.0, 0.0, 1.0, 1.0],
     }
   );
@@ -257,7 +258,6 @@ function setupMeshes() {
     },
     4,
     {
-      translation: [-0.0, 1.75, -0.0],
       color: [0.0, 1.0, 1.0, 1.0],
     }
   );
@@ -272,15 +272,35 @@ function setupMeshes() {
     },
     5,
     {
-      translation: [0.0, -1.0, 0.0],
+      translation: [0.0, GROUND_Y, 0.0],
     }
   );
 
-  sceneElements.push(new SphereObject({vboIndex: 0}));
-  sceneElements.push(new SphereObject({vboIndex: 1}));
-  sceneElements.push(new SphereObject({vboIndex: 2}));
-  sceneElements.push(new SphereObject({vboIndex: 3}));
-  sceneElements.push(new SphereObject({vboIndex: 4}));
+  sceneElements.push(new SphereObject({
+    vboIndex: 0,
+    position: new Vector3(-1.0, -0.75, 0.0),
+    acceleration: new Vector3(0.0, 0.01, 0.0)
+  }));
+  sceneElements.push(new SphereObject({
+    vboIndex: 1,
+    position: new Vector3(0.0, 0.0, 1.0),
+    acceleration: new Vector3(0.0, 0.01, 0.0)
+  }));
+  sceneElements.push(new SphereObject({
+    vboIndex: 2,
+    position: new Vector3(1.0, 0.25, -1.0),
+    acceleration: new Vector3(0.0, 0.01, 0.0)
+  }));
+  sceneElements.push(new SphereObject({
+    vboIndex: 3,
+    position: new Vector3(-1.0, 1.0, -1.0),
+    acceleration: new Vector3(0.0, 0.01, 0.0)
+  }));
+  sceneElements.push(new SphereObject({
+    vboIndex: 4,
+    position: new Vector3(-0.0, 1.75, -0.0),
+    acceleration: new Vector3(0.0, 0.01, 0.0)
+  }));
 
   vertexPositionAttribute = gl.getAttribLocation(glProgram, "aVertexPosition");
   vertexColorAttribute = gl.getAttribLocation(glProgram, "aVertexColor");
@@ -290,21 +310,52 @@ function setupMeshes() {
   gl.enableVertexAttribArray(vertexNormalAttribute);
 }
 
+function searchForObject(arr, index) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].vboIndex === index) {
+      return i;
+    }
+  }
+  return -1;
+}
+function isAboveGround(n) {
+  const sphere = sceneElements[n];
+  return INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - (sphere.position.y + sphere.radius) > GROUND_Y;
+}
+
 function drawScene() {
-  // sphere
-  mat4.identity(mvMatrix);
-  mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -20.0]);
-  mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
-  mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
-  mat4.scale(mvMatrix, mvMatrix, [zoom, zoom, zoom]);
-
-  const invertedMatrix = mat3.create();
-  mat3.fromMat4(invertedMatrix, mvMatrix);
-  mat3.invert(normalMatrix, invertedMatrix);
-  mat3.transpose(normalMatrix, normalMatrix);
-  setMatrixUniforms();
-
   for (let i = 0; i < vertexIndexBuffers.length; ++i) {
+    mat4.identity(mvMatrix);
+    mat4.translate(mvMatrix, mvMatrix, [0.0, -1.0, -15.5]);
+
+    const n = searchForObject(sceneElements, i);
+    if (n !== -1) {
+      const sphere = sceneElements[n];
+      if (isAboveGround(n)) {
+        sphere.velocity.y += sphere.acceleration.y;
+        sphere.position.y += sphere.velocity.y;
+      } else {
+        sphere.position.y -= sphere.velocity.y;
+        sphere.velocity.y *= ELASTICITY;
+      }
+
+      mat4.translate(mvMatrix, mvMatrix, [
+        sphere.position.x,
+        INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - sphere.position.y,
+        sphere.position.z
+      ]);
+    }
+
+    // mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
+    // mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
+    mat4.scale(mvMatrix, mvMatrix, [zoom, zoom, zoom]);
+
+    const invertedMatrix = mat3.create();
+    mat3.fromMat4(invertedMatrix, mvMatrix);
+    mat3.invert(normalMatrix, invertedMatrix);
+    mat3.transpose(normalMatrix, normalMatrix);
+    setMatrixUniforms();
+
     gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[i]);
     gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffers[i]);

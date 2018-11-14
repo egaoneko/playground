@@ -17,10 +17,10 @@
     <link rel="stylesheet" href="./resources/layout.css" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js"></script>
 <script src="resources/js/stats.js"></script>
-    <link rel="stylesheet" href="webgl-physics-base.css">
+    <link rel="stylesheet" href="webgl-physics-gravity.css">
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
-    <title>WebGL physics base</title>
+    <title>WebGL physics gravity</title>
   </head>
   <body>
 
@@ -49,7 +49,7 @@
 
       <div class="row-fluid">
         <div class="span12">
-          <h4 id="title">WebGL physics base</h4>
+          <h4 id="title">WebGL physics gravity</h4>
           <div id="container" class="main">
   <canvas id="canvas"></canvas>
 </div>
@@ -59,8 +59,8 @@
 
       <div class="row-fluid">
         <div class="span12">
-          <p id="shortdesc">WebGL physics base.</p>
-          <div id="docs"><p>This page&#39;s try to WebGL physics base.</p>
+          <p id="shortdesc">WebGL physics gravity.</p>
+          <div id="docs"><p>This page&#39;s try to WebGL physics gravity.</p>
 </div>
           <p id="tags">Tags: webgl</p>
         </div>
@@ -72,10 +72,11 @@
           <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
         </div>
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
-          <textarea class="hidden" name="title">WebGL physics base</textarea>
-          <textarea class="hidden" name="description">WebGL physics base.</textarea>
+          <textarea class="hidden" name="title">WebGL physics gravity</textarea>
+          <textarea class="hidden" name="description">WebGL physics gravity.</textarea>
           <textarea class="hidden" name="js">import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
 import {SphereObject} from &quot;./utils/webgl/object-utils&quot;;
+import Vector3 from &quot;../src/pg/math/vector3&quot;;
 
 var gl &#x3D; null;
 var canvas &#x3D; null;
@@ -111,6 +112,10 @@ var start &#x3D; [];
 var angleX &#x3D; 0;
 var angleY &#x3D; 0;
 var zoom &#x3D; 1.0;
+
+var INITIAL_HEIGHT_TRANSLATION_OF_SPHERES &#x3D; 5.0;
+var GROUND_Y &#x3D; -1.0;
+var ELASTICITY &#x3D;  -0.8;
 
 window.addEventListener(&#x27;load&#x27;, initWebGL);
 document.addEventListener(&#x27;keyup&#x27;, function (evt) {
@@ -267,7 +272,6 @@ function setupMeshes() {
     },
     0,
     {
-      translation: [-1.0, -0.75, 0.0],
       color: [1.0, 0.0, 0.0, 1.0],
       division: 20,
       smoothShading: false
@@ -284,7 +288,6 @@ function setupMeshes() {
     },
     1,
     {
-      translation: [0.0, 0.0, 1.0],
       color: [0.0, 1.0, 0.0, 1.0],
       division: 10,
       smoothShading: false
@@ -301,7 +304,6 @@ function setupMeshes() {
     },
     2,
     {
-      translation: [1.0, 0.25, -1.0],
       color: [1.0, 1.0, 0.0, 1.0],
       division: 5,
       smoothShading: false
@@ -318,7 +320,6 @@ function setupMeshes() {
     },
     3,
     {
-      translation: [-1.0, 1.0, -1.0],
       color: [1.0, 0.0, 1.0, 1.0],
     }
   );
@@ -333,7 +334,6 @@ function setupMeshes() {
     },
     4,
     {
-      translation: [-0.0, 1.75, -0.0],
       color: [0.0, 1.0, 1.0, 1.0],
     }
   );
@@ -348,15 +348,35 @@ function setupMeshes() {
     },
     5,
     {
-      translation: [0.0, -1.0, 0.0],
+      translation: [0.0, GROUND_Y, 0.0],
     }
   );
 
-  sceneElements.push(new SphereObject({vboIndex: 0}));
-  sceneElements.push(new SphereObject({vboIndex: 1}));
-  sceneElements.push(new SphereObject({vboIndex: 2}));
-  sceneElements.push(new SphereObject({vboIndex: 3}));
-  sceneElements.push(new SphereObject({vboIndex: 4}));
+  sceneElements.push(new SphereObject({
+    vboIndex: 0,
+    position: new Vector3(-1.0, -0.75, 0.0),
+    acceleration: new Vector3(0.0, 0.01, 0.0)
+  }));
+  sceneElements.push(new SphereObject({
+    vboIndex: 1,
+    position: new Vector3(0.0, 0.0, 1.0),
+    acceleration: new Vector3(0.0, 0.01, 0.0)
+  }));
+  sceneElements.push(new SphereObject({
+    vboIndex: 2,
+    position: new Vector3(1.0, 0.25, -1.0),
+    acceleration: new Vector3(0.0, 0.01, 0.0)
+  }));
+  sceneElements.push(new SphereObject({
+    vboIndex: 3,
+    position: new Vector3(-1.0, 1.0, -1.0),
+    acceleration: new Vector3(0.0, 0.01, 0.0)
+  }));
+  sceneElements.push(new SphereObject({
+    vboIndex: 4,
+    position: new Vector3(-0.0, 1.75, -0.0),
+    acceleration: new Vector3(0.0, 0.01, 0.0)
+  }));
 
   vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexPosition&quot;);
   vertexColorAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexColor&quot;);
@@ -366,21 +386,52 @@ function setupMeshes() {
   gl.enableVertexAttribArray(vertexNormalAttribute);
 }
 
+function searchForObject(arr, index) {
+  for (var i &#x3D; 0; i &lt; arr.length; i++) {
+    if (arr[i].vboIndex &#x3D;&#x3D;&#x3D; index) {
+      return i;
+    }
+  }
+  return -1;
+}
+function isAboveGround(n) {
+  var sphere &#x3D; sceneElements[n];
+  return INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - (sphere.position.y + sphere.radius) &gt; GROUND_Y;
+}
+
 function drawScene() {
-  // sphere
-  mat4.identity(mvMatrix);
-  mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -20.0]);
-  mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
-  mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
-  mat4.scale(mvMatrix, mvMatrix, [zoom, zoom, zoom]);
-
-  var invertedMatrix &#x3D; mat3.create();
-  mat3.fromMat4(invertedMatrix, mvMatrix);
-  mat3.invert(normalMatrix, invertedMatrix);
-  mat3.transpose(normalMatrix, normalMatrix);
-  setMatrixUniforms();
-
   for (var i &#x3D; 0; i &lt; vertexIndexBuffers.length; ++i) {
+    mat4.identity(mvMatrix);
+    mat4.translate(mvMatrix, mvMatrix, [0.0, -1.0, -15.5]);
+
+    var n &#x3D; searchForObject(sceneElements, i);
+    if (n !&#x3D;&#x3D; -1) {
+      var sphere &#x3D; sceneElements[n];
+      if (isAboveGround(n)) {
+        sphere.velocity.y +&#x3D; sphere.acceleration.y;
+        sphere.position.y +&#x3D; sphere.velocity.y;
+      } else {
+        sphere.position.y -&#x3D; sphere.velocity.y;
+        sphere.velocity.y *&#x3D; ELASTICITY;
+      }
+
+      mat4.translate(mvMatrix, mvMatrix, [
+        sphere.position.x,
+        INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - sphere.position.y,
+        sphere.position.z
+      ]);
+    }
+
+    // mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
+    // mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
+    mat4.scale(mvMatrix, mvMatrix, [zoom, zoom, zoom]);
+
+    var invertedMatrix &#x3D; mat3.create();
+    mat3.fromMat4(invertedMatrix, mvMatrix);
+    mat3.invert(normalMatrix, invertedMatrix);
+    mat3.transpose(normalMatrix, normalMatrix);
+    setMatrixUniforms();
+
     gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[i]);
     gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffers[i]);
@@ -446,7 +497,7 @@ function flatFragmentShaderSource() {
         <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
-    &lt;title&gt;WebGL physics base&lt;/title&gt;
+    &lt;title&gt;WebGL physics gravity&lt;/title&gt;
     &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
     &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
@@ -471,6 +522,7 @@ function flatFragmentShaderSource() {
     &lt;script&gt;
       import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
       import {SphereObject} from &quot;./utils/webgl/object-utils&quot;;
+      import Vector3 from &quot;../src/pg/math/vector3&quot;;
 
       var gl &#x3D; null;
       var canvas &#x3D; null;
@@ -506,6 +558,10 @@ function flatFragmentShaderSource() {
       var angleX &#x3D; 0;
       var angleY &#x3D; 0;
       var zoom &#x3D; 1.0;
+
+      var INITIAL_HEIGHT_TRANSLATION_OF_SPHERES &#x3D; 5.0;
+      var GROUND_Y &#x3D; -1.0;
+      var ELASTICITY &#x3D;  -0.8;
 
       window.addEventListener(&#x27;load&#x27;, initWebGL);
       document.addEventListener(&#x27;keyup&#x27;, function (evt) {
@@ -662,7 +718,6 @@ function flatFragmentShaderSource() {
           },
           0,
           {
-            translation: [-1.0, -0.75, 0.0],
             color: [1.0, 0.0, 0.0, 1.0],
             division: 20,
             smoothShading: false
@@ -679,7 +734,6 @@ function flatFragmentShaderSource() {
           },
           1,
           {
-            translation: [0.0, 0.0, 1.0],
             color: [0.0, 1.0, 0.0, 1.0],
             division: 10,
             smoothShading: false
@@ -696,7 +750,6 @@ function flatFragmentShaderSource() {
           },
           2,
           {
-            translation: [1.0, 0.25, -1.0],
             color: [1.0, 1.0, 0.0, 1.0],
             division: 5,
             smoothShading: false
@@ -713,7 +766,6 @@ function flatFragmentShaderSource() {
           },
           3,
           {
-            translation: [-1.0, 1.0, -1.0],
             color: [1.0, 0.0, 1.0, 1.0],
           }
         );
@@ -728,7 +780,6 @@ function flatFragmentShaderSource() {
           },
           4,
           {
-            translation: [-0.0, 1.75, -0.0],
             color: [0.0, 1.0, 1.0, 1.0],
           }
         );
@@ -743,15 +794,35 @@ function flatFragmentShaderSource() {
           },
           5,
           {
-            translation: [0.0, -1.0, 0.0],
+            translation: [0.0, GROUND_Y, 0.0],
           }
         );
 
-        sceneElements.push(new SphereObject({vboIndex: 0}));
-        sceneElements.push(new SphereObject({vboIndex: 1}));
-        sceneElements.push(new SphereObject({vboIndex: 2}));
-        sceneElements.push(new SphereObject({vboIndex: 3}));
-        sceneElements.push(new SphereObject({vboIndex: 4}));
+        sceneElements.push(new SphereObject({
+          vboIndex: 0,
+          position: new Vector3(-1.0, -0.75, 0.0),
+          acceleration: new Vector3(0.0, 0.01, 0.0)
+        }));
+        sceneElements.push(new SphereObject({
+          vboIndex: 1,
+          position: new Vector3(0.0, 0.0, 1.0),
+          acceleration: new Vector3(0.0, 0.01, 0.0)
+        }));
+        sceneElements.push(new SphereObject({
+          vboIndex: 2,
+          position: new Vector3(1.0, 0.25, -1.0),
+          acceleration: new Vector3(0.0, 0.01, 0.0)
+        }));
+        sceneElements.push(new SphereObject({
+          vboIndex: 3,
+          position: new Vector3(-1.0, 1.0, -1.0),
+          acceleration: new Vector3(0.0, 0.01, 0.0)
+        }));
+        sceneElements.push(new SphereObject({
+          vboIndex: 4,
+          position: new Vector3(-0.0, 1.75, -0.0),
+          acceleration: new Vector3(0.0, 0.01, 0.0)
+        }));
 
         vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexPosition&quot;);
         vertexColorAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexColor&quot;);
@@ -761,21 +832,52 @@ function flatFragmentShaderSource() {
         gl.enableVertexAttribArray(vertexNormalAttribute);
       }
 
+      function searchForObject(arr, index) {
+        for (var i &#x3D; 0; i &lt; arr.length; i++) {
+          if (arr[i].vboIndex &#x3D;&#x3D;&#x3D; index) {
+            return i;
+          }
+        }
+        return -1;
+      }
+      function isAboveGround(n) {
+        var sphere &#x3D; sceneElements[n];
+        return INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - (sphere.position.y + sphere.radius) &gt; GROUND_Y;
+      }
+
       function drawScene() {
-        // sphere
-        mat4.identity(mvMatrix);
-        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -20.0]);
-        mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
-        mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
-        mat4.scale(mvMatrix, mvMatrix, [zoom, zoom, zoom]);
-
-        var invertedMatrix &#x3D; mat3.create();
-        mat3.fromMat4(invertedMatrix, mvMatrix);
-        mat3.invert(normalMatrix, invertedMatrix);
-        mat3.transpose(normalMatrix, normalMatrix);
-        setMatrixUniforms();
-
         for (var i &#x3D; 0; i &lt; vertexIndexBuffers.length; ++i) {
+          mat4.identity(mvMatrix);
+          mat4.translate(mvMatrix, mvMatrix, [0.0, -1.0, -15.5]);
+
+          var n &#x3D; searchForObject(sceneElements, i);
+          if (n !&#x3D;&#x3D; -1) {
+            var sphere &#x3D; sceneElements[n];
+            if (isAboveGround(n)) {
+              sphere.velocity.y +&#x3D; sphere.acceleration.y;
+              sphere.position.y +&#x3D; sphere.velocity.y;
+            } else {
+              sphere.position.y -&#x3D; sphere.velocity.y;
+              sphere.velocity.y *&#x3D; ELASTICITY;
+            }
+
+            mat4.translate(mvMatrix, mvMatrix, [
+              sphere.position.x,
+              INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - sphere.position.y,
+              sphere.position.z
+            ]);
+          }
+
+          // mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
+          // mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
+          mat4.scale(mvMatrix, mvMatrix, [zoom, zoom, zoom]);
+
+          var invertedMatrix &#x3D; mat3.create();
+          mat3.fromMat4(invertedMatrix, mvMatrix);
+          mat3.invert(normalMatrix, invertedMatrix);
+          mat3.transpose(normalMatrix, normalMatrix);
+          setMatrixUniforms();
+
           gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[i]);
           gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
           gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffers[i]);
@@ -829,6 +931,6 @@ function flatFragmentShaderSource() {
 
     <script src="./resources/common.js"></script>
     <script src="./resources/prism/prism.min.js"></script>
-    <script src="common.js"></script><script src="webgl-physics-base.js"></script>
+    <script src="common.js"></script><script src="webgl-physics-gravity.js"></script>
   </body>
 </html>
