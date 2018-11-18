@@ -31,10 +31,6 @@ const SHADER = {
 };
 
 const sceneElements = [];
-let capture = false;
-let start = [];
-let angleX = 0;
-let angleY = 0;
 let zoom = 1.0;
 
 const INITIAL_HEIGHT_TRANSLATION_OF_SPHERES = 5.0;
@@ -85,31 +81,6 @@ function initWebGL() {
 }
 
 function initEvents() {
-  canvas.addEventListener('mousedown', (e) => {
-    capture = true;
-    start = [e.pageX, e.pageY];
-
-    const mouseMoveHandler = (e) => {
-      const x = e.pageX - start[0];
-      const y = e.pageY - start[1];
-
-      // start update
-      start[0] = e.pageX;
-      start[1] = e.pageY;
-
-      angleX += x;
-      angleY += y;
-    };
-    const mouseUpHandler = () => {
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      document.removeEventListener('mouseup', mouseUpHandler);
-      capture = false;
-    };
-
-    document.addEventListener('mousemove', mouseMoveHandler);
-    document.addEventListener('mouseup', mouseUpHandler);
-  });
-
   const adjustZoom = (delta) => {
     if (delta > 0) {
       zoom += 1;
@@ -204,7 +175,7 @@ function setupMeshes() {
   );
 
   for (let i = 1; i <= NUM_SPHERES; ++i) {
-    const radius = 0.5 * Math.random() + 0.25
+    const radius = 0.5 * Math.random() + 0.25;
     setupSphereMesh(
       gl,
       {
@@ -244,6 +215,7 @@ function searchForObject(arr, index) {
   }
   return -1;
 }
+
 function isAboveGround(n) {
   const sphere = sceneElements[n];
   return INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - (sphere.position.y + sphere.radius) > GROUND_Y;

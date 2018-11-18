@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-62717870-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-62717870-1');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
+    <link rel="stylesheet" href="./resources/layout-full.css" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js"></script>
+<script src="resources/js/stats.js"></script>
+    <link rel="stylesheet" href="webgl-physics-ramp.css">
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-2.2.4.min.js"
+      integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+      crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <title>WebGL physics ramp</title>
+  </head>
+  <body>
+  <header class="navbar dropdown" role="navigation">
+    <button type="button" class="btn btn-default dropdown-toggle" id="hamburger" data-toggle="dropdown" aria-label="hamburger" aria-haspopup="true" aria-expanded="false">
+      <span class="glyphicon glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="hamburger">
+      <li><a class="active" href="index.html">Examples</a></li>
+      <li><a href="../apidoc">API</a></li>
+      <li><a href="https://github.com/egaoneko/playground">Code</a></li>
+      <li role="separator" class="divider"></li>
+      <li><a href="#" data-toggle="modal" data-target="#flipFlop">Source</a></li>
+    </ul>
+  </header>
+  <div id="container" class="main">
+  <canvas id="canvas"></canvas>
+</div>
+
+
+  <!-- The modal -->
+  <div class="modal fade" id="flipFlop" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" id="modalLabel">WebGL physics ramp</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row-fluid">
+            <div class="span12">
+              <p id="shortdesc">WebGL physics ramp.</p>
+              <div id="docs"><p>This page&#39;s try to WebGL physics ramp.</p>
+</div>
+              <p id="tags">Tags: webgl</p>
+            </div>
+          </div>
+
+          <div class="row-fluid">
+            <div id="source-controls">
+              <a id="copy-button" data-clipboard-target="#example-source"><i class="fa fa-clipboard"></i> Copy</a>
+              <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
+            </div>
+            <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
+              <textarea class="hidden" name="title">WebGL physics ramp</textarea>
+              <textarea class="hidden" name="description">WebGL physics ramp.</textarea>
+              <textarea class="hidden" name="js">import {
+  setupPlaneMesh,
+  setupSphereMesh
+} from &quot;./utils/webgl/mesh-utils&quot;;
+import {
+  SphereObject,
+  WallObject
+} from &quot;./utils/webgl/object-utils&quot;;
+import Vector3 from &quot;../src/pg/math/vector3&quot;;
+
+var gl &#x3D; null;
+var canvas &#x3D; null;
+var container &#x3D; null;
+var glProgram &#x3D; null;
+var fragmentShader &#x3D; null;
+var vertexShader &#x3D; null;
+
+var vertexPositionAttribute &#x3D; null;
+var vertexNormalAttribute &#x3D; null;
+var vertexColorAttribute &#x3D; null;
+var trianglesVerticeBuffers &#x3D; [];
+var trianglesNormalBuffers &#x3D; [];
+var trianglesColorBuffers &#x3D; [];
+var vertexIndexBuffers &#x3D; [];
+
+var pMatrix &#x3D; mat4.create();
+var mvMatrix &#x3D; mat4.create();
+var normalMatrix &#x3D; mat3.create();
+
+var paused &#x3D; false;
+
+var SHADER &#x3D; {
+  flat: {
+    vertexShader: flatVertexShaderSource(),
+    fragmentShader: flatFragmentShaderSource()
+  }
+};
+
+var sceneElements &#x3D; [];
+var zoom &#x3D; 0.5;
+
+var GROUND_Y &#x3D; -1.0;
+var PLANE_SIZE &#x3D; 100.0;
+
+//ramp dimensions
+var HEIGHT_1 &#x3D; 65.0;
+var HEIGHT_2 &#x3D; 15.0;
+var HEIGHT_3 &#x3D; 20.0;
+var HEIGHT_4 &#x3D; 15.0;
+var LENGTH &#x3D; 60.0;
+var LENGTH_2 &#x3D; 60.0 * 0.5;
+var LENGTH_3 &#x3D; 60.0 * 0.75;
+var LANDING_RAMP_START &#x3D; LENGTH * 2.0;
+var LANDING_RAMP_END &#x3D; LENGTH * 3.0;
+var DEPTH &#x3D; 25.0;
+
+var SCALE &#x3D; 0.15;
+
+var sphere &#x3D; null;
+var rampWalls &#x3D; [];
+
+window.addEventListener(&#x27;load&#x27;, initWebGL);
+document.addEventListener(&#x27;keyup&#x27;, function (evt) {
+  console.log(evt.keyCode);
+  switch (evt.keyCode) {
+    case 80: // &#x27;p&#x27;
+      paused &#x3D; !paused;
+      break;
+    default:
+      break;
+  }
+});
+
+function initWebGL() {
+  canvas &#x3D; document.querySelector(&#x27;#canvas&#x27;);
+  container &#x3D; document.querySelector(&#x27;#container&#x27;);
+  canvas.width &#x3D; container.clientWidth;
+  canvas.height &#x3D; container.clientHeight;
+
+  initEvents();
+
+  try {
+    gl &#x3D; canvas.getContext(&#x27;webgl&#x27;, {preserveDrawingBuffer: true}) ||
+      canvas.getContext(&#x27;experimental-webgl&#x27;, {preserveDrawingBuffer: true});
+  } catch (e) {
+    console.error(e);
+  }
+
+  if (gl) {
+    initShaders();
+    setupMeshes();
+
+    (function animLoop() {
+
+      if (!paused) {
+        setupWebGL();
+        drawScene();
+        checkForCollisions();
+      }
+
+      requestAnimationFrame(animLoop);
+    })();
+  }
+}
+
+function initEvents() {
+  var adjustZoom &#x3D; function (delta) {
+    if (delta &gt; 0) {
+      zoom +&#x3D; 1;
+    } else {
+      zoom -&#x3D; 0.1;
+      if (zoom &lt; 0.01) {
+        zoom &#x3D; 0.1;
+      }
+    }
+  };
+  canvas.addEventListener(&#x27;mousewheel&#x27;, function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    adjustZoom(e.wheelDelta);
+  });
+  canvas.addEventListener(&#x27;DOMMouseScroll&#x27;, function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    adjustZoom(e.originalEvent.detail * -0.1);
+  });
+}
+
+function setupWebGL() {
+  // set the clear color to a shade of green
+  // gl.clearColor(0.7, 0.7, 0.7, 1.0);
+  // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  mat4.perspective(pMatrix, 45, canvas.width / canvas.height, 0.1, 100.0);
+}
+
+function initShaders() {
+  createProgram(&#x27;flat&#x27;);
+}
+
+function createProgram(type) {
+  // create program
+  glProgram &#x3D; gl.createProgram();
+  attachShader(glProgram, type);
+  // use program
+  gl.useProgram(glProgram);
+  getMatrixUniforms();
+}
+
+function attachShader(glProgram, type) {
+  // get shader source
+  var vsSource &#x3D; SHADER[type].vertexShader;
+  var fsSource &#x3D; SHADER[type].fragmentShader;
+
+  // compile shaders
+  vertexShader &#x3D; makeShader(vsSource, gl.VERTEX_SHADER);
+  fragmentShader &#x3D; makeShader(fsSource, gl.FRAGMENT_SHADER);
+
+  // attach and link shaders to the program
+  gl.attachShader(glProgram, vertexShader);
+  gl.attachShader(glProgram, fragmentShader);
+  gl.linkProgram(glProgram);
+
+  if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
+    alert(&#x27;Unable to initialize the shader program.&#x27;);
+  }
+}
+
+function makeShader(source, type) {
+  // compile the shader
+  var shader &#x3D; gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    alert((&quot;Error compiling shader: &quot; + (gl.getShaderInfoLog(shader))));
+  }
+
+  return shader;
+}
+
+function setupMeshes() {
+
+  setupPlaneMesh(
+    gl,
+    {
+      trianglesNormalBuffers: trianglesNormalBuffers,
+      trianglesColorBuffers: trianglesColorBuffers,
+      trianglesVerticeBuffers: trianglesVerticeBuffers,
+      vertexIndexBuffers: vertexIndexBuffers,
+    },
+    0,
+    {
+      translation: [0.0, GROUND_Y, 0.0],
+      size: PLANE_SIZE,
+    }
+  );
+  addRamp(1);
+  setupRampWalls();
+
+  var radius &#x3D; 2.0;
+  setupSphereMesh(
+    gl,
+    {
+      trianglesNormalBuffers: trianglesNormalBuffers,
+      trianglesColorBuffers: trianglesColorBuffers,
+      trianglesVerticeBuffers: trianglesVerticeBuffers,
+      vertexIndexBuffers: vertexIndexBuffers,
+    },
+    2,
+    {
+      color: [1.0, 0.0, 0.0, 0.9],
+      radius: radius,
+    }
+  );
+  sphere &#x3D; new SphereObject({
+    vboIndex: 2,
+    radius: radius,
+    position: new Vector3(0.0, HEIGHT_1 * SCALE, 0.0),
+    acceleration: new Vector3(0.0, -0.001, 0.0)
+  });
+
+  sceneElements.push(sphere);
+
+  vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexPosition&quot;);
+  vertexColorAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexColor&quot;);
+  vertexNormalAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexNormal&quot;);
+  gl.enableVertexAttribArray(vertexPositionAttribute);
+  gl.enableVertexAttribArray(vertexColorAttribute);
+  gl.enableVertexAttribArray(vertexNormalAttribute);
+}
+
+function drawScene() {
+  var tX &#x3D; -20;//angleX;
+  var tY &#x3D; 7;//angleY;
+
+  for (var i &#x3D; 0; i &lt; vertexIndexBuffers.length; ++i) {
+    mat4.identity(mvMatrix);
+    mat4.translate(mvMatrix, mvMatrix, [0.0, -1.0, -20.0]);
+    mat4.rotate(mvMatrix, mvMatrix, tX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
+    mat4.rotate(mvMatrix, mvMatrix, tY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
+    mat4.scale(mvMatrix, mvMatrix, [zoom, zoom, zoom]);
+
+    //coordinate space translations
+    if (i &#x3D;&#x3D;&#x3D; 1) { //ramp
+      mat4.translate(
+        mvMatrix,
+        mvMatrix,
+        [-LANDING_RAMP_END * 0.5 * SCALE, GROUND_Y, -DEPTH * 0.5 * SCALE]
+      );
+      mat4.scale(mvMatrix, mvMatrix, [SCALE, SCALE, SCALE]);
+    } else if (i &#x3D;&#x3D;&#x3D; 2) { //sphere
+      mat4.translate(
+        mvMatrix,
+        mvMatrix,
+        [(sphere.radius - LANDING_RAMP_END * 0.5) * SCALE + sphere.position.x,
+          (GROUND_Y - sphere.radius) * SCALE + sphere.position.y,
+          sphere.position.z
+        ]
+      );
+      mat4.scale(mvMatrix, mvMatrix, [SCALE, SCALE, SCALE]);
+    }
+
+    var invertedMatrix &#x3D; mat3.create();
+    mat3.fromMat4(invertedMatrix, mvMatrix);
+    mat3.invert(normalMatrix, invertedMatrix);
+    mat3.transpose(normalMatrix, normalMatrix);
+    setMatrixUniforms();
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[i]);
+    gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+    if (i &#x3D;&#x3D;&#x3D; 1) { //ramp
+      gl.disableVertexAttribArray(vertexColorAttribute);
+      gl.vertexAttrib4f(vertexColorAttribute, 1.0, 0.9, 0.7, 1.0);
+    } else {
+      gl.enableVertexAttribArray(vertexColorAttribute);
+      gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffers[i]);
+      gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+    }
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[i]);
+    gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[i]);
+    gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
+  }
+}
+
+function getMatrixUniforms() {
+  glProgram.pMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uPMatrix&#x27;);
+  glProgram.mvMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uMVMatrix&#x27;);
+  glProgram.normalMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &quot;uNormalMatrix&quot;);
+}
+
+function setMatrixUniforms() {
+  gl.uniformMatrix4fv(glProgram.pMatrixUniform, false, pMatrix);
+  gl.uniformMatrix4fv(glProgram.mvMatrixUniform, false, mvMatrix);
+  gl.uniformMatrix3fv(glProgram.normalMatrixUniform, false, normalMatrix);
+}
+
+function flatVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    uniform mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 L;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0, 2.0, -1.0);\n      vec3 pointLightDirection &#x3D; normalize(vec3(pointLightPosition.xyz - aVertexPosition.xyz));\n      vec3 ambientColor &#x3D; vec3(0.1, 0.1, 0.1);\n      \n      L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      N &#x3D; uNormalMatrix * aVertexNormal;\n      \n      vColor &#x3D; aVertexColor;\n    }\n  &quot;;
+}
+
+function flatFragmentShaderSource() {
+  return &quot;\n    varying highp vec3 vColor;\n    varying highp vec3 N;\n    varying highp vec3 L;\n    \n    void main(void) {\n      highp float lambert &#x3D; max(dot(normalize(N), normalize(L)), 0.0);\n      gl_FragColor &#x3D; vec4(vColor * lambert, 1.0);\n    }\n  &quot;;
+}
+
+function checkForCollisions() {
+  var x &#x3D; sphere.position.x / SCALE;
+
+  if (sphere.position.y &lt; 0.0) {
+    return;
+  }
+
+  var found &#x3D; false;
+
+  for (var i &#x3D; 0; i &lt; rampWalls.length; i++) {
+    if (x &gt;&#x3D; rampWalls[i].startX &amp;&amp; x &lt;&#x3D; rampWalls[i].endX) {
+      found &#x3D; true;
+
+      if (rampWalls[i].slope &lt; -0.001 || rampWalls[i].slope &gt; 0.001) {
+        if (rampWalls[i].slope &gt; 0.001) {
+          sphere.totalVelocity -&#x3D; sphere.acceleration.y;
+        } else if (rampWalls[i].slope &lt; -0.001) {
+          sphere.totalVelocity +&#x3D; sphere.acceleration.y;
+        }
+        //console.log(sphere.totalVelocity);
+        sphere.velocity.x &#x3D; (sphere.totalVelocity * Math.cos(rampWalls[i].angle));
+        sphere.velocity.y &#x3D; sphere.totalVelocity * Math.sin(rampWalls[i].angle);
+
+        sphere.position.y +&#x3D; sphere.velocity.y;
+      }
+      sphere.position.x +&#x3D; sphere.velocity.x;
+    }
+  }
+
+  if (!found) {
+    sphere.velocity.y +&#x3D; sphere.acceleration.y;
+    sphere.position.x +&#x3D; sphere.velocity.x;
+    sphere.position.y +&#x3D; sphere.velocity.y;
+  }
+}
+
+function setupRampWalls() {
+  var w &#x3D; {
+    startX: 0.0,
+    startY: HEIGHT_1,
+    endX: LENGTH_2,
+    endY: HEIGHT_2
+  };
+  rampWalls.push(new WallObject(w));
+
+  var p &#x3D; {
+    startX: LENGTH_2,
+    startY: HEIGHT_2,
+    endX: LENGTH_3,
+    endY: HEIGHT_2
+  };
+  rampWalls.push(new WallObject(p));
+
+  p &#x3D; {
+    startX: LENGTH_3,
+    startY: HEIGHT_2,
+    endX: LENGTH,
+    endY: HEIGHT_3
+  };
+  rampWalls.push(new WallObject(p));
+
+  p &#x3D; {
+    startX: LANDING_RAMP_START,
+    startY: HEIGHT_4,
+    endX: LANDING_RAMP_END,
+    endY: 0.0
+  };
+  rampWalls.push(new WallObject(p));
+}
+
+function addRamp(n) {
+  //26 vertices
+  var vertexPositionData &#x3D; [
+    //0-3
+    0, 0, 0,
+    LENGTH_2, 0, 0,
+    LENGTH_3, 0, 0,
+    LENGTH, 0, 0,
+
+    //4-7
+    0, HEIGHT_2, 0,
+    LENGTH_2, HEIGHT_2, 0,
+    LENGTH_3, HEIGHT_2, 0,
+    LENGTH, HEIGHT_2, 0,
+    //8-9
+    0, HEIGHT_1, 0,
+    LENGTH, HEIGHT_3, 0,
+    //just z-values change
+    //10-13
+    0, 0, DEPTH,
+    LENGTH_2, 0, DEPTH,
+    LENGTH_3, 0, DEPTH,
+    LENGTH, 0, DEPTH,
+
+    //14-17
+    0, HEIGHT_2, DEPTH,
+    LENGTH_2, HEIGHT_2, DEPTH,
+    LENGTH_3, HEIGHT_2, DEPTH,
+    LENGTH, HEIGHT_2, DEPTH,
+    //18-19
+    0, HEIGHT_1, DEPTH,
+    LENGTH, HEIGHT_3, DEPTH,
+    //down ramp
+    //20-22
+    LANDING_RAMP_START, 0, 0,
+    LANDING_RAMP_END, 0, 0,
+    LANDING_RAMP_START, HEIGHT_4, 0,
+    //23-25
+    LANDING_RAMP_START, 0, DEPTH,
+    LANDING_RAMP_END, 0, DEPTH,
+    LANDING_RAMP_START, HEIGHT_4, DEPTH
+  ];
+  //28 faces &#x3D; 84 indices
+  var indexData &#x3D; [
+    0, 1, 5,
+    0, 5, 4,
+    1, 6, 5,
+    1, 2, 6,	//front side
+    2, 3, 7,
+    2, 7, 6,
+    6, 7, 9,
+    4, 5, 8,
+    10, 15, 11,
+    10, 14, 15,
+    11, 15, 16,
+    11, 16, 12,	//back side
+    12, 17, 13,
+    12, 16, 17,
+    16, 19, 17,
+    14, 18, 15,
+    0, 13, 3,		//bottom
+    0, 10, 13,
+    0, 8, 10,		//left
+    8, 18, 10,
+    3, 13, 9,		//right
+    9, 13, 19,
+    8, 5, 15,			//top
+    8, 15, 18,
+    5, 6, 16,
+    5, 16, 15,
+    6, 9, 19,
+    6, 19, 16,
+    //down ramp
+    20, 21, 22,
+    23, 25, 24,	//sides
+    20, 22, 23,
+    23, 22, 25,	//back
+    20, 23, 21,
+    21, 23, 24,	//bottom
+    21, 24, 22,	//top
+    22, 24, 25
+  ];
+  var normalData &#x3D; calculateNormals(vertexPositionData, indexData);
+  trianglesNormalBuffers[n] &#x3D; gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[n]);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
+  trianglesNormalBuffers[n].itemSize &#x3D; 3;
+  trianglesNormalBuffers[n].numItems &#x3D; normalData.length / 3;
+
+  trianglesVerticeBuffers[n] &#x3D; gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[n]);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+  trianglesVerticeBuffers[n].itemSize &#x3D; 3;
+  trianglesVerticeBuffers[n].numItems &#x3D; vertexPositionData.length / 3;
+
+  vertexIndexBuffers[n] &#x3D; gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[n]);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STREAM_DRAW);
+  vertexIndexBuffers[n].itemSize &#x3D; 3;
+  vertexIndexBuffers[n].numItems &#x3D; indexData.length;
+}
+
+function calculateNormals(vertices, indices) {
+  var normals &#x3D; [];
+
+  for (var i &#x3D; 0; i &lt; indices.length; i +&#x3D; 3) {
+    var a &#x3D; indices[i];
+    var b &#x3D; indices[i + 1];
+    var c &#x3D; indices[i + 2];
+    //normal is the cross product
+    var v1 &#x3D; [
+      vertices[a * 3] - vertices[b * 3],
+      vertices[a * 3 + 1] - vertices[b * 3 + 1],
+      vertices[a * 3 + 2] - vertices[b * 3 + 2]
+    ];
+    var v2 &#x3D; [
+      vertices[a * 3] - vertices[c * 3],
+      vertices[a * 3 + 1] - vertices[c * 3 + 1],
+      vertices[a * 3 + 2] - vertices[c * 3 + 2]
+    ];
+    var cross &#x3D; [
+      v1[1] * v2[2] - v1[2] * v2[1],
+      v1[2] * v2[0] - v1[0] * v2[2],
+      v1[0] * v2[1] - v1[1] * v2[0]
+    ];
+    //same value for each of the three vertices
+    normals.push.apply(normals, cross);
+    normals.push.apply(normals, cross);
+    normals.push.apply(normals, cross);
+  }
+  return normals;
+}
+</textarea>
+              <textarea class="hidden" name="css">#container {
+  position: relative;
+  overflow: hidden;
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+}
+</textarea>
+              <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+  &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
+&lt;/div&gt;
+</textarea>
+              <input type="hidden" name="data">
+            </form>
+            <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;WebGL physics ramp&lt;/title&gt;
+    &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
+    &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
+    &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;http://www.3daysofprogramming.com/playground/examples/resources/js/stats.js&quot;&gt;&lt;/script&gt;
+    &lt;style&gt;
+      #container {
+        position: relative;
+        overflow: hidden;
+      }
+
+      #canvas {
+        width: 100%;
+        height: 100%;
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+      &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+      import {
+        setupPlaneMesh,
+        setupSphereMesh
+      } from &quot;./utils/webgl/mesh-utils&quot;;
+      import {
+        SphereObject,
+        WallObject
+      } from &quot;./utils/webgl/object-utils&quot;;
+      import Vector3 from &quot;../src/pg/math/vector3&quot;;
+
+      var gl &#x3D; null;
+      var canvas &#x3D; null;
+      var container &#x3D; null;
+      var glProgram &#x3D; null;
+      var fragmentShader &#x3D; null;
+      var vertexShader &#x3D; null;
+
+      var vertexPositionAttribute &#x3D; null;
+      var vertexNormalAttribute &#x3D; null;
+      var vertexColorAttribute &#x3D; null;
+      var trianglesVerticeBuffers &#x3D; [];
+      var trianglesNormalBuffers &#x3D; [];
+      var trianglesColorBuffers &#x3D; [];
+      var vertexIndexBuffers &#x3D; [];
+
+      var pMatrix &#x3D; mat4.create();
+      var mvMatrix &#x3D; mat4.create();
+      var normalMatrix &#x3D; mat3.create();
+
+      var paused &#x3D; false;
+
+      var SHADER &#x3D; {
+        flat: {
+          vertexShader: flatVertexShaderSource(),
+          fragmentShader: flatFragmentShaderSource()
+        }
+      };
+
+      var sceneElements &#x3D; [];
+      var zoom &#x3D; 0.5;
+
+      var GROUND_Y &#x3D; -1.0;
+      var PLANE_SIZE &#x3D; 100.0;
+
+      //ramp dimensions
+      var HEIGHT_1 &#x3D; 65.0;
+      var HEIGHT_2 &#x3D; 15.0;
+      var HEIGHT_3 &#x3D; 20.0;
+      var HEIGHT_4 &#x3D; 15.0;
+      var LENGTH &#x3D; 60.0;
+      var LENGTH_2 &#x3D; 60.0 * 0.5;
+      var LENGTH_3 &#x3D; 60.0 * 0.75;
+      var LANDING_RAMP_START &#x3D; LENGTH * 2.0;
+      var LANDING_RAMP_END &#x3D; LENGTH * 3.0;
+      var DEPTH &#x3D; 25.0;
+
+      var SCALE &#x3D; 0.15;
+
+      var sphere &#x3D; null;
+      var rampWalls &#x3D; [];
+
+      window.addEventListener(&#x27;load&#x27;, initWebGL);
+      document.addEventListener(&#x27;keyup&#x27;, function (evt) {
+        console.log(evt.keyCode);
+        switch (evt.keyCode) {
+          case 80: // &#x27;p&#x27;
+            paused &#x3D; !paused;
+            break;
+          default:
+            break;
+        }
+      });
+
+      function initWebGL() {
+        canvas &#x3D; document.querySelector(&#x27;#canvas&#x27;);
+        container &#x3D; document.querySelector(&#x27;#container&#x27;);
+        canvas.width &#x3D; container.clientWidth;
+        canvas.height &#x3D; container.clientHeight;
+
+        initEvents();
+
+        try {
+          gl &#x3D; canvas.getContext(&#x27;webgl&#x27;, {preserveDrawingBuffer: true}) ||
+            canvas.getContext(&#x27;experimental-webgl&#x27;, {preserveDrawingBuffer: true});
+        } catch (e) {
+          console.error(e);
+        }
+
+        if (gl) {
+          initShaders();
+          setupMeshes();
+
+          (function animLoop() {
+
+            if (!paused) {
+              setupWebGL();
+              drawScene();
+              checkForCollisions();
+            }
+
+            requestAnimationFrame(animLoop);
+          })();
+        }
+      }
+
+      function initEvents() {
+        var adjustZoom &#x3D; function (delta) {
+          if (delta &gt; 0) {
+            zoom +&#x3D; 1;
+          } else {
+            zoom -&#x3D; 0.1;
+            if (zoom &lt; 0.01) {
+              zoom &#x3D; 0.1;
+            }
+          }
+        };
+        canvas.addEventListener(&#x27;mousewheel&#x27;, function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+          adjustZoom(e.wheelDelta);
+        });
+        canvas.addEventListener(&#x27;DOMMouseScroll&#x27;, function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+          adjustZoom(e.originalEvent.detail * -0.1);
+        });
+      }
+
+      function setupWebGL() {
+        // set the clear color to a shade of green
+        // gl.clearColor(0.7, 0.7, 0.7, 1.0);
+        // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.enable(gl.DEPTH_TEST);
+
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        mat4.perspective(pMatrix, 45, canvas.width / canvas.height, 0.1, 100.0);
+      }
+
+      function initShaders() {
+        createProgram(&#x27;flat&#x27;);
+      }
+
+      function createProgram(type) {
+        // create program
+        glProgram &#x3D; gl.createProgram();
+        attachShader(glProgram, type);
+        // use program
+        gl.useProgram(glProgram);
+        getMatrixUniforms();
+      }
+
+      function attachShader(glProgram, type) {
+        // get shader source
+        var vsSource &#x3D; SHADER[type].vertexShader;
+        var fsSource &#x3D; SHADER[type].fragmentShader;
+
+        // compile shaders
+        vertexShader &#x3D; makeShader(vsSource, gl.VERTEX_SHADER);
+        fragmentShader &#x3D; makeShader(fsSource, gl.FRAGMENT_SHADER);
+
+        // attach and link shaders to the program
+        gl.attachShader(glProgram, vertexShader);
+        gl.attachShader(glProgram, fragmentShader);
+        gl.linkProgram(glProgram);
+
+        if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
+          alert(&#x27;Unable to initialize the shader program.&#x27;);
+        }
+      }
+
+      function makeShader(source, type) {
+        // compile the shader
+        var shader &#x3D; gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          alert((&quot;Error compiling shader: &quot; + (gl.getShaderInfoLog(shader))));
+        }
+
+        return shader;
+      }
+
+      function setupMeshes() {
+
+        setupPlaneMesh(
+          gl,
+          {
+            trianglesNormalBuffers: trianglesNormalBuffers,
+            trianglesColorBuffers: trianglesColorBuffers,
+            trianglesVerticeBuffers: trianglesVerticeBuffers,
+            vertexIndexBuffers: vertexIndexBuffers,
+          },
+          0,
+          {
+            translation: [0.0, GROUND_Y, 0.0],
+            size: PLANE_SIZE,
+          }
+        );
+        addRamp(1);
+        setupRampWalls();
+
+        var radius &#x3D; 2.0;
+        setupSphereMesh(
+          gl,
+          {
+            trianglesNormalBuffers: trianglesNormalBuffers,
+            trianglesColorBuffers: trianglesColorBuffers,
+            trianglesVerticeBuffers: trianglesVerticeBuffers,
+            vertexIndexBuffers: vertexIndexBuffers,
+          },
+          2,
+          {
+            color: [1.0, 0.0, 0.0, 0.9],
+            radius: radius,
+          }
+        );
+        sphere &#x3D; new SphereObject({
+          vboIndex: 2,
+          radius: radius,
+          position: new Vector3(0.0, HEIGHT_1 * SCALE, 0.0),
+          acceleration: new Vector3(0.0, -0.001, 0.0)
+        });
+
+        sceneElements.push(sphere);
+
+        vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexPosition&quot;);
+        vertexColorAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexColor&quot;);
+        vertexNormalAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexNormal&quot;);
+        gl.enableVertexAttribArray(vertexPositionAttribute);
+        gl.enableVertexAttribArray(vertexColorAttribute);
+        gl.enableVertexAttribArray(vertexNormalAttribute);
+      }
+
+      function drawScene() {
+        var tX &#x3D; -20;//angleX;
+        var tY &#x3D; 7;//angleY;
+
+        for (var i &#x3D; 0; i &lt; vertexIndexBuffers.length; ++i) {
+          mat4.identity(mvMatrix);
+          mat4.translate(mvMatrix, mvMatrix, [0.0, -1.0, -20.0]);
+          mat4.rotate(mvMatrix, mvMatrix, tX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
+          mat4.rotate(mvMatrix, mvMatrix, tY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
+          mat4.scale(mvMatrix, mvMatrix, [zoom, zoom, zoom]);
+
+          //coordinate space translations
+          if (i &#x3D;&#x3D;&#x3D; 1) { //ramp
+            mat4.translate(
+              mvMatrix,
+              mvMatrix,
+              [-LANDING_RAMP_END * 0.5 * SCALE, GROUND_Y, -DEPTH * 0.5 * SCALE]
+            );
+            mat4.scale(mvMatrix, mvMatrix, [SCALE, SCALE, SCALE]);
+          } else if (i &#x3D;&#x3D;&#x3D; 2) { //sphere
+            mat4.translate(
+              mvMatrix,
+              mvMatrix,
+              [(sphere.radius - LANDING_RAMP_END * 0.5) * SCALE + sphere.position.x,
+                (GROUND_Y - sphere.radius) * SCALE + sphere.position.y,
+                sphere.position.z
+              ]
+            );
+            mat4.scale(mvMatrix, mvMatrix, [SCALE, SCALE, SCALE]);
+          }
+
+          var invertedMatrix &#x3D; mat3.create();
+          mat3.fromMat4(invertedMatrix, mvMatrix);
+          mat3.invert(normalMatrix, invertedMatrix);
+          mat3.transpose(normalMatrix, normalMatrix);
+          setMatrixUniforms();
+
+          gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[i]);
+          gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+          if (i &#x3D;&#x3D;&#x3D; 1) { //ramp
+            gl.disableVertexAttribArray(vertexColorAttribute);
+            gl.vertexAttrib4f(vertexColorAttribute, 1.0, 0.9, 0.7, 1.0);
+          } else {
+            gl.enableVertexAttribArray(vertexColorAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffers[i]);
+            gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+          }
+
+          gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[i]);
+          gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[i]);
+          gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
+        }
+      }
+
+      function getMatrixUniforms() {
+        glProgram.pMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uPMatrix&#x27;);
+        glProgram.mvMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uMVMatrix&#x27;);
+        glProgram.normalMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &quot;uNormalMatrix&quot;);
+      }
+
+      function setMatrixUniforms() {
+        gl.uniformMatrix4fv(glProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(glProgram.mvMatrixUniform, false, mvMatrix);
+        gl.uniformMatrix3fv(glProgram.normalMatrixUniform, false, normalMatrix);
+      }
+
+      function flatVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    uniform mat3 uNormalMatrix;\n    \n    varying highp vec3 vColor;\n    varying highp vec3 L;\n    varying highp vec3 N;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0, 2.0, -1.0);\n      vec3 pointLightDirection &#x3D; normalize(vec3(pointLightPosition.xyz - aVertexPosition.xyz));\n      vec3 ambientColor &#x3D; vec3(0.1, 0.1, 0.1);\n      \n      L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      N &#x3D; uNormalMatrix * aVertexNormal;\n      \n      vColor &#x3D; aVertexColor;\n    }\n  &quot;;
+      }
+
+      function flatFragmentShaderSource() {
+        return &quot;\n    varying highp vec3 vColor;\n    varying highp vec3 N;\n    varying highp vec3 L;\n    \n    void main(void) {\n      highp float lambert &#x3D; max(dot(normalize(N), normalize(L)), 0.0);\n      gl_FragColor &#x3D; vec4(vColor * lambert, 1.0);\n    }\n  &quot;;
+      }
+
+      function checkForCollisions() {
+        var x &#x3D; sphere.position.x / SCALE;
+
+        if (sphere.position.y &lt; 0.0) {
+          return;
+        }
+
+        var found &#x3D; false;
+
+        for (var i &#x3D; 0; i &lt; rampWalls.length; i++) {
+          if (x &gt;&#x3D; rampWalls[i].startX &amp;&amp; x &lt;&#x3D; rampWalls[i].endX) {
+            found &#x3D; true;
+
+            if (rampWalls[i].slope &lt; -0.001 || rampWalls[i].slope &gt; 0.001) {
+              if (rampWalls[i].slope &gt; 0.001) {
+                sphere.totalVelocity -&#x3D; sphere.acceleration.y;
+              } else if (rampWalls[i].slope &lt; -0.001) {
+                sphere.totalVelocity +&#x3D; sphere.acceleration.y;
+              }
+              //console.log(sphere.totalVelocity);
+              sphere.velocity.x &#x3D; (sphere.totalVelocity * Math.cos(rampWalls[i].angle));
+              sphere.velocity.y &#x3D; sphere.totalVelocity * Math.sin(rampWalls[i].angle);
+
+              sphere.position.y +&#x3D; sphere.velocity.y;
+            }
+            sphere.position.x +&#x3D; sphere.velocity.x;
+          }
+        }
+
+        if (!found) {
+          sphere.velocity.y +&#x3D; sphere.acceleration.y;
+          sphere.position.x +&#x3D; sphere.velocity.x;
+          sphere.position.y +&#x3D; sphere.velocity.y;
+        }
+      }
+
+      function setupRampWalls() {
+        var w &#x3D; {
+          startX: 0.0,
+          startY: HEIGHT_1,
+          endX: LENGTH_2,
+          endY: HEIGHT_2
+        };
+        rampWalls.push(new WallObject(w));
+
+        var p &#x3D; {
+          startX: LENGTH_2,
+          startY: HEIGHT_2,
+          endX: LENGTH_3,
+          endY: HEIGHT_2
+        };
+        rampWalls.push(new WallObject(p));
+
+        p &#x3D; {
+          startX: LENGTH_3,
+          startY: HEIGHT_2,
+          endX: LENGTH,
+          endY: HEIGHT_3
+        };
+        rampWalls.push(new WallObject(p));
+
+        p &#x3D; {
+          startX: LANDING_RAMP_START,
+          startY: HEIGHT_4,
+          endX: LANDING_RAMP_END,
+          endY: 0.0
+        };
+        rampWalls.push(new WallObject(p));
+      }
+
+      function addRamp(n) {
+        //26 vertices
+        var vertexPositionData &#x3D; [
+          //0-3
+          0, 0, 0,
+          LENGTH_2, 0, 0,
+          LENGTH_3, 0, 0,
+          LENGTH, 0, 0,
+
+          //4-7
+          0, HEIGHT_2, 0,
+          LENGTH_2, HEIGHT_2, 0,
+          LENGTH_3, HEIGHT_2, 0,
+          LENGTH, HEIGHT_2, 0,
+          //8-9
+          0, HEIGHT_1, 0,
+          LENGTH, HEIGHT_3, 0,
+          //just z-values change
+          //10-13
+          0, 0, DEPTH,
+          LENGTH_2, 0, DEPTH,
+          LENGTH_3, 0, DEPTH,
+          LENGTH, 0, DEPTH,
+
+          //14-17
+          0, HEIGHT_2, DEPTH,
+          LENGTH_2, HEIGHT_2, DEPTH,
+          LENGTH_3, HEIGHT_2, DEPTH,
+          LENGTH, HEIGHT_2, DEPTH,
+          //18-19
+          0, HEIGHT_1, DEPTH,
+          LENGTH, HEIGHT_3, DEPTH,
+          //down ramp
+          //20-22
+          LANDING_RAMP_START, 0, 0,
+          LANDING_RAMP_END, 0, 0,
+          LANDING_RAMP_START, HEIGHT_4, 0,
+          //23-25
+          LANDING_RAMP_START, 0, DEPTH,
+          LANDING_RAMP_END, 0, DEPTH,
+          LANDING_RAMP_START, HEIGHT_4, DEPTH
+        ];
+        //28 faces &#x3D; 84 indices
+        var indexData &#x3D; [
+          0, 1, 5,
+          0, 5, 4,
+          1, 6, 5,
+          1, 2, 6,	//front side
+          2, 3, 7,
+          2, 7, 6,
+          6, 7, 9,
+          4, 5, 8,
+          10, 15, 11,
+          10, 14, 15,
+          11, 15, 16,
+          11, 16, 12,	//back side
+          12, 17, 13,
+          12, 16, 17,
+          16, 19, 17,
+          14, 18, 15,
+          0, 13, 3,		//bottom
+          0, 10, 13,
+          0, 8, 10,		//left
+          8, 18, 10,
+          3, 13, 9,		//right
+          9, 13, 19,
+          8, 5, 15,			//top
+          8, 15, 18,
+          5, 6, 16,
+          5, 16, 15,
+          6, 9, 19,
+          6, 19, 16,
+          //down ramp
+          20, 21, 22,
+          23, 25, 24,	//sides
+          20, 22, 23,
+          23, 22, 25,	//back
+          20, 23, 21,
+          21, 23, 24,	//bottom
+          21, 24, 22,	//top
+          22, 24, 25
+        ];
+        var normalData &#x3D; calculateNormals(vertexPositionData, indexData);
+        trianglesNormalBuffers[n] &#x3D; gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[n]);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
+        trianglesNormalBuffers[n].itemSize &#x3D; 3;
+        trianglesNormalBuffers[n].numItems &#x3D; normalData.length / 3;
+
+        trianglesVerticeBuffers[n] &#x3D; gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[n]);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+        trianglesVerticeBuffers[n].itemSize &#x3D; 3;
+        trianglesVerticeBuffers[n].numItems &#x3D; vertexPositionData.length / 3;
+
+        vertexIndexBuffers[n] &#x3D; gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[n]);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STREAM_DRAW);
+        vertexIndexBuffers[n].itemSize &#x3D; 3;
+        vertexIndexBuffers[n].numItems &#x3D; indexData.length;
+      }
+
+      function calculateNormals(vertices, indices) {
+        var normals &#x3D; [];
+
+        for (var i &#x3D; 0; i &lt; indices.length; i +&#x3D; 3) {
+          var a &#x3D; indices[i];
+          var b &#x3D; indices[i + 1];
+          var c &#x3D; indices[i + 2];
+          //normal is the cross product
+          var v1 &#x3D; [
+            vertices[a * 3] - vertices[b * 3],
+            vertices[a * 3 + 1] - vertices[b * 3 + 1],
+            vertices[a * 3 + 2] - vertices[b * 3 + 2]
+          ];
+          var v2 &#x3D; [
+            vertices[a * 3] - vertices[c * 3],
+            vertices[a * 3 + 1] - vertices[c * 3 + 1],
+            vertices[a * 3 + 2] - vertices[c * 3 + 2]
+          ];
+          var cross &#x3D; [
+            v1[1] * v2[2] - v1[2] * v2[1],
+            v1[2] * v2[0] - v1[0] * v2[2],
+            v1[0] * v2[1] - v1[1] * v2[0]
+          ];
+          //same value for each of the three vertices
+          normals.push.apply(normals, cross);
+          normals.push.apply(normals, cross);
+          normals.push.apply(normals, cross);
+        }
+        return normals;
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./resources/common.js"></script>
+  <script src="./resources/prism/prism.min.js"></script>
+  <script src="common.js"></script><script src="webgl-physics-ramp.js"></script>
+  </body>
+</html>

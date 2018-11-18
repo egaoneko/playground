@@ -14,68 +14,70 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
-    <link rel="stylesheet" href="./resources/layout.css" type="text/css">
+    <link rel="stylesheet" href="./resources/layout-full.css" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js"></script>
 <script src="resources/js/stats.js"></script>
-    <link rel="stylesheet" href="webgl-physics-gravity.css">
+    <link rel="stylesheet" href="webgl-physics-projectile.css">
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
-    <title>WebGL physics gravity</title>
+    <script
+      src="https://code.jquery.com/jquery-2.2.4.min.js"
+      integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+      crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <title>WebGL physics projectile</title>
   </head>
   <body>
-
-    <header class="navbar" role="navigation">
-      <div class="container">
-        <div class="display-table pull-left" id="navbar-logo-container">
-          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
-        </div>
-        <!-- menu items that get hidden below 768px width -->
-        <nav class='collapse navbar-collapse navbar-responsive-collapse'>
-          <ul class="nav navbar-nav pull-right">
-            <li><a class="active" href="index.html">Examples</a></li>
-            <li><a href="../apidoc">API</a></li>
-            <li><a href="https://github.com/egaoneko/playground">Code</a></li>
-          </ul>
-        </nav>
-      </div>
-    </header>
-
-    <div class="container-fluid">
-
-      <div id="latest-check" class="alert alert-warning alert-dismissible" role="alert" style="display:none">
-        <button id="latest-dismiss" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        This example uses Playground v<span>0.0.1</span>. The <a id="latest-link" href="#" class="alert-link">latest</a> is v<span id="latest-version"></span>.
-      </div>
-
-      <div class="row-fluid">
-        <div class="span12">
-          <h4 id="title">WebGL physics gravity</h4>
-          <div id="container" class="main">
+  <header class="navbar dropdown" role="navigation">
+    <button type="button" class="btn btn-default dropdown-toggle" id="hamburger" data-toggle="dropdown" aria-label="hamburger" aria-haspopup="true" aria-expanded="false">
+      <span class="glyphicon glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="hamburger">
+      <li><a class="active" href="index.html">Examples</a></li>
+      <li><a href="../apidoc">API</a></li>
+      <li><a href="https://github.com/egaoneko/playground">Code</a></li>
+      <li role="separator" class="divider"></li>
+      <li><a href="#" data-toggle="modal" data-target="#flipFlop">Source</a></li>
+    </ul>
+  </header>
+  <div id="container" class="main">
   <canvas id="canvas"></canvas>
 </div>
 
-        </div>
-      </div>
 
-      <div class="row-fluid">
-        <div class="span12">
-          <p id="shortdesc">WebGL physics gravity.</p>
-          <div id="docs"><p>This page&#39;s try to WebGL physics gravity.</p>
+  <!-- The modal -->
+  <div class="modal fade" id="flipFlop" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" id="modalLabel">WebGL physics projectile</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row-fluid">
+            <div class="span12">
+              <p id="shortdesc">WebGL physics projectile.</p>
+              <div id="docs"><p>This page&#39;s try to WebGL physics projectile.</p>
 </div>
-          <p id="tags">Tags: webgl</p>
-        </div>
-      </div>
+              <p id="tags">Tags: webgl</p>
+            </div>
+          </div>
 
-      <div class="row-fluid">
-        <div id="source-controls">
-          <a id="copy-button" data-clipboard-target="#example-source"><i class="fa fa-clipboard"></i> Copy</a>
-          <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
-        </div>
-        <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
-          <textarea class="hidden" name="title">WebGL physics gravity</textarea>
-          <textarea class="hidden" name="description">WebGL physics gravity.</textarea>
-          <textarea class="hidden" name="js">import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
-import {SphereObject} from &quot;./utils/webgl/object-utils&quot;;
+          <div class="row-fluid">
+            <div id="source-controls">
+              <a id="copy-button" data-clipboard-target="#example-source"><i class="fa fa-clipboard"></i> Copy</a>
+              <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
+            </div>
+            <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
+              <textarea class="hidden" name="title">WebGL physics projectile</textarea>
+              <textarea class="hidden" name="description">WebGL physics projectile.</textarea>
+              <textarea class="hidden" name="js">import {
+  setupPlaneMesh,
+  setupSphereMesh
+} from &quot;./utils/webgl/mesh-utils&quot;;
+import { SphereObject } from &quot;./utils/webgl/object-utils&quot;;
 import Vector3 from &quot;../src/pg/math/vector3&quot;;
 
 var gl &#x3D; null;
@@ -97,6 +99,9 @@ var pMatrix &#x3D; mat4.create();
 var mvMatrix &#x3D; mat4.create();
 var normalMatrix &#x3D; mat3.create();
 
+var start &#x3D; [];
+var angleX &#x3D; 0;
+var angleY &#x3D; 0;
 var paused &#x3D; false;
 
 var SHADER &#x3D; {
@@ -107,17 +112,32 @@ var SHADER &#x3D; {
 };
 
 var sceneElements &#x3D; [];
-var zoom &#x3D; 1.0;
+var zoom &#x3D; 0.2;
 
-var INITIAL_HEIGHT_TRANSLATION_OF_SPHERES &#x3D; 5.0;
+var angle &#x3D; 0.0;
+var fire &#x3D; false;
+
 var GROUND_Y &#x3D; -1.0;
-var ELASTICITY &#x3D;  -0.8;
+var RECTANGLE_LENGTH &#x3D; 4.0;
 
 window.addEventListener(&#x27;load&#x27;, initWebGL);
 document.addEventListener(&#x27;keyup&#x27;, function (evt) {
+  console.log(evt.keyCode);
   switch (evt.keyCode) {
     case 80: // &#x27;p&#x27;
       paused &#x3D; !paused;
+      break;
+    case 38: //&#x27;up&#x27;
+      ++angle;
+      break;
+    case 40: //&#x27;dwon&#x27;
+      --angle;
+      break;
+    case 70: // &#x27;f&#x27;
+      fire &#x3D; true;
+      console.log(&quot;fire!&quot;);
+      sceneElements[0].position &#x3D; new Vector3(0.0, 0.0, 0.0);
+      sceneElements[0].velocity &#x3D; new Vector3(Math.cos(angle * .1), Math.sin(angle * .1), 0.0);
       break;
     default:
       break;
@@ -155,6 +175,29 @@ function initWebGL() {
 }
 
 function initEvents() {
+  canvas.addEventListener(&#x27;mousedown&#x27;, function (e) {
+    start &#x3D; [e.pageX, e.pageY];
+
+    var mouseMoveHandler &#x3D; function (e) {
+      var x &#x3D; e.pageX - start[0];
+      var y &#x3D; e.pageY - start[1];
+
+      // start update
+      start[0] &#x3D; e.pageX;
+      start[1] &#x3D; e.pageY;
+
+      angleX +&#x3D; x;
+      angleY +&#x3D; y;
+    };
+    var mouseUpHandler &#x3D; function () {
+      document.removeEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);
+      document.removeEventListener(&#x27;mouseup&#x27;, mouseUpHandler);
+    };
+
+    document.addEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);
+    document.addEventListener(&#x27;mouseup&#x27;, mouseUpHandler);
+  });
+
   var adjustZoom &#x3D; function (delta) {
     if (delta &gt; 0) {
       zoom +&#x3D; 1;
@@ -233,7 +276,8 @@ function makeShader(source, type) {
 }
 
 function setupMeshes() {
-  setupSphereMesh(
+
+  setupPlaneMesh(
     gl,
     {
       trianglesNormalBuffers: trianglesNormalBuffers,
@@ -243,28 +287,12 @@ function setupMeshes() {
     },
     0,
     {
-      color: [1.0, 0.0, 0.0, 1.0],
-      division: 20,
-      smoothShading: false
+      translation: [0.0, GROUND_Y, 0.0],
     }
   );
+  addBox(1);
 
-  setupSphereMesh(
-    gl,
-    {
-      trianglesNormalBuffers: trianglesNormalBuffers,
-      trianglesColorBuffers: trianglesColorBuffers,
-      trianglesVerticeBuffers: trianglesVerticeBuffers,
-      vertexIndexBuffers: vertexIndexBuffers,
-    },
-    1,
-    {
-      color: [0.0, 1.0, 0.0, 1.0],
-      division: 10,
-      smoothShading: false
-    }
-  );
-
+  var radius &#x3D; 1;
   setupSphereMesh(
     gl,
     {
@@ -275,78 +303,16 @@ function setupMeshes() {
     },
     2,
     {
-      color: [1.0, 1.0, 0.0, 1.0],
-      division: 5,
-      smoothShading: false
+      color: [1.0, 0.0, 0.0, 0.9],
+      radius: radius,
     }
   );
 
-  setupSphereMesh(
-    gl,
-    {
-      trianglesNormalBuffers: trianglesNormalBuffers,
-      trianglesColorBuffers: trianglesColorBuffers,
-      trianglesVerticeBuffers: trianglesVerticeBuffers,
-      vertexIndexBuffers: vertexIndexBuffers,
-    },
-    3,
-    {
-      color: [1.0, 0.0, 1.0, 1.0],
-    }
-  );
-
-  setupSphereMesh(
-    gl,
-    {
-      trianglesNormalBuffers: trianglesNormalBuffers,
-      trianglesColorBuffers: trianglesColorBuffers,
-      trianglesVerticeBuffers: trianglesVerticeBuffers,
-      vertexIndexBuffers: vertexIndexBuffers,
-    },
-    4,
-    {
-      color: [0.0, 1.0, 1.0, 1.0],
-    }
-  );
-
-  setupPlaneMesh(
-    gl,
-    {
-      trianglesNormalBuffers: trianglesNormalBuffers,
-      trianglesColorBuffers: trianglesColorBuffers,
-      trianglesVerticeBuffers: trianglesVerticeBuffers,
-      vertexIndexBuffers: vertexIndexBuffers,
-    },
-    5,
-    {
-      translation: [0.0, GROUND_Y, 0.0],
-    }
-  );
-
-  sceneElements.push(new SphereObject({
-    vboIndex: 0,
-    position: new Vector3(-1.0, -0.75, 0.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
-  sceneElements.push(new SphereObject({
-    vboIndex: 1,
-    position: new Vector3(0.0, 0.0, 1.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
   sceneElements.push(new SphereObject({
     vboIndex: 2,
-    position: new Vector3(1.0, 0.25, -1.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
-  sceneElements.push(new SphereObject({
-    vboIndex: 3,
-    position: new Vector3(-1.0, 1.0, -1.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
-  sceneElements.push(new SphereObject({
-    vboIndex: 4,
-    position: new Vector3(-0.0, 1.75, -0.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
+    radius: radius,
+    position: new Vector3(0.0, 0.0, 0.0),
+    acceleration: new Vector3(0.0, -0.01, 0.0)
   }));
 
   vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexPosition&quot;);
@@ -357,45 +323,34 @@ function setupMeshes() {
   gl.enableVertexAttribArray(vertexNormalAttribute);
 }
 
-function searchForObject(arr, index) {
-  for (var i &#x3D; 0; i &lt; arr.length; i++) {
-    if (arr[i].vboIndex &#x3D;&#x3D;&#x3D; index) {
-      return i;
-    }
-  }
-  return -1;
-}
-function isAboveGround(n) {
-  var sphere &#x3D; sceneElements[n];
-  return INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - (sphere.position.y + sphere.radius) &gt; GROUND_Y;
-}
-
 function drawScene() {
   for (var i &#x3D; 0; i &lt; vertexIndexBuffers.length; ++i) {
     mat4.identity(mvMatrix);
-    mat4.translate(mvMatrix, mvMatrix, [0.0, -1.0, -15.5]);
-
-    var n &#x3D; searchForObject(sceneElements, i);
-    if (n !&#x3D;&#x3D; -1) {
-      var sphere &#x3D; sceneElements[n];
-      if (isAboveGround(n)) {
-        sphere.velocity.y +&#x3D; sphere.acceleration.y;
-        sphere.position.y +&#x3D; sphere.velocity.y;
-      } else {
-        sphere.position.y -&#x3D; sphere.velocity.y;
-        sphere.velocity.y *&#x3D; ELASTICITY;
-      }
-
-      mat4.translate(mvMatrix, mvMatrix, [
-        sphere.position.x,
-        INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - sphere.position.y,
-        sphere.position.z
-      ]);
-    }
-
-    // mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
-    // mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
+    mat4.translate(mvMatrix, mvMatrix, [-10.0, -1.0, -30.0]);
+    mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
+    mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
     mat4.scale(mvMatrix, mvMatrix, [zoom, zoom, zoom]);
+
+    if (i &#x3D;&#x3D;&#x3D; 1) {
+      mat4.translate(mvMatrix, mvMatrix, [-RECTANGLE_LENGTH * .1, 3.0, 0.0]);
+      mat4.rotate(mvMatrix, mvMatrix, angle * .1, [0.0, 0.0, 1.3]);
+    } else if (i &#x3D;&#x3D;&#x3D; 0) {
+      mat4.rotate(mvMatrix, mvMatrix, -0.3, [-0.3, 0.0, 0.2]);
+      mat4.rotate(mvMatrix, mvMatrix, 90, [0.0, 1.0, 0.0]);
+    } else if (i &#x3D;&#x3D;&#x3D; 2) {
+      mat4.translate(mvMatrix, mvMatrix, [
+        sceneElements[0].position.x + Math.cos(angle * .1),
+        sceneElements[0].position.y + 3.0 + sceneElements[0].radius + Math.sin(angle * .1),
+        sceneElements[0].position.z + 0.0 + sceneElements[0].radius]
+      );
+
+      if (fire) {
+        sceneElements[0].velocity.y +&#x3D; sceneElements[0].acceleration.y;
+        sceneElements[0].position.x +&#x3D; sceneElements[0].velocity.x;
+        sceneElements[0].position.y +&#x3D; sceneElements[0].velocity.y;
+        sceneElements[0].position.z +&#x3D; sceneElements[0].velocity.z;
+      }
+    }
 
     var invertedMatrix &#x3D; mat3.create();
     mat3.fromMat4(invertedMatrix, mvMatrix);
@@ -403,29 +358,23 @@ function drawScene() {
     mat3.transpose(normalMatrix, normalMatrix);
     setMatrixUniforms();
 
+    if (i &#x3D;&#x3D;&#x3D; 1) {
+      gl.disableVertexAttribArray(vertexColorAttribute);
+      gl.vertexAttrib4f(vertexColorAttribute, 1.0, 0.9, 0.7, 1.0);
+    } else {
+      gl.enableVertexAttribArray(vertexColorAttribute);
+      gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffers[i]);
+      gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+    }
+
     gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[i]);
     gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffers[i]);
-    gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+
     gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[i]);
     gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 
-    if (i &#x3D;&#x3D;&#x3D; 4) {
-      gl.disable(gl.DEPTH_TEST);
-      gl.enable(gl.BLEND);
-      gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-      gl.blendEquation(gl.FUNC_ADD);
-    } else {
-      gl.disable(gl.BLEND);
-      gl.enable(gl.DEPTH_TEST);
-    }
-
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[i]);
-    if (i &gt; 2) {
-      gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
-    } else {
-      gl.drawArrays(gl.TRIANGLES, 0, trianglesVerticeBuffers[i].numItems);
-    }
+    gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
   }
 }
 
@@ -448,8 +397,85 @@ function flatVertexShaderSource() {
 function flatFragmentShaderSource() {
   return &quot;\n    varying highp vec3 vColor;\n    varying highp vec3 N;\n    varying highp vec3 L;\n    \n    void main(void) {\n      highp float lambert &#x3D; max(dot(normalize(N), normalize(L)), 0.0);\n      gl_FragColor &#x3D; vec4(vColor * lambert, 1.0);\n    }\n  &quot;;
 }
+
+function addBox(n) {
+  //8 vertices
+  var vertexPositionData &#x3D; [
+    //0-3
+    0, 0, 0,
+    RECTANGLE_LENGTH, 0, 0,
+    RECTANGLE_LENGTH, RECTANGLE_LENGTH * .5, 0,
+    0, RECTANGLE_LENGTH * .5, 0,
+
+    //4-7
+    0, 0, RECTANGLE_LENGTH * .5,
+    RECTANGLE_LENGTH, 0, RECTANGLE_LENGTH * .5,
+    RECTANGLE_LENGTH, RECTANGLE_LENGTH * .5, RECTANGLE_LENGTH * .5,
+    0, RECTANGLE_LENGTH * .5, RECTANGLE_LENGTH * .5 ];
+  //10 triangles, 2 per face, 1 face not drawn
+  var indexData &#x3D; [
+    0, 1, 2,	//front
+    0, 2, 3,
+    0, 3, 7,	//left
+    0, 7, 4,
+    2, 7, 3,	//top
+    2, 6, 7,
+    4, 6, 5,	//back
+    4, 7, 6,
+    1, 0, 4,	//bottom
+    1, 4, 5 ];
+  var normalData &#x3D; calculateNormals(vertexPositionData, indexData);
+  trianglesNormalBuffers[n] &#x3D; gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[n]);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
+  trianglesNormalBuffers[n].itemSize &#x3D; 3;
+  trianglesNormalBuffers[n].numItems &#x3D; normalData.length / 3;
+
+  trianglesVerticeBuffers[n] &#x3D; gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[n]);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+  trianglesVerticeBuffers[n].itemSize &#x3D; 3;
+  trianglesVerticeBuffers[n].numItems &#x3D; vertexPositionData.length / 3;
+
+  vertexIndexBuffers[n] &#x3D; gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[n]);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STREAM_DRAW);
+  vertexIndexBuffers[n].itemSize &#x3D; 3;
+  vertexIndexBuffers[n].numItems &#x3D; indexData.length;
+}
+
+function calculateNormals(vertices, indices) {
+  var normals &#x3D; [];
+
+  for (var i &#x3D; 0; i &lt; indices.length; i +&#x3D; 3) {
+    var a &#x3D; indices[i];
+    var b &#x3D; indices[i + 1];
+    var c &#x3D; indices[i + 2];
+    //normal is the cross product
+    var v1 &#x3D; [
+      vertices[a * 3] - vertices[b * 3],
+      vertices[a * 3 + 1] - vertices[b * 3 + 1],
+      vertices[a * 3 + 2] - vertices[b * 3 + 2]
+    ];
+    var v2 &#x3D; [
+      vertices[a * 3] - vertices[c * 3],
+      vertices[a * 3 + 1] - vertices[c * 3 + 1],
+      vertices[a * 3 + 2] - vertices[c * 3 + 2]
+    ];
+    var cross &#x3D; [
+      v1[1] * v2[2] - v1[0] * v2[1],
+      v1[2] * v2[0] - v1[0] * v2[2],
+      v1[0] * v2[1] - v1[1] * v2[0]
+    ];
+    //same value for each of the three vertices
+    normals.push.apply(normals, cross);
+    normals.push.apply(normals, cross);
+    normals.push.apply(normals, cross);
+  }
+  return normals;
+}
 </textarea>
-          <textarea class="hidden" name="css">#container {
+              <textarea class="hidden" name="css">#container {
   position: relative;
   overflow: hidden;
 }
@@ -459,16 +485,16 @@ function flatFragmentShaderSource() {
   height: 100%;
 }
 </textarea>
-          <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+              <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
   &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
 &lt;/div&gt;
 </textarea>
-          <input type="hidden" name="data">
-        </form>
-        <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
+              <input type="hidden" name="data">
+            </form>
+            <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
-    &lt;title&gt;WebGL physics gravity&lt;/title&gt;
+    &lt;title&gt;WebGL physics projectile&lt;/title&gt;
     &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
     &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
@@ -491,8 +517,11 @@ function flatFragmentShaderSource() {
       &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
     &lt;/div&gt;
     &lt;script&gt;
-      import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
-      import {SphereObject} from &quot;./utils/webgl/object-utils&quot;;
+      import {
+        setupPlaneMesh,
+        setupSphereMesh
+      } from &quot;./utils/webgl/mesh-utils&quot;;
+      import { SphereObject } from &quot;./utils/webgl/object-utils&quot;;
       import Vector3 from &quot;../src/pg/math/vector3&quot;;
 
       var gl &#x3D; null;
@@ -514,6 +543,9 @@ function flatFragmentShaderSource() {
       var mvMatrix &#x3D; mat4.create();
       var normalMatrix &#x3D; mat3.create();
 
+      var start &#x3D; [];
+      var angleX &#x3D; 0;
+      var angleY &#x3D; 0;
       var paused &#x3D; false;
 
       var SHADER &#x3D; {
@@ -524,17 +556,32 @@ function flatFragmentShaderSource() {
       };
 
       var sceneElements &#x3D; [];
-      var zoom &#x3D; 1.0;
+      var zoom &#x3D; 0.2;
 
-      var INITIAL_HEIGHT_TRANSLATION_OF_SPHERES &#x3D; 5.0;
+      var angle &#x3D; 0.0;
+      var fire &#x3D; false;
+
       var GROUND_Y &#x3D; -1.0;
-      var ELASTICITY &#x3D;  -0.8;
+      var RECTANGLE_LENGTH &#x3D; 4.0;
 
       window.addEventListener(&#x27;load&#x27;, initWebGL);
       document.addEventListener(&#x27;keyup&#x27;, function (evt) {
+        console.log(evt.keyCode);
         switch (evt.keyCode) {
           case 80: // &#x27;p&#x27;
             paused &#x3D; !paused;
+            break;
+          case 38: //&#x27;up&#x27;
+            ++angle;
+            break;
+          case 40: //&#x27;dwon&#x27;
+            --angle;
+            break;
+          case 70: // &#x27;f&#x27;
+            fire &#x3D; true;
+            console.log(&quot;fire!&quot;);
+            sceneElements[0].position &#x3D; new Vector3(0.0, 0.0, 0.0);
+            sceneElements[0].velocity &#x3D; new Vector3(Math.cos(angle * .1), Math.sin(angle * .1), 0.0);
             break;
           default:
             break;
@@ -572,6 +619,29 @@ function flatFragmentShaderSource() {
       }
 
       function initEvents() {
+        canvas.addEventListener(&#x27;mousedown&#x27;, function (e) {
+          start &#x3D; [e.pageX, e.pageY];
+
+          var mouseMoveHandler &#x3D; function (e) {
+            var x &#x3D; e.pageX - start[0];
+            var y &#x3D; e.pageY - start[1];
+
+            // start update
+            start[0] &#x3D; e.pageX;
+            start[1] &#x3D; e.pageY;
+
+            angleX +&#x3D; x;
+            angleY +&#x3D; y;
+          };
+          var mouseUpHandler &#x3D; function () {
+            document.removeEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);
+            document.removeEventListener(&#x27;mouseup&#x27;, mouseUpHandler);
+          };
+
+          document.addEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);
+          document.addEventListener(&#x27;mouseup&#x27;, mouseUpHandler);
+        });
+
         var adjustZoom &#x3D; function (delta) {
           if (delta &gt; 0) {
             zoom +&#x3D; 1;
@@ -650,7 +720,8 @@ function flatFragmentShaderSource() {
       }
 
       function setupMeshes() {
-        setupSphereMesh(
+
+        setupPlaneMesh(
           gl,
           {
             trianglesNormalBuffers: trianglesNormalBuffers,
@@ -660,28 +731,12 @@ function flatFragmentShaderSource() {
           },
           0,
           {
-            color: [1.0, 0.0, 0.0, 1.0],
-            division: 20,
-            smoothShading: false
+            translation: [0.0, GROUND_Y, 0.0],
           }
         );
+        addBox(1);
 
-        setupSphereMesh(
-          gl,
-          {
-            trianglesNormalBuffers: trianglesNormalBuffers,
-            trianglesColorBuffers: trianglesColorBuffers,
-            trianglesVerticeBuffers: trianglesVerticeBuffers,
-            vertexIndexBuffers: vertexIndexBuffers,
-          },
-          1,
-          {
-            color: [0.0, 1.0, 0.0, 1.0],
-            division: 10,
-            smoothShading: false
-          }
-        );
-
+        var radius &#x3D; 1;
         setupSphereMesh(
           gl,
           {
@@ -692,78 +747,16 @@ function flatFragmentShaderSource() {
           },
           2,
           {
-            color: [1.0, 1.0, 0.0, 1.0],
-            division: 5,
-            smoothShading: false
+            color: [1.0, 0.0, 0.0, 0.9],
+            radius: radius,
           }
         );
 
-        setupSphereMesh(
-          gl,
-          {
-            trianglesNormalBuffers: trianglesNormalBuffers,
-            trianglesColorBuffers: trianglesColorBuffers,
-            trianglesVerticeBuffers: trianglesVerticeBuffers,
-            vertexIndexBuffers: vertexIndexBuffers,
-          },
-          3,
-          {
-            color: [1.0, 0.0, 1.0, 1.0],
-          }
-        );
-
-        setupSphereMesh(
-          gl,
-          {
-            trianglesNormalBuffers: trianglesNormalBuffers,
-            trianglesColorBuffers: trianglesColorBuffers,
-            trianglesVerticeBuffers: trianglesVerticeBuffers,
-            vertexIndexBuffers: vertexIndexBuffers,
-          },
-          4,
-          {
-            color: [0.0, 1.0, 1.0, 1.0],
-          }
-        );
-
-        setupPlaneMesh(
-          gl,
-          {
-            trianglesNormalBuffers: trianglesNormalBuffers,
-            trianglesColorBuffers: trianglesColorBuffers,
-            trianglesVerticeBuffers: trianglesVerticeBuffers,
-            vertexIndexBuffers: vertexIndexBuffers,
-          },
-          5,
-          {
-            translation: [0.0, GROUND_Y, 0.0],
-          }
-        );
-
-        sceneElements.push(new SphereObject({
-          vboIndex: 0,
-          position: new Vector3(-1.0, -0.75, 0.0),
-          acceleration: new Vector3(0.0, 0.01, 0.0)
-        }));
-        sceneElements.push(new SphereObject({
-          vboIndex: 1,
-          position: new Vector3(0.0, 0.0, 1.0),
-          acceleration: new Vector3(0.0, 0.01, 0.0)
-        }));
         sceneElements.push(new SphereObject({
           vboIndex: 2,
-          position: new Vector3(1.0, 0.25, -1.0),
-          acceleration: new Vector3(0.0, 0.01, 0.0)
-        }));
-        sceneElements.push(new SphereObject({
-          vboIndex: 3,
-          position: new Vector3(-1.0, 1.0, -1.0),
-          acceleration: new Vector3(0.0, 0.01, 0.0)
-        }));
-        sceneElements.push(new SphereObject({
-          vboIndex: 4,
-          position: new Vector3(-0.0, 1.75, -0.0),
-          acceleration: new Vector3(0.0, 0.01, 0.0)
+          radius: radius,
+          position: new Vector3(0.0, 0.0, 0.0),
+          acceleration: new Vector3(0.0, -0.01, 0.0)
         }));
 
         vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexPosition&quot;);
@@ -774,45 +767,34 @@ function flatFragmentShaderSource() {
         gl.enableVertexAttribArray(vertexNormalAttribute);
       }
 
-      function searchForObject(arr, index) {
-        for (var i &#x3D; 0; i &lt; arr.length; i++) {
-          if (arr[i].vboIndex &#x3D;&#x3D;&#x3D; index) {
-            return i;
-          }
-        }
-        return -1;
-      }
-      function isAboveGround(n) {
-        var sphere &#x3D; sceneElements[n];
-        return INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - (sphere.position.y + sphere.radius) &gt; GROUND_Y;
-      }
-
       function drawScene() {
         for (var i &#x3D; 0; i &lt; vertexIndexBuffers.length; ++i) {
           mat4.identity(mvMatrix);
-          mat4.translate(mvMatrix, mvMatrix, [0.0, -1.0, -15.5]);
-
-          var n &#x3D; searchForObject(sceneElements, i);
-          if (n !&#x3D;&#x3D; -1) {
-            var sphere &#x3D; sceneElements[n];
-            if (isAboveGround(n)) {
-              sphere.velocity.y +&#x3D; sphere.acceleration.y;
-              sphere.position.y +&#x3D; sphere.velocity.y;
-            } else {
-              sphere.position.y -&#x3D; sphere.velocity.y;
-              sphere.velocity.y *&#x3D; ELASTICITY;
-            }
-
-            mat4.translate(mvMatrix, mvMatrix, [
-              sphere.position.x,
-              INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - sphere.position.y,
-              sphere.position.z
-            ]);
-          }
-
-          // mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
-          // mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
+          mat4.translate(mvMatrix, mvMatrix, [-10.0, -1.0, -30.0]);
+          mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
+          mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
           mat4.scale(mvMatrix, mvMatrix, [zoom, zoom, zoom]);
+
+          if (i &#x3D;&#x3D;&#x3D; 1) {
+            mat4.translate(mvMatrix, mvMatrix, [-RECTANGLE_LENGTH * .1, 3.0, 0.0]);
+            mat4.rotate(mvMatrix, mvMatrix, angle * .1, [0.0, 0.0, 1.3]);
+          } else if (i &#x3D;&#x3D;&#x3D; 0) {
+            mat4.rotate(mvMatrix, mvMatrix, -0.3, [-0.3, 0.0, 0.2]);
+            mat4.rotate(mvMatrix, mvMatrix, 90, [0.0, 1.0, 0.0]);
+          } else if (i &#x3D;&#x3D;&#x3D; 2) {
+            mat4.translate(mvMatrix, mvMatrix, [
+              sceneElements[0].position.x + Math.cos(angle * .1),
+              sceneElements[0].position.y + 3.0 + sceneElements[0].radius + Math.sin(angle * .1),
+              sceneElements[0].position.z + 0.0 + sceneElements[0].radius]
+            );
+
+            if (fire) {
+              sceneElements[0].velocity.y +&#x3D; sceneElements[0].acceleration.y;
+              sceneElements[0].position.x +&#x3D; sceneElements[0].velocity.x;
+              sceneElements[0].position.y +&#x3D; sceneElements[0].velocity.y;
+              sceneElements[0].position.z +&#x3D; sceneElements[0].velocity.z;
+            }
+          }
 
           var invertedMatrix &#x3D; mat3.create();
           mat3.fromMat4(invertedMatrix, mvMatrix);
@@ -820,29 +802,23 @@ function flatFragmentShaderSource() {
           mat3.transpose(normalMatrix, normalMatrix);
           setMatrixUniforms();
 
+          if (i &#x3D;&#x3D;&#x3D; 1) {
+            gl.disableVertexAttribArray(vertexColorAttribute);
+            gl.vertexAttrib4f(vertexColorAttribute, 1.0, 0.9, 0.7, 1.0);
+          } else {
+            gl.enableVertexAttribArray(vertexColorAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffers[i]);
+            gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+          }
+
           gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[i]);
           gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-          gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffers[i]);
-          gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+
           gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[i]);
           gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 
-          if (i &#x3D;&#x3D;&#x3D; 4) {
-            gl.disable(gl.DEPTH_TEST);
-            gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-            gl.blendEquation(gl.FUNC_ADD);
-          } else {
-            gl.disable(gl.BLEND);
-            gl.enable(gl.DEPTH_TEST);
-          }
-
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[i]);
-          if (i &gt; 2) {
-            gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
-          } else {
-            gl.drawArrays(gl.TRIANGLES, 0, trianglesVerticeBuffers[i].numItems);
-          }
+          gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
         }
       }
 
@@ -865,14 +841,95 @@ function flatFragmentShaderSource() {
       function flatFragmentShaderSource() {
         return &quot;\n    varying highp vec3 vColor;\n    varying highp vec3 N;\n    varying highp vec3 L;\n    \n    void main(void) {\n      highp float lambert &#x3D; max(dot(normalize(N), normalize(L)), 0.0);\n      gl_FragColor &#x3D; vec4(vColor * lambert, 1.0);\n    }\n  &quot;;
       }
+
+      function addBox(n) {
+        //8 vertices
+        var vertexPositionData &#x3D; [
+          //0-3
+          0, 0, 0,
+          RECTANGLE_LENGTH, 0, 0,
+          RECTANGLE_LENGTH, RECTANGLE_LENGTH * .5, 0,
+          0, RECTANGLE_LENGTH * .5, 0,
+
+          //4-7
+          0, 0, RECTANGLE_LENGTH * .5,
+          RECTANGLE_LENGTH, 0, RECTANGLE_LENGTH * .5,
+          RECTANGLE_LENGTH, RECTANGLE_LENGTH * .5, RECTANGLE_LENGTH * .5,
+          0, RECTANGLE_LENGTH * .5, RECTANGLE_LENGTH * .5 ];
+        //10 triangles, 2 per face, 1 face not drawn
+        var indexData &#x3D; [
+          0, 1, 2,	//front
+          0, 2, 3,
+          0, 3, 7,	//left
+          0, 7, 4,
+          2, 7, 3,	//top
+          2, 6, 7,
+          4, 6, 5,	//back
+          4, 7, 6,
+          1, 0, 4,	//bottom
+          1, 4, 5 ];
+        var normalData &#x3D; calculateNormals(vertexPositionData, indexData);
+        trianglesNormalBuffers[n] &#x3D; gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[n]);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
+        trianglesNormalBuffers[n].itemSize &#x3D; 3;
+        trianglesNormalBuffers[n].numItems &#x3D; normalData.length / 3;
+
+        trianglesVerticeBuffers[n] &#x3D; gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[n]);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+        trianglesVerticeBuffers[n].itemSize &#x3D; 3;
+        trianglesVerticeBuffers[n].numItems &#x3D; vertexPositionData.length / 3;
+
+        vertexIndexBuffers[n] &#x3D; gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[n]);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STREAM_DRAW);
+        vertexIndexBuffers[n].itemSize &#x3D; 3;
+        vertexIndexBuffers[n].numItems &#x3D; indexData.length;
+      }
+
+      function calculateNormals(vertices, indices) {
+        var normals &#x3D; [];
+
+        for (var i &#x3D; 0; i &lt; indices.length; i +&#x3D; 3) {
+          var a &#x3D; indices[i];
+          var b &#x3D; indices[i + 1];
+          var c &#x3D; indices[i + 2];
+          //normal is the cross product
+          var v1 &#x3D; [
+            vertices[a * 3] - vertices[b * 3],
+            vertices[a * 3 + 1] - vertices[b * 3 + 1],
+            vertices[a * 3 + 2] - vertices[b * 3 + 2]
+          ];
+          var v2 &#x3D; [
+            vertices[a * 3] - vertices[c * 3],
+            vertices[a * 3 + 1] - vertices[c * 3 + 1],
+            vertices[a * 3 + 2] - vertices[c * 3 + 2]
+          ];
+          var cross &#x3D; [
+            v1[1] * v2[2] - v1[0] * v2[1],
+            v1[2] * v2[0] - v1[0] * v2[2],
+            v1[0] * v2[1] - v1[1] * v2[0]
+          ];
+          //same value for each of the three vertices
+          normals.push.apply(normals, cross);
+          normals.push.apply(normals, cross);
+          normals.push.apply(normals, cross);
+        }
+        return normals;
+      }
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
+          </div>
+        </div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <script src="./resources/common.js"></script>
-    <script src="./resources/prism/prism.min.js"></script>
-    <script src="common.js"></script><script src="webgl-physics-gravity.js"></script>
+  <script src="./resources/common.js"></script>
+  <script src="./resources/prism/prism.min.js"></script>
+  <script src="common.js"></script><script src="webgl-physics-projectile.js"></script>
   </body>
 </html>
