@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-62717870-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-62717870-1');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
+    <link rel="stylesheet" href="./resources/layout.css" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js"></script>
+<script src="resources/js/stats.js"></script>
+    <link rel="stylesheet" href="webgl-fragment.css">
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+    <title>WebGL fragment</title>
+  </head>
+  <body>
+
+    <header class="navbar" role="navigation">
+      <div class="container">
+        <div class="display-table pull-left" id="navbar-logo-container">
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
+        </div>
+        <!-- menu items that get hidden below 768px width -->
+        <nav class='collapse navbar-collapse navbar-responsive-collapse'>
+          <ul class="nav navbar-nav pull-right">
+            <li><a class="active" href="index.html">Examples</a></li>
+            <li><a href="../apidoc">API</a></li>
+            <li><a href="https://github.com/egaoneko/playground">Code</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container-fluid">
+
+      <div id="latest-check" class="alert alert-warning alert-dismissible" role="alert" style="display:none">
+        <button id="latest-dismiss" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        This example uses Playground v<span>0.0.1</span>. The <a id="latest-link" href="#" class="alert-link">latest</a> is v<span id="latest-version"></span>.
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <h4 id="title">WebGL fragment</h4>
+          <div id="container" class="main">
+  <canvas id="canvas"></canvas>
+</div>
+<div>
+  <input type="radio" id="fragment1" name="fragment" value="circle" checked>
+  <label for="fragment1">CIRCLE</label>
+
+  <input type="radio" id="fragment2" name="fragment" value="circle_floor">
+  <label for="fragment2">CIRCLE FLOOR</label>
+
+  <input type="radio" id="fragment3" name="fragment" value="circle_uniform_1">
+  <label for="fragment3">CIRCLE UNIFORM 1</label>
+
+  <input type="radio" id="fragment4" name="fragment" value="circle_uniform_2">
+  <label for="fragment4">CIRCLE UNIFORM 2</label>
+</div>
+
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <p id="shortdesc">WebGL fragment.</p>
+          <div id="docs"><p>This page&#39;s try to WebGL fragment.</p>
+</div>
+          <p id="tags">Tags: webgl</p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div id="source-controls">
+          <a id="copy-button" data-clipboard-target="#example-source"><i class="fa fa-clipboard"></i> Copy</a>
+          <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
+        </div>
+        <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
+          <textarea class="hidden" name="title">WebGL fragment</textarea>
+          <textarea class="hidden" name="description">WebGL fragment.</textarea>
+          <textarea class="hidden" name="js">var gl &#x3D; null;
+var canvas &#x3D; null;
+var container &#x3D; null;
+var glProgram &#x3D; null;
+var fragmentShader &#x3D; null;
+var vertexShader &#x3D; null;
+
+var vertexPositionAttribute &#x3D; null;
+var trianglesVerticeBuffer &#x3D; null;
+var vertexIndexBuffer &#x3D; null;
+
+var SHADER &#x3D; {
+  circle: {
+    vertexShader: circleVertexShaderSource(),
+    fragmentShader: circleFragmentShaderSource()
+  },
+  circle_floor: {
+    vertexShader: circleFloorVertexShaderSource(),
+    fragmentShader: circleFloorFragmentShaderSource()
+  },
+  circle_uniform_1: {
+    vertexShader: circleUniform1VertexShaderSource(),
+    fragmentShader: circleUniform1FragmentShaderSource()
+  },
+  circle_uniform_2: {
+    vertexShader: circleUniform2VertexShaderSource(),
+    fragmentShader: circleUniform2FragmentShaderSource()
+  },
+};
+
+var radios &#x3D; document.querySelectorAll(&#x27;input[type&#x3D;radio][name&#x3D;&quot;fragment&quot;]&#x27;);
+
+window.addEventListener(&#x27;load&#x27;, initWebGL);
+
+function changeHandler() {
+  gl.deleteProgram(glProgram);
+  createProgram(this.value);
+}
+
+Array.prototype.forEach.call(radios, function (radio) {
+  radio.addEventListener(&#x27;change&#x27;, changeHandler);
+});
+
+function initWebGL() {
+  canvas &#x3D; document.querySelector(&#x27;#canvas&#x27;);
+  container &#x3D; document.querySelector(&#x27;#container&#x27;);
+  canvas.width &#x3D; container.clientWidth;
+  canvas.height &#x3D; container.clientHeight;
+
+  try {
+    gl &#x3D; canvas.getContext(&#x27;webgl&#x27;) || canvas.getContext(&#x27;experimental-webgl&#x27;);
+  } catch (e) {
+    console.error(e);
+  }
+
+  if (gl) {
+    initShaders();
+    createSquare();
+    setUniforms();
+
+    vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexPosition&quot;);
+    gl.enableVertexAttribArray(vertexPositionAttribute);
+
+    (function animLoop() {
+      setupWebGL();
+      drawScene();
+
+      requestAnimationFrame(animLoop);
+    })();
+  }
+}
+
+function setupWebGL() {
+  // set the clear color to a shade of green
+  gl.clearColor(0.7, 0.7, 0.7, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+}
+
+function initShaders() {
+  createProgram(&#x27;circle&#x27;);
+}
+
+function createProgram(type) {
+  // create program
+  glProgram &#x3D; gl.createProgram();
+  attachShader(glProgram, type);
+  // use program
+  gl.useProgram(glProgram);
+}
+
+function attachShader(glProgram, type) {
+  // get shader source
+  var vsSource &#x3D; SHADER[type].vertexShader;
+  var fsSource &#x3D; SHADER[type].fragmentShader;
+
+  // compile shaders
+  vertexShader &#x3D; makeShader(vsSource, gl.VERTEX_SHADER);
+  fragmentShader &#x3D; makeShader(fsSource, gl.FRAGMENT_SHADER);
+
+  // attach and link shaders to the program
+  gl.attachShader(glProgram, vertexShader);
+  gl.attachShader(glProgram, fragmentShader);
+  gl.linkProgram(glProgram);
+
+  if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
+    alert(&#x27;Unable to initialize the shader program.&#x27;);
+  }
+}
+
+function makeShader(source, type) {
+  // compile the shader
+  var shader &#x3D; gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    alert((&quot;Error compiling shader: &quot; + (gl.getShaderInfoLog(shader))));
+  }
+
+  return shader;
+}
+
+function drawScene() {
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffer);
+  gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffer);
+  gl.drawElements(gl.TRIANGLES, vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+}
+
+function createSquare(size) {
+  if ( size &#x3D;&#x3D;&#x3D; void 0 ) size &#x3D; 2.0;
+
+  var vertexPositionData &#x3D; [
+    0.0, 0.0, 0.0,
+    -size / 2.0, -size / 2.0, 0.0,
+    size / 2.0, -size / 2.0, 0.0,
+    size / 2.0, size / 2.0, 0.0,
+    -size / 2.0, size / 2.0, 0.0 ];
+  var indexData &#x3D; [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 1];
+
+  trianglesVerticeBuffer &#x3D; gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+  trianglesVerticeBuffer.itemSize &#x3D; 3;
+  trianglesVerticeBuffer.numItems &#x3D; vertexPositionData.length / 3;
+  vertexIndexBuffer &#x3D; gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STREAM_DRAW);
+  vertexIndexBuffer.itemSize &#x3D; 3;
+  vertexIndexBuffer.numItems &#x3D; indexData.length;
+}
+
+function setUniforms() {
+  var colorData &#x3D; [
+    255, 0, 0, 255,
+    255, 0, 0, 255,
+    255, 0, 0, 255,
+    255, 0, 0, 255,
+    255, 255, 0, 255,
+    255, 255, 0, 255,
+    255, 255, 0, 255,
+    255, 255, 0, 255,
+    0, 255, 0, 255,
+    0, 255, 0, 255,
+    0, 255, 0, 255,
+    0, 255, 0, 255,
+    0, 0, 255, 255,
+    0, 0, 255, 255,
+    0, 0, 255, 255,
+    0, 0, 255, 255
+  ];
+  var colors &#x3D; new Uint8Array(colorData);
+  var colorsTexture &#x3D; gl.createTexture();
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, colorsTexture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 4, 4, 0,
+    gl.RGBA, gl.UNSIGNED_BYTE, colors);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.uniform1i(gl.getUniformLocation(glProgram, &quot;sColors&quot;), colorsTexture);
+}
+
+function circleVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    varying vec2 position;\n    \n    void main(void) {\n      position &#x3D; vec2(aVertexPosition.xy);\n      gl_Position &#x3D; vec4(position, 0.0, 1.0);\n    }\n  &quot;;
+}
+
+function circleFragmentShaderSource() {
+  return &quot;\n    varying highp vec2 position;\n    \n    void main(void) {   \n      highp float d &#x3D; length(position);\n      gl_FragColor &#x3D; vec4(max(0.0, 1.0 - d), 0.0, 0.0, 1.0);\n    }\n  &quot;;
+}
+
+function circleFloorVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    varying vec2 position;\n    \n    void main(void) {\n      position &#x3D; vec2(aVertexPosition.xy);\n      gl_Position &#x3D; vec4(position, 0.0, 1.0);\n    }\n  &quot;;
+}
+
+function circleFloorFragmentShaderSource() {
+  return &quot;\n    varying highp vec2 position;\n    \n    void main(void) {   \n      highp float d &#x3D; length(position);\n      highp float c &#x3D; floor(d*10.0) * 0.1;\n      gl_FragColor &#x3D; vec4(max(0.0, 1.0 - c), 0.0, 0.0, 1.0);\n    }\n  &quot;;
+}
+
+function circleUniform1VertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    varying vec2 position;\n    \n    void main(void) {\n      position &#x3D; vec2(aVertexPosition.xy);\n      gl_Position &#x3D; vec4(position, 0.0, 1.0);\n    }\n  &quot;;
+}
+
+function circleUniform1FragmentShaderSource() {
+  return &quot;\n    uniform sampler2D sColors;\n    varying highp vec2 position;\n    \n    void main(void) {   \n      highp float t &#x3D; length(position);\n      gl_FragColor &#x3D; vec4(texture2D(sColors, vec2(0.0, t)).rgb, 1.0);\n    }\n  &quot;;
+}
+
+function circleUniform2VertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    varying vec2 position;\n    \n    void main(void) {\n      position &#x3D; vec2(aVertexPosition.xy);\n      gl_Position &#x3D; vec4(position, 0.0, 1.0);\n    }\n  &quot;;
+}
+
+function circleUniform2FragmentShaderSource() {
+  return &quot;\n    uniform sampler2D sColors;\n    varying highp vec2 position;\n    \n    void main(void) {   \n      highp float t &#x3D; length(position);\n      highp float x &#x3D; sin(-position.y) * tan(length(position.xx));\n      t &#x3D; t + x;\n      gl_FragColor &#x3D; mix( vec4(0.0, 0.0, 0.0, 1.0), vec4(texture2D(sColors, vec2(0.0, t)).rgb, 1.0), t);\n    }\n  &quot;;
+}
+</textarea>
+          <textarea class="hidden" name="css">#container {
+  position: relative;
+  overflow: hidden;
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+}
+</textarea>
+          <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+  &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
+&lt;/div&gt;
+&lt;div&gt;
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment1&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;circle&quot; checked&gt;
+  &lt;label for&#x3D;&quot;fragment1&quot;&gt;CIRCLE&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment2&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;circle_floor&quot;&gt;
+  &lt;label for&#x3D;&quot;fragment2&quot;&gt;CIRCLE FLOOR&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment3&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;circle_uniform_1&quot;&gt;
+  &lt;label for&#x3D;&quot;fragment3&quot;&gt;CIRCLE UNIFORM 1&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment4&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;circle_uniform_2&quot;&gt;
+  &lt;label for&#x3D;&quot;fragment4&quot;&gt;CIRCLE UNIFORM 2&lt;/label&gt;
+&lt;/div&gt;
+</textarea>
+          <input type="hidden" name="data">
+        </form>
+        <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;WebGL fragment&lt;/title&gt;
+    &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
+    &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
+    &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;http://www.3daysofprogramming.com/playground/examples/resources/js/stats.js&quot;&gt;&lt;/script&gt;
+    &lt;style&gt;
+      #container {
+        position: relative;
+        overflow: hidden;
+      }
+
+      #canvas {
+        width: 100%;
+        height: 100%;
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+      &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment1&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;circle&quot; checked&gt;
+      &lt;label for&#x3D;&quot;fragment1&quot;&gt;CIRCLE&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment2&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;circle_floor&quot;&gt;
+      &lt;label for&#x3D;&quot;fragment2&quot;&gt;CIRCLE FLOOR&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment3&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;circle_uniform_1&quot;&gt;
+      &lt;label for&#x3D;&quot;fragment3&quot;&gt;CIRCLE UNIFORM 1&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment4&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;circle_uniform_2&quot;&gt;
+      &lt;label for&#x3D;&quot;fragment4&quot;&gt;CIRCLE UNIFORM 2&lt;/label&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+      var gl &#x3D; null;
+      var canvas &#x3D; null;
+      var container &#x3D; null;
+      var glProgram &#x3D; null;
+      var fragmentShader &#x3D; null;
+      var vertexShader &#x3D; null;
+
+      var vertexPositionAttribute &#x3D; null;
+      var trianglesVerticeBuffer &#x3D; null;
+      var vertexIndexBuffer &#x3D; null;
+
+      var SHADER &#x3D; {
+        circle: {
+          vertexShader: circleVertexShaderSource(),
+          fragmentShader: circleFragmentShaderSource()
+        },
+        circle_floor: {
+          vertexShader: circleFloorVertexShaderSource(),
+          fragmentShader: circleFloorFragmentShaderSource()
+        },
+        circle_uniform_1: {
+          vertexShader: circleUniform1VertexShaderSource(),
+          fragmentShader: circleUniform1FragmentShaderSource()
+        },
+        circle_uniform_2: {
+          vertexShader: circleUniform2VertexShaderSource(),
+          fragmentShader: circleUniform2FragmentShaderSource()
+        },
+      };
+
+      var radios &#x3D; document.querySelectorAll(&#x27;input[type&#x3D;radio][name&#x3D;&quot;fragment&quot;]&#x27;);
+
+      window.addEventListener(&#x27;load&#x27;, initWebGL);
+
+      function changeHandler() {
+        gl.deleteProgram(glProgram);
+        createProgram(this.value);
+      }
+
+      Array.prototype.forEach.call(radios, function (radio) {
+        radio.addEventListener(&#x27;change&#x27;, changeHandler);
+      });
+
+      function initWebGL() {
+        canvas &#x3D; document.querySelector(&#x27;#canvas&#x27;);
+        container &#x3D; document.querySelector(&#x27;#container&#x27;);
+        canvas.width &#x3D; container.clientWidth;
+        canvas.height &#x3D; container.clientHeight;
+
+        try {
+          gl &#x3D; canvas.getContext(&#x27;webgl&#x27;) || canvas.getContext(&#x27;experimental-webgl&#x27;);
+        } catch (e) {
+          console.error(e);
+        }
+
+        if (gl) {
+          initShaders();
+          createSquare();
+          setUniforms();
+
+          vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexPosition&quot;);
+          gl.enableVertexAttribArray(vertexPositionAttribute);
+
+          (function animLoop() {
+            setupWebGL();
+            drawScene();
+
+            requestAnimationFrame(animLoop);
+          })();
+        }
+      }
+
+      function setupWebGL() {
+        // set the clear color to a shade of green
+        gl.clearColor(0.7, 0.7, 0.7, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.enable(gl.DEPTH_TEST);
+
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
+
+      function initShaders() {
+        createProgram(&#x27;circle&#x27;);
+      }
+
+      function createProgram(type) {
+        // create program
+        glProgram &#x3D; gl.createProgram();
+        attachShader(glProgram, type);
+        // use program
+        gl.useProgram(glProgram);
+      }
+
+      function attachShader(glProgram, type) {
+        // get shader source
+        var vsSource &#x3D; SHADER[type].vertexShader;
+        var fsSource &#x3D; SHADER[type].fragmentShader;
+
+        // compile shaders
+        vertexShader &#x3D; makeShader(vsSource, gl.VERTEX_SHADER);
+        fragmentShader &#x3D; makeShader(fsSource, gl.FRAGMENT_SHADER);
+
+        // attach and link shaders to the program
+        gl.attachShader(glProgram, vertexShader);
+        gl.attachShader(glProgram, fragmentShader);
+        gl.linkProgram(glProgram);
+
+        if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
+          alert(&#x27;Unable to initialize the shader program.&#x27;);
+        }
+      }
+
+      function makeShader(source, type) {
+        // compile the shader
+        var shader &#x3D; gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          alert((&quot;Error compiling shader: &quot; + (gl.getShaderInfoLog(shader))));
+        }
+
+        return shader;
+      }
+
+      function drawScene() {
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffer);
+        gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffer);
+        gl.drawElements(gl.TRIANGLES, vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+
+      function createSquare(size) {
+        if ( size &#x3D;&#x3D;&#x3D; void 0 ) size &#x3D; 2.0;
+
+        var vertexPositionData &#x3D; [
+          0.0, 0.0, 0.0,
+          -size / 2.0, -size / 2.0, 0.0,
+          size / 2.0, -size / 2.0, 0.0,
+          size / 2.0, size / 2.0, 0.0,
+          -size / 2.0, size / 2.0, 0.0 ];
+        var indexData &#x3D; [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 1];
+
+        trianglesVerticeBuffer &#x3D; gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+        trianglesVerticeBuffer.itemSize &#x3D; 3;
+        trianglesVerticeBuffer.numItems &#x3D; vertexPositionData.length / 3;
+        vertexIndexBuffer &#x3D; gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STREAM_DRAW);
+        vertexIndexBuffer.itemSize &#x3D; 3;
+        vertexIndexBuffer.numItems &#x3D; indexData.length;
+      }
+
+      function setUniforms() {
+        var colorData &#x3D; [
+          255, 0, 0, 255,
+          255, 0, 0, 255,
+          255, 0, 0, 255,
+          255, 0, 0, 255,
+          255, 255, 0, 255,
+          255, 255, 0, 255,
+          255, 255, 0, 255,
+          255, 255, 0, 255,
+          0, 255, 0, 255,
+          0, 255, 0, 255,
+          0, 255, 0, 255,
+          0, 255, 0, 255,
+          0, 0, 255, 255,
+          0, 0, 255, 255,
+          0, 0, 255, 255,
+          0, 0, 255, 255
+        ];
+        var colors &#x3D; new Uint8Array(colorData);
+        var colorsTexture &#x3D; gl.createTexture();
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, colorsTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 4, 4, 0,
+          gl.RGBA, gl.UNSIGNED_BYTE, colors);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.uniform1i(gl.getUniformLocation(glProgram, &quot;sColors&quot;), colorsTexture);
+      }
+
+      function circleVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    varying vec2 position;\n    \n    void main(void) {\n      position &#x3D; vec2(aVertexPosition.xy);\n      gl_Position &#x3D; vec4(position, 0.0, 1.0);\n    }\n  &quot;;
+      }
+
+      function circleFragmentShaderSource() {
+        return &quot;\n    varying highp vec2 position;\n    \n    void main(void) {   \n      highp float d &#x3D; length(position);\n      gl_FragColor &#x3D; vec4(max(0.0, 1.0 - d), 0.0, 0.0, 1.0);\n    }\n  &quot;;
+      }
+
+      function circleFloorVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    varying vec2 position;\n    \n    void main(void) {\n      position &#x3D; vec2(aVertexPosition.xy);\n      gl_Position &#x3D; vec4(position, 0.0, 1.0);\n    }\n  &quot;;
+      }
+
+      function circleFloorFragmentShaderSource() {
+        return &quot;\n    varying highp vec2 position;\n    \n    void main(void) {   \n      highp float d &#x3D; length(position);\n      highp float c &#x3D; floor(d*10.0) * 0.1;\n      gl_FragColor &#x3D; vec4(max(0.0, 1.0 - c), 0.0, 0.0, 1.0);\n    }\n  &quot;;
+      }
+
+      function circleUniform1VertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    varying vec2 position;\n    \n    void main(void) {\n      position &#x3D; vec2(aVertexPosition.xy);\n      gl_Position &#x3D; vec4(position, 0.0, 1.0);\n    }\n  &quot;;
+      }
+
+      function circleUniform1FragmentShaderSource() {
+        return &quot;\n    uniform sampler2D sColors;\n    varying highp vec2 position;\n    \n    void main(void) {   \n      highp float t &#x3D; length(position);\n      gl_FragColor &#x3D; vec4(texture2D(sColors, vec2(0.0, t)).rgb, 1.0);\n    }\n  &quot;;
+      }
+
+      function circleUniform2VertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    varying vec2 position;\n    \n    void main(void) {\n      position &#x3D; vec2(aVertexPosition.xy);\n      gl_Position &#x3D; vec4(position, 0.0, 1.0);\n    }\n  &quot;;
+      }
+
+      function circleUniform2FragmentShaderSource() {
+        return &quot;\n    uniform sampler2D sColors;\n    varying highp vec2 position;\n    \n    void main(void) {   \n      highp float t &#x3D; length(position);\n      highp float x &#x3D; sin(-position.y) * tan(length(position.xx));\n      t &#x3D; t + x;\n      gl_FragColor &#x3D; mix( vec4(0.0, 0.0, 0.0, 1.0), vec4(texture2D(sColors, vec2(0.0, t)).rgb, 1.0), t);\n    }\n  &quot;;
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      </div>
+    </div>
+
+    <script src="./resources/common.js"></script>
+    <script src="./resources/prism/prism.min.js"></script>
+    <script src="common.js"></script><script src="webgl-fragment.js"></script>
+  </body>
+</html>
