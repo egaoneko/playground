@@ -106,7 +106,6 @@ var SHADER &#x3D; {
 };
 
 var sceneElements &#x3D; [];
-var capture &#x3D; false;
 var start &#x3D; [];
 var angleX &#x3D; 0;
 var angleY &#x3D; 0;
@@ -155,7 +154,6 @@ function initWebGL() {
 
 function initEvents() {
   canvas.addEventListener(&#x27;mousedown&#x27;, function (e) {
-    capture &#x3D; true;
     start &#x3D; [e.pageX, e.pageY];
 
     var mouseMoveHandler &#x3D; function (e) {
@@ -172,7 +170,6 @@ function initEvents() {
     var mouseUpHandler &#x3D; function () {
       document.removeEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);
       document.removeEventListener(&#x27;mouseup&#x27;, mouseUpHandler);
-      capture &#x3D; false;
     };
 
     document.addEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);
@@ -501,7 +498,6 @@ function flatFragmentShaderSource() {
       };
 
       var sceneElements &#x3D; [];
-      var capture &#x3D; false;
       var start &#x3D; [];
       var angleX &#x3D; 0;
       var angleY &#x3D; 0;
@@ -550,7 +546,6 @@ function flatFragmentShaderSource() {
 
       function initEvents() {
         canvas.addEventListener(&#x27;mousedown&#x27;, function (e) {
-          capture &#x3D; true;
           start &#x3D; [e.pageX, e.pageY];
 
           var mouseMoveHandler &#x3D; function (e) {
@@ -567,7 +562,6 @@ function flatFragmentShaderSource() {
           var mouseUpHandler &#x3D; function () {
             document.removeEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);
             document.removeEventListener(&#x27;mouseup&#x27;, mouseUpHandler);
-            capture &#x3D; false;
           };
 
           document.addEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);

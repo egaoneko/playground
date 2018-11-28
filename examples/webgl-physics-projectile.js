@@ -1,5 +1,8 @@
-import {setupPlaneMesh, setupSphereMesh} from "./utils/webgl/mesh-utils";
-import {SphereObject} from "./utils/webgl/object-utils";
+import {
+  setupPlaneMesh,
+  setupSphereMesh
+} from "./utils/webgl/mesh-utils";
+import { SphereObject } from "./utils/webgl/object-utils";
 import Vector3 from "../src/pg/math/vector3";
 
 let gl = null;
@@ -21,6 +24,9 @@ let pMatrix = mat4.create();
 let mvMatrix = mat4.create();
 let normalMatrix = mat3.create();
 
+let start = [];
+let angleX = 0;
+let angleY = 0;
 let paused = false;
 
 const SHADER = {
@@ -31,17 +37,32 @@ const SHADER = {
 };
 
 const sceneElements = [];
-let zoom = 1.0;
+let zoom = 0.2;
 
-const INITIAL_HEIGHT_TRANSLATION_OF_SPHERES = 5.0;
+let angle = 0.0;
+let fire = false;
+
 const GROUND_Y = -1.0;
-const ELASTICITY =  -0.8;
+const RECTANGLE_LENGTH = 4.0;
 
 window.addEventListener('load', initWebGL);
 document.addEventListener('keyup', (evt) => {
+  console.log(evt.keyCode);
   switch (evt.keyCode) {
     case 80: // 'p'
       paused = !paused;
+      break;
+    case 38: //'up'
+      ++angle;
+      break;
+    case 40: //'dwon'
+      --angle;
+      break;
+    case 70: // 'f'
+      fire = true;
+      console.log("fire!");
+      sceneElements[0].position = new Vector3(0.0, 0.0, 0.0);
+      sceneElements[0].velocity = new Vector3(Math.cos(angle * .1), Math.sin(angle * .1), 0.0);
       break;
     default:
       break;
@@ -79,6 +100,29 @@ function initWebGL() {
 }
 
 function initEvents() {
+  canvas.addEventListener('mousedown', (e) => {
+    start = [e.pageX, e.pageY];
+
+    const mouseMoveHandler = (e) => {
+      const x = e.pageX - start[0];
+      const y = e.pageY - start[1];
+
+      // start update
+      start[0] = e.pageX;
+      start[1] = e.pageY;
+
+      angleX += x;
+      angleY += y;
+    };
+    const mouseUpHandler = () => {
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+    };
+
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+  });
+
   const adjustZoom = (delta) => {
     if (delta > 0) {
       zoom += 1;
@@ -157,7 +201,8 @@ function makeShader(source, type) {
 }
 
 function setupMeshes() {
-  setupSphereMesh(
+
+  setupPlaneMesh(
     gl,
     {
       trianglesNormalBuffers,
@@ -167,28 +212,12 @@ function setupMeshes() {
     },
     0,
     {
-      color: [1.0, 0.0, 0.0, 1.0],
-      division: 20,
-      smoothShading: false
+      translation: [0.0, GROUND_Y, 0.0],
     }
   );
+  addBox(1);
 
-  setupSphereMesh(
-    gl,
-    {
-      trianglesNormalBuffers,
-      trianglesColorBuffers,
-      trianglesVerticeBuffers,
-      vertexIndexBuffers,
-    },
-    1,
-    {
-      color: [0.0, 1.0, 0.0, 1.0],
-      division: 10,
-      smoothShading: false
-    }
-  );
-
+  const radius = 1;
   setupSphereMesh(
     gl,
     {
@@ -199,78 +228,16 @@ function setupMeshes() {
     },
     2,
     {
-      color: [1.0, 1.0, 0.0, 1.0],
-      division: 5,
-      smoothShading: false
+      color: [1.0, 0.0, 0.0, 0.9],
+      radius: radius,
     }
   );
 
-  setupSphereMesh(
-    gl,
-    {
-      trianglesNormalBuffers,
-      trianglesColorBuffers,
-      trianglesVerticeBuffers,
-      vertexIndexBuffers,
-    },
-    3,
-    {
-      color: [1.0, 0.0, 1.0, 1.0],
-    }
-  );
-
-  setupSphereMesh(
-    gl,
-    {
-      trianglesNormalBuffers,
-      trianglesColorBuffers,
-      trianglesVerticeBuffers,
-      vertexIndexBuffers,
-    },
-    4,
-    {
-      color: [0.0, 1.0, 1.0, 1.0],
-    }
-  );
-
-  setupPlaneMesh(
-    gl,
-    {
-      trianglesNormalBuffers,
-      trianglesColorBuffers,
-      trianglesVerticeBuffers,
-      vertexIndexBuffers,
-    },
-    5,
-    {
-      translation: [0.0, GROUND_Y, 0.0],
-    }
-  );
-
-  sceneElements.push(new SphereObject({
-    vboIndex: 0,
-    position: new Vector3(-1.0, -0.75, 0.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
-  sceneElements.push(new SphereObject({
-    vboIndex: 1,
-    position: new Vector3(0.0, 0.0, 1.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
   sceneElements.push(new SphereObject({
     vboIndex: 2,
-    position: new Vector3(1.0, 0.25, -1.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
-  sceneElements.push(new SphereObject({
-    vboIndex: 3,
-    position: new Vector3(-1.0, 1.0, -1.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
-  sceneElements.push(new SphereObject({
-    vboIndex: 4,
-    position: new Vector3(-0.0, 1.75, -0.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
+    radius: radius,
+    position: new Vector3(0.0, 0.0, 0.0),
+    acceleration: new Vector3(0.0, -0.01, 0.0)
   }));
 
   vertexPositionAttribute = gl.getAttribLocation(glProgram, "aVertexPosition");
@@ -281,45 +248,34 @@ function setupMeshes() {
   gl.enableVertexAttribArray(vertexNormalAttribute);
 }
 
-function searchForObject(arr, index) {
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i].vboIndex === index) {
-      return i;
-    }
-  }
-  return -1;
-}
-function isAboveGround(n) {
-  const sphere = sceneElements[n];
-  return INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - (sphere.position.y + sphere.radius) > GROUND_Y;
-}
-
 function drawScene() {
   for (let i = 0; i < vertexIndexBuffers.length; ++i) {
     mat4.identity(mvMatrix);
-    mat4.translate(mvMatrix, mvMatrix, [0.0, -1.0, -15.5]);
-
-    const n = searchForObject(sceneElements, i);
-    if (n !== -1) {
-      const sphere = sceneElements[n];
-      if (isAboveGround(n)) {
-        sphere.velocity.y += sphere.acceleration.y;
-        sphere.position.y += sphere.velocity.y;
-      } else {
-        sphere.position.y -= sphere.velocity.y;
-        sphere.velocity.y *= ELASTICITY;
-      }
-
-      mat4.translate(mvMatrix, mvMatrix, [
-        sphere.position.x,
-        INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - sphere.position.y,
-        sphere.position.z
-      ]);
-    }
-
-    // mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
-    // mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
+    mat4.translate(mvMatrix, mvMatrix, [-10.0, -1.0, -30.0]);
+    mat4.rotate(mvMatrix, mvMatrix, angleX * 2 * Math.PI / 180.0, [0.0, 1.0, 0.0]);
+    mat4.rotate(mvMatrix, mvMatrix, angleY * 2 * Math.PI / 180.0, [1.0, 0.0, 0.0]);
     mat4.scale(mvMatrix, mvMatrix, [zoom, zoom, zoom]);
+
+    if (i === 1) {
+      mat4.translate(mvMatrix, mvMatrix, [-RECTANGLE_LENGTH * .1, 3.0, 0.0]);
+      mat4.rotate(mvMatrix, mvMatrix, angle * .1, [0.0, 0.0, 1.3]);
+    } else if (i === 0) {
+      mat4.rotate(mvMatrix, mvMatrix, -0.3, [-0.3, 0.0, 0.2]);
+      mat4.rotate(mvMatrix, mvMatrix, 90, [0.0, 1.0, 0.0]);
+    } else if (i === 2) {
+      mat4.translate(mvMatrix, mvMatrix, [
+        sceneElements[0].position.x + Math.cos(angle * .1),
+        sceneElements[0].position.y + 3.0 + sceneElements[0].radius + Math.sin(angle * .1),
+        sceneElements[0].position.z + 0.0 + sceneElements[0].radius]
+      );
+
+      if (fire) {
+        sceneElements[0].velocity.y += sceneElements[0].acceleration.y;
+        sceneElements[0].position.x += sceneElements[0].velocity.x;
+        sceneElements[0].position.y += sceneElements[0].velocity.y;
+        sceneElements[0].position.z += sceneElements[0].velocity.z;
+      }
+    }
 
     const invertedMatrix = mat3.create();
     mat3.fromMat4(invertedMatrix, mvMatrix);
@@ -327,29 +283,23 @@ function drawScene() {
     mat3.transpose(normalMatrix, normalMatrix);
     setMatrixUniforms();
 
+    if (i === 1) {
+      gl.disableVertexAttribArray(vertexColorAttribute);
+      gl.vertexAttrib4f(vertexColorAttribute, 1.0, 0.9, 0.7, 1.0);
+    } else {
+      gl.enableVertexAttribArray(vertexColorAttribute);
+      gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffers[i]);
+      gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+    }
+
     gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[i]);
     gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffers[i]);
-    gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+
     gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[i]);
     gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 
-    if (i === 4) {
-      gl.disable(gl.DEPTH_TEST);
-      gl.enable(gl.BLEND);
-      gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-      gl.blendEquation(gl.FUNC_ADD);
-    } else {
-      gl.disable(gl.BLEND);
-      gl.enable(gl.DEPTH_TEST);
-    }
-
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[i]);
-    if (i > 2) {
-      gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
-    } else {
-      gl.drawArrays(gl.TRIANGLES, 0, trianglesVerticeBuffers[i].numItems);
-    }
+    gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
   }
 }
 
@@ -405,4 +355,83 @@ function flatFragmentShaderSource() {
       gl_FragColor = vec4(vColor * lambert, 1.0);
     }
   `;
+}
+
+function addBox(n) {
+  //8 vertices
+  const vertexPositionData = [
+    //0-3
+    0, 0, 0,
+    RECTANGLE_LENGTH, 0, 0,
+    RECTANGLE_LENGTH, RECTANGLE_LENGTH * .5, 0,
+    0, RECTANGLE_LENGTH * .5, 0,
+
+    //4-7
+    0, 0, RECTANGLE_LENGTH * .5,
+    RECTANGLE_LENGTH, 0, RECTANGLE_LENGTH * .5,
+    RECTANGLE_LENGTH, RECTANGLE_LENGTH * .5, RECTANGLE_LENGTH * .5,
+    0, RECTANGLE_LENGTH * .5, RECTANGLE_LENGTH * .5,
+  ];
+  //10 triangles, 2 per face, 1 face not drawn
+  const indexData = [
+    0, 1, 2,	//front
+    0, 2, 3,
+    0, 3, 7,	//left
+    0, 7, 4,
+    2, 7, 3,	//top
+    2, 6, 7,
+    4, 6, 5,	//back
+    4, 7, 6,
+    1, 0, 4,	//bottom
+    1, 4, 5,
+  ];
+  const normalData = calculateNormals(vertexPositionData, indexData);
+  trianglesNormalBuffers[n] = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[n]);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normalData), gl.STATIC_DRAW);
+  trianglesNormalBuffers[n].itemSize = 3;
+  trianglesNormalBuffers[n].numItems = normalData.length / 3;
+
+  trianglesVerticeBuffers[n] = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffers[n]);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+  trianglesVerticeBuffers[n].itemSize = 3;
+  trianglesVerticeBuffers[n].numItems = vertexPositionData.length / 3;
+
+  vertexIndexBuffers[n] = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[n]);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STREAM_DRAW);
+  vertexIndexBuffers[n].itemSize = 3;
+  vertexIndexBuffers[n].numItems = indexData.length;
+}
+
+function calculateNormals(vertices, indices) {
+  const normals = [];
+
+  for (let i = 0; i < indices.length; i += 3) {
+    const a = indices[i];
+    const b = indices[i + 1];
+    const c = indices[i + 2];
+    //normal is the cross product
+    const v1 = [
+      vertices[a * 3] - vertices[b * 3],
+      vertices[a * 3 + 1] - vertices[b * 3 + 1],
+      vertices[a * 3 + 2] - vertices[b * 3 + 2]
+    ];
+    const v2 = [
+      vertices[a * 3] - vertices[c * 3],
+      vertices[a * 3 + 1] - vertices[c * 3 + 1],
+      vertices[a * 3 + 2] - vertices[c * 3 + 2]
+    ];
+    const cross = [
+      v1[1] * v2[2] - v1[0] * v2[1],
+      v1[2] * v2[0] - v1[0] * v2[2],
+      v1[0] * v2[1] - v1[1] * v2[0]
+    ];
+    //same value for each of the three vertices
+    normals.push.apply(normals, cross);
+    normals.push.apply(normals, cross);
+    normals.push.apply(normals, cross);
+  }
+  return normals;
 }

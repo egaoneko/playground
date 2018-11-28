@@ -30,7 +30,6 @@ const SHADER = {
 };
 
 const sceneElements = [];
-let capture = false;
 let start = [];
 let angleX = 0;
 let angleY = 0;
@@ -79,7 +78,6 @@ function initWebGL() {
 
 function initEvents() {
   canvas.addEventListener('mousedown', (e) => {
-    capture = true;
     start = [e.pageX, e.pageY];
 
     const mouseMoveHandler = (e) => {
@@ -96,7 +94,6 @@ function initEvents() {
     const mouseUpHandler = () => {
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', mouseUpHandler);
-      capture = false;
     };
 
     document.addEventListener('mousemove', mouseMoveHandler);

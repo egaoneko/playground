@@ -107,10 +107,6 @@ var SHADER &#x3D; {
 };
 
 var sceneElements &#x3D; [];
-var capture &#x3D; false;
-var start &#x3D; [];
-var angleX &#x3D; 0;
-var angleY &#x3D; 0;
 var zoom &#x3D; 1.0;
 
 var INITIAL_HEIGHT_TRANSLATION_OF_SPHERES &#x3D; 5.0;
@@ -161,31 +157,6 @@ function initWebGL() {
 }
 
 function initEvents() {
-  canvas.addEventListener(&#x27;mousedown&#x27;, function (e) {
-    capture &#x3D; true;
-    start &#x3D; [e.pageX, e.pageY];
-
-    var mouseMoveHandler &#x3D; function (e) {
-      var x &#x3D; e.pageX - start[0];
-      var y &#x3D; e.pageY - start[1];
-
-      // start update
-      start[0] &#x3D; e.pageX;
-      start[1] &#x3D; e.pageY;
-
-      angleX +&#x3D; x;
-      angleY +&#x3D; y;
-    };
-    var mouseUpHandler &#x3D; function () {
-      document.removeEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);
-      document.removeEventListener(&#x27;mouseup&#x27;, mouseUpHandler);
-      capture &#x3D; false;
-    };
-
-    document.addEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);
-    document.addEventListener(&#x27;mouseup&#x27;, mouseUpHandler);
-  });
-
   var adjustZoom &#x3D; function (delta) {
     if (delta &gt; 0) {
       zoom +&#x3D; 1;
@@ -280,7 +251,7 @@ function setupMeshes() {
   );
 
   for (var i &#x3D; 1; i &lt;&#x3D; NUM_SPHERES; ++i) {
-    var radius &#x3D; 0.5 * Math.random() + 0.25
+    var radius &#x3D; 0.5 * Math.random() + 0.25;
     setupSphereMesh(
       gl,
       {
@@ -320,6 +291,7 @@ function searchForObject(arr, index) {
   }
   return -1;
 }
+
 function isAboveGround(n) {
   var sphere &#x3D; sceneElements[n];
   return INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - (sphere.position.y + sphere.radius) &gt; GROUND_Y;
@@ -489,10 +461,6 @@ function flatFragmentShaderSource() {
       };
 
       var sceneElements &#x3D; [];
-      var capture &#x3D; false;
-      var start &#x3D; [];
-      var angleX &#x3D; 0;
-      var angleY &#x3D; 0;
       var zoom &#x3D; 1.0;
 
       var INITIAL_HEIGHT_TRANSLATION_OF_SPHERES &#x3D; 5.0;
@@ -543,31 +511,6 @@ function flatFragmentShaderSource() {
       }
 
       function initEvents() {
-        canvas.addEventListener(&#x27;mousedown&#x27;, function (e) {
-          capture &#x3D; true;
-          start &#x3D; [e.pageX, e.pageY];
-
-          var mouseMoveHandler &#x3D; function (e) {
-            var x &#x3D; e.pageX - start[0];
-            var y &#x3D; e.pageY - start[1];
-
-            // start update
-            start[0] &#x3D; e.pageX;
-            start[1] &#x3D; e.pageY;
-
-            angleX +&#x3D; x;
-            angleY +&#x3D; y;
-          };
-          var mouseUpHandler &#x3D; function () {
-            document.removeEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);
-            document.removeEventListener(&#x27;mouseup&#x27;, mouseUpHandler);
-            capture &#x3D; false;
-          };
-
-          document.addEventListener(&#x27;mousemove&#x27;, mouseMoveHandler);
-          document.addEventListener(&#x27;mouseup&#x27;, mouseUpHandler);
-        });
-
         var adjustZoom &#x3D; function (delta) {
           if (delta &gt; 0) {
             zoom +&#x3D; 1;
@@ -662,7 +605,7 @@ function flatFragmentShaderSource() {
         );
 
         for (var i &#x3D; 1; i &lt;&#x3D; NUM_SPHERES; ++i) {
-          var radius &#x3D; 0.5 * Math.random() + 0.25
+          var radius &#x3D; 0.5 * Math.random() + 0.25;
           setupSphereMesh(
             gl,
             {
@@ -702,6 +645,7 @@ function flatFragmentShaderSource() {
         }
         return -1;
       }
+
       function isAboveGround(n) {
         var sphere &#x3D; sceneElements[n];
         return INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - (sphere.position.y + sphere.radius) &gt; GROUND_Y;

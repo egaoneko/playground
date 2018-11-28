@@ -17,10 +17,10 @@
     <link rel="stylesheet" href="./resources/layout.css" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js"></script>
 <script src="resources/js/stats.js"></script>
-    <link rel="stylesheet" href="webgl-physics-gravity.css">
+    <link rel="stylesheet" href="webgl-physics-inter-collision-detection.css">
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
-    <title>WebGL physics gravity</title>
+    <title>WebGL physics inter collision detection</title>
   </head>
   <body>
 
@@ -49,7 +49,7 @@
 
       <div class="row-fluid">
         <div class="span12">
-          <h4 id="title">WebGL physics gravity</h4>
+          <h4 id="title">WebGL physics inter collision detection</h4>
           <div id="container" class="main">
   <canvas id="canvas"></canvas>
 </div>
@@ -59,8 +59,8 @@
 
       <div class="row-fluid">
         <div class="span12">
-          <p id="shortdesc">WebGL physics gravity.</p>
-          <div id="docs"><p>This page&#39;s try to WebGL physics gravity.</p>
+          <p id="shortdesc">WebGL physics inter collision detection.</p>
+          <div id="docs"><p>This page&#39;s try to WebGL physics inter collision detection.</p>
 </div>
           <p id="tags">Tags: webgl</p>
         </div>
@@ -72,10 +72,13 @@
           <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
         </div>
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
-          <textarea class="hidden" name="title">WebGL physics gravity</textarea>
-          <textarea class="hidden" name="description">WebGL physics gravity.</textarea>
-          <textarea class="hidden" name="js">import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
-import {SphereObject} from &quot;./utils/webgl/object-utils&quot;;
+          <textarea class="hidden" name="title">WebGL physics inter collision detection</textarea>
+          <textarea class="hidden" name="description">WebGL physics inter collision detection.</textarea>
+          <textarea class="hidden" name="js">import {
+  setupPlaneMesh,
+  setupSphereMesh
+} from &quot;./utils/webgl/mesh-utils&quot;;
+import { SphereObject } from &quot;./utils/webgl/object-utils&quot;;
 import Vector3 from &quot;../src/pg/math/vector3&quot;;
 
 var gl &#x3D; null;
@@ -111,7 +114,9 @@ var zoom &#x3D; 1.0;
 
 var INITIAL_HEIGHT_TRANSLATION_OF_SPHERES &#x3D; 5.0;
 var GROUND_Y &#x3D; -1.0;
-var ELASTICITY &#x3D;  -0.8;
+var ELASTICITY &#x3D; -0.8;
+var PLANE_SIZE &#x3D; 10.0;
+var NUM_SPHERES &#x3D; 50;
 
 window.addEventListener(&#x27;load&#x27;, initWebGL);
 document.addEventListener(&#x27;keyup&#x27;, function (evt) {
@@ -233,81 +238,6 @@ function makeShader(source, type) {
 }
 
 function setupMeshes() {
-  setupSphereMesh(
-    gl,
-    {
-      trianglesNormalBuffers: trianglesNormalBuffers,
-      trianglesColorBuffers: trianglesColorBuffers,
-      trianglesVerticeBuffers: trianglesVerticeBuffers,
-      vertexIndexBuffers: vertexIndexBuffers,
-    },
-    0,
-    {
-      color: [1.0, 0.0, 0.0, 1.0],
-      division: 20,
-      smoothShading: false
-    }
-  );
-
-  setupSphereMesh(
-    gl,
-    {
-      trianglesNormalBuffers: trianglesNormalBuffers,
-      trianglesColorBuffers: trianglesColorBuffers,
-      trianglesVerticeBuffers: trianglesVerticeBuffers,
-      vertexIndexBuffers: vertexIndexBuffers,
-    },
-    1,
-    {
-      color: [0.0, 1.0, 0.0, 1.0],
-      division: 10,
-      smoothShading: false
-    }
-  );
-
-  setupSphereMesh(
-    gl,
-    {
-      trianglesNormalBuffers: trianglesNormalBuffers,
-      trianglesColorBuffers: trianglesColorBuffers,
-      trianglesVerticeBuffers: trianglesVerticeBuffers,
-      vertexIndexBuffers: vertexIndexBuffers,
-    },
-    2,
-    {
-      color: [1.0, 1.0, 0.0, 1.0],
-      division: 5,
-      smoothShading: false
-    }
-  );
-
-  setupSphereMesh(
-    gl,
-    {
-      trianglesNormalBuffers: trianglesNormalBuffers,
-      trianglesColorBuffers: trianglesColorBuffers,
-      trianglesVerticeBuffers: trianglesVerticeBuffers,
-      vertexIndexBuffers: vertexIndexBuffers,
-    },
-    3,
-    {
-      color: [1.0, 0.0, 1.0, 1.0],
-    }
-  );
-
-  setupSphereMesh(
-    gl,
-    {
-      trianglesNormalBuffers: trianglesNormalBuffers,
-      trianglesColorBuffers: trianglesColorBuffers,
-      trianglesVerticeBuffers: trianglesVerticeBuffers,
-      vertexIndexBuffers: vertexIndexBuffers,
-    },
-    4,
-    {
-      color: [0.0, 1.0, 1.0, 1.0],
-    }
-  );
 
   setupPlaneMesh(
     gl,
@@ -317,37 +247,36 @@ function setupMeshes() {
       trianglesVerticeBuffers: trianglesVerticeBuffers,
       vertexIndexBuffers: vertexIndexBuffers,
     },
-    5,
+    0,
     {
       translation: [0.0, GROUND_Y, 0.0],
     }
   );
 
-  sceneElements.push(new SphereObject({
-    vboIndex: 0,
-    position: new Vector3(-1.0, -0.75, 0.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
-  sceneElements.push(new SphereObject({
-    vboIndex: 1,
-    position: new Vector3(0.0, 0.0, 1.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
-  sceneElements.push(new SphereObject({
-    vboIndex: 2,
-    position: new Vector3(1.0, 0.25, -1.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
-  sceneElements.push(new SphereObject({
-    vboIndex: 3,
-    position: new Vector3(-1.0, 1.0, -1.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
-  sceneElements.push(new SphereObject({
-    vboIndex: 4,
-    position: new Vector3(-0.0, 1.75, -0.0),
-    acceleration: new Vector3(0.0, 0.01, 0.0)
-  }));
+  for (var i &#x3D; 1; i &lt;&#x3D; NUM_SPHERES; ++i) {
+    var radius &#x3D; 0.5 * Math.random() + 0.;
+    setupSphereMesh(
+      gl,
+      {
+        trianglesNormalBuffers: trianglesNormalBuffers,
+        trianglesColorBuffers: trianglesColorBuffers,
+        trianglesVerticeBuffers: trianglesVerticeBuffers,
+        vertexIndexBuffers: vertexIndexBuffers,
+      },
+      i,
+      {
+        color: [Math.random(), Math.random(), Math.random(), 1.0],
+        radius: radius,
+      }
+    );
+
+    sceneElements.push(new SphereObject({
+      vboIndex: i,
+      radius: radius,
+      position: new Vector3(10.0 * Math.random() - 5.0, -5.0 * Math.random(), 10.0 * Math.random() - 5.0),
+      acceleration: new Vector3(0.0, 0.01, 0.0)
+    }));
+  }
 
   vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexPosition&quot;);
   vertexColorAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexColor&quot;);
@@ -365,9 +294,86 @@ function searchForObject(arr, index) {
   }
   return -1;
 }
+
 function isAboveGround(n) {
   var sphere &#x3D; sceneElements[n];
   return INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - (sphere.position.y + sphere.radius) &gt; GROUND_Y;
+}
+
+function checkForCollisions(arr, n) {
+  var sphere &#x3D; arr[n];
+
+  arr.forEach(function (other, index) {
+    if (n &#x3D;&#x3D;&#x3D; index) {
+      return;
+    }
+
+    var p1 &#x3D; sphere.position;
+    var p2 &#x3D; other.position;
+    var vec &#x3D; new Vector3(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
+
+    if (vec.length() &lt; (sphere.radius + other.radius)) {
+      //swap velocities of two vectors
+      var tmp1 &#x3D; sphere.velocity;
+      var tmp2 &#x3D; other.velocity;
+      var r1 &#x3D; sphere.radius;
+      var r2 &#x3D; other.radius;
+
+      var finalX &#x3D; findFinalVelocities(tmp1.x, tmp2.x, r1, r2);
+      var finalY &#x3D; findFinalVelocities(tmp1.y, tmp2.y, r1, r2);
+      // const finalZ &#x3D; findFinalVelocities(tmp1.z, tmp2.z, r1, r2);
+
+      // sphere.velocity &#x3D; new Vector3(finalX[0], finalY[0], finalZ[0]);
+      // other.velocity &#x3D; new Vector3(finalX[1], finalY[1], finalZ[1]);
+      sphere.velocity &#x3D; new Vector3(finalX[0], finalY[0], sphere.velocity.z);
+      other.velocity &#x3D; new Vector3(finalX[1], finalY[1], other.velocity.z);
+
+      //move positions so they don&#x27;t get stuck
+      // sphere.position.x +&#x3D; sphere.velocity.x;
+      // sphere.position.y +&#x3D; sphere.velocity.y;
+      // sphere.position.z +&#x3D; sphere.velocity.z;
+      moveObject(arr, n);
+
+      // other.position.x +&#x3D; other.velocity.x;
+      // other.position.y +&#x3D; other.velocity.y;
+      // other.position.z +&#x3D; other.velocity.z;
+      moveObject(arr, index);
+    }
+  });
+}
+
+function findFinalVelocities(v1, v2, r1, r2) {
+  var m1 &#x3D; (r1 * r1 * r1) / (r2 * r2 * r2);
+  var m2 &#x3D; 1.0;
+  var f1 &#x3D; (m1 - m2) / (m1 + m2) * v1 + 2 * m2 / (m1 + m2) * v2;
+  var f2 &#x3D; (m2 - m1) / (m2 + m1) * v2 + 2 * m1 / (m2 + m1) * v1;
+  return [f1, f2];
+}
+
+function moveObject(arr, n) {
+  var sphere &#x3D; arr[n];
+
+  if (isAboveGround(n)) {
+    sphere.velocity.y +&#x3D; sphere.acceleration.y;
+    sphere.position.y +&#x3D; sphere.velocity.y;
+  } else {
+    sphere.position.y -&#x3D; sphere.velocity.y;
+    sphere.velocity.y *&#x3D; ELASTICITY;
+  }
+
+  if (sphere.position.x &gt; PLANE_SIZE || sphere.position.x &lt; -PLANE_SIZE) {
+    sphere.position.x +&#x3D; (-1.0 * sphere.velocity.x);
+    sphere.position.x *&#x3D; -1.0;
+  } else {
+    sphere.position.x +&#x3D; sphere.velocity.x;
+  }
+
+  if (sphere.position.z &gt; PLANE_SIZE || sphere.position.z &lt; -PLANE_SIZE) {
+    sphere.position.z +&#x3D; (-1.0 * sphere.velocity.z);
+    sphere.position.z *&#x3D; -1.0;
+  } else {
+    sphere.position.z +&#x3D; sphere.velocity.z;
+  }
 }
 
 function drawScene() {
@@ -378,13 +384,8 @@ function drawScene() {
     var n &#x3D; searchForObject(sceneElements, i);
     if (n !&#x3D;&#x3D; -1) {
       var sphere &#x3D; sceneElements[n];
-      if (isAboveGround(n)) {
-        sphere.velocity.y +&#x3D; sphere.acceleration.y;
-        sphere.position.y +&#x3D; sphere.velocity.y;
-      } else {
-        sphere.position.y -&#x3D; sphere.velocity.y;
-        sphere.velocity.y *&#x3D; ELASTICITY;
-      }
+      moveObject(sceneElements, n);
+      checkForCollisions(sceneElements, n);
 
       mat4.translate(mvMatrix, mvMatrix, [
         sphere.position.x,
@@ -410,7 +411,7 @@ function drawScene() {
     gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[i]);
     gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 
-    if (i &#x3D;&#x3D;&#x3D; 4) {
+    if (i !&#x3D;&#x3D; 0 &amp;&amp; i % 2 &#x3D;&#x3D;&#x3D; 0) {
       gl.disable(gl.DEPTH_TEST);
       gl.enable(gl.BLEND);
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
@@ -421,11 +422,7 @@ function drawScene() {
     }
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[i]);
-    if (i &gt; 2) {
-      gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
-    } else {
-      gl.drawArrays(gl.TRIANGLES, 0, trianglesVerticeBuffers[i].numItems);
-    }
+    gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
   }
 }
 
@@ -468,7 +465,7 @@ function flatFragmentShaderSource() {
         <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
-    &lt;title&gt;WebGL physics gravity&lt;/title&gt;
+    &lt;title&gt;WebGL physics inter collision detection&lt;/title&gt;
     &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
     &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
@@ -491,8 +488,11 @@ function flatFragmentShaderSource() {
       &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
     &lt;/div&gt;
     &lt;script&gt;
-      import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
-      import {SphereObject} from &quot;./utils/webgl/object-utils&quot;;
+      import {
+        setupPlaneMesh,
+        setupSphereMesh
+      } from &quot;./utils/webgl/mesh-utils&quot;;
+      import { SphereObject } from &quot;./utils/webgl/object-utils&quot;;
       import Vector3 from &quot;../src/pg/math/vector3&quot;;
 
       var gl &#x3D; null;
@@ -528,7 +528,9 @@ function flatFragmentShaderSource() {
 
       var INITIAL_HEIGHT_TRANSLATION_OF_SPHERES &#x3D; 5.0;
       var GROUND_Y &#x3D; -1.0;
-      var ELASTICITY &#x3D;  -0.8;
+      var ELASTICITY &#x3D; -0.8;
+      var PLANE_SIZE &#x3D; 10.0;
+      var NUM_SPHERES &#x3D; 50;
 
       window.addEventListener(&#x27;load&#x27;, initWebGL);
       document.addEventListener(&#x27;keyup&#x27;, function (evt) {
@@ -650,81 +652,6 @@ function flatFragmentShaderSource() {
       }
 
       function setupMeshes() {
-        setupSphereMesh(
-          gl,
-          {
-            trianglesNormalBuffers: trianglesNormalBuffers,
-            trianglesColorBuffers: trianglesColorBuffers,
-            trianglesVerticeBuffers: trianglesVerticeBuffers,
-            vertexIndexBuffers: vertexIndexBuffers,
-          },
-          0,
-          {
-            color: [1.0, 0.0, 0.0, 1.0],
-            division: 20,
-            smoothShading: false
-          }
-        );
-
-        setupSphereMesh(
-          gl,
-          {
-            trianglesNormalBuffers: trianglesNormalBuffers,
-            trianglesColorBuffers: trianglesColorBuffers,
-            trianglesVerticeBuffers: trianglesVerticeBuffers,
-            vertexIndexBuffers: vertexIndexBuffers,
-          },
-          1,
-          {
-            color: [0.0, 1.0, 0.0, 1.0],
-            division: 10,
-            smoothShading: false
-          }
-        );
-
-        setupSphereMesh(
-          gl,
-          {
-            trianglesNormalBuffers: trianglesNormalBuffers,
-            trianglesColorBuffers: trianglesColorBuffers,
-            trianglesVerticeBuffers: trianglesVerticeBuffers,
-            vertexIndexBuffers: vertexIndexBuffers,
-          },
-          2,
-          {
-            color: [1.0, 1.0, 0.0, 1.0],
-            division: 5,
-            smoothShading: false
-          }
-        );
-
-        setupSphereMesh(
-          gl,
-          {
-            trianglesNormalBuffers: trianglesNormalBuffers,
-            trianglesColorBuffers: trianglesColorBuffers,
-            trianglesVerticeBuffers: trianglesVerticeBuffers,
-            vertexIndexBuffers: vertexIndexBuffers,
-          },
-          3,
-          {
-            color: [1.0, 0.0, 1.0, 1.0],
-          }
-        );
-
-        setupSphereMesh(
-          gl,
-          {
-            trianglesNormalBuffers: trianglesNormalBuffers,
-            trianglesColorBuffers: trianglesColorBuffers,
-            trianglesVerticeBuffers: trianglesVerticeBuffers,
-            vertexIndexBuffers: vertexIndexBuffers,
-          },
-          4,
-          {
-            color: [0.0, 1.0, 1.0, 1.0],
-          }
-        );
 
         setupPlaneMesh(
           gl,
@@ -734,37 +661,36 @@ function flatFragmentShaderSource() {
             trianglesVerticeBuffers: trianglesVerticeBuffers,
             vertexIndexBuffers: vertexIndexBuffers,
           },
-          5,
+          0,
           {
             translation: [0.0, GROUND_Y, 0.0],
           }
         );
 
-        sceneElements.push(new SphereObject({
-          vboIndex: 0,
-          position: new Vector3(-1.0, -0.75, 0.0),
-          acceleration: new Vector3(0.0, 0.01, 0.0)
-        }));
-        sceneElements.push(new SphereObject({
-          vboIndex: 1,
-          position: new Vector3(0.0, 0.0, 1.0),
-          acceleration: new Vector3(0.0, 0.01, 0.0)
-        }));
-        sceneElements.push(new SphereObject({
-          vboIndex: 2,
-          position: new Vector3(1.0, 0.25, -1.0),
-          acceleration: new Vector3(0.0, 0.01, 0.0)
-        }));
-        sceneElements.push(new SphereObject({
-          vboIndex: 3,
-          position: new Vector3(-1.0, 1.0, -1.0),
-          acceleration: new Vector3(0.0, 0.01, 0.0)
-        }));
-        sceneElements.push(new SphereObject({
-          vboIndex: 4,
-          position: new Vector3(-0.0, 1.75, -0.0),
-          acceleration: new Vector3(0.0, 0.01, 0.0)
-        }));
+        for (var i &#x3D; 1; i &lt;&#x3D; NUM_SPHERES; ++i) {
+          var radius &#x3D; 0.5 * Math.random() + 0.;
+          setupSphereMesh(
+            gl,
+            {
+              trianglesNormalBuffers: trianglesNormalBuffers,
+              trianglesColorBuffers: trianglesColorBuffers,
+              trianglesVerticeBuffers: trianglesVerticeBuffers,
+              vertexIndexBuffers: vertexIndexBuffers,
+            },
+            i,
+            {
+              color: [Math.random(), Math.random(), Math.random(), 1.0],
+              radius: radius,
+            }
+          );
+
+          sceneElements.push(new SphereObject({
+            vboIndex: i,
+            radius: radius,
+            position: new Vector3(10.0 * Math.random() - 5.0, -5.0 * Math.random(), 10.0 * Math.random() - 5.0),
+            acceleration: new Vector3(0.0, 0.01, 0.0)
+          }));
+        }
 
         vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexPosition&quot;);
         vertexColorAttribute &#x3D; gl.getAttribLocation(glProgram, &quot;aVertexColor&quot;);
@@ -782,9 +708,86 @@ function flatFragmentShaderSource() {
         }
         return -1;
       }
+
       function isAboveGround(n) {
         var sphere &#x3D; sceneElements[n];
         return INITIAL_HEIGHT_TRANSLATION_OF_SPHERES - (sphere.position.y + sphere.radius) &gt; GROUND_Y;
+      }
+
+      function checkForCollisions(arr, n) {
+        var sphere &#x3D; arr[n];
+
+        arr.forEach(function (other, index) {
+          if (n &#x3D;&#x3D;&#x3D; index) {
+            return;
+          }
+
+          var p1 &#x3D; sphere.position;
+          var p2 &#x3D; other.position;
+          var vec &#x3D; new Vector3(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
+
+          if (vec.length() &lt; (sphere.radius + other.radius)) {
+            //swap velocities of two vectors
+            var tmp1 &#x3D; sphere.velocity;
+            var tmp2 &#x3D; other.velocity;
+            var r1 &#x3D; sphere.radius;
+            var r2 &#x3D; other.radius;
+
+            var finalX &#x3D; findFinalVelocities(tmp1.x, tmp2.x, r1, r2);
+            var finalY &#x3D; findFinalVelocities(tmp1.y, tmp2.y, r1, r2);
+            // const finalZ &#x3D; findFinalVelocities(tmp1.z, tmp2.z, r1, r2);
+
+            // sphere.velocity &#x3D; new Vector3(finalX[0], finalY[0], finalZ[0]);
+            // other.velocity &#x3D; new Vector3(finalX[1], finalY[1], finalZ[1]);
+            sphere.velocity &#x3D; new Vector3(finalX[0], finalY[0], sphere.velocity.z);
+            other.velocity &#x3D; new Vector3(finalX[1], finalY[1], other.velocity.z);
+
+            //move positions so they don&#x27;t get stuck
+            // sphere.position.x +&#x3D; sphere.velocity.x;
+            // sphere.position.y +&#x3D; sphere.velocity.y;
+            // sphere.position.z +&#x3D; sphere.velocity.z;
+            moveObject(arr, n);
+
+            // other.position.x +&#x3D; other.velocity.x;
+            // other.position.y +&#x3D; other.velocity.y;
+            // other.position.z +&#x3D; other.velocity.z;
+            moveObject(arr, index);
+          }
+        });
+      }
+
+      function findFinalVelocities(v1, v2, r1, r2) {
+        var m1 &#x3D; (r1 * r1 * r1) / (r2 * r2 * r2);
+        var m2 &#x3D; 1.0;
+        var f1 &#x3D; (m1 - m2) / (m1 + m2) * v1 + 2 * m2 / (m1 + m2) * v2;
+        var f2 &#x3D; (m2 - m1) / (m2 + m1) * v2 + 2 * m1 / (m2 + m1) * v1;
+        return [f1, f2];
+      }
+
+      function moveObject(arr, n) {
+        var sphere &#x3D; arr[n];
+
+        if (isAboveGround(n)) {
+          sphere.velocity.y +&#x3D; sphere.acceleration.y;
+          sphere.position.y +&#x3D; sphere.velocity.y;
+        } else {
+          sphere.position.y -&#x3D; sphere.velocity.y;
+          sphere.velocity.y *&#x3D; ELASTICITY;
+        }
+
+        if (sphere.position.x &gt; PLANE_SIZE || sphere.position.x &lt; -PLANE_SIZE) {
+          sphere.position.x +&#x3D; (-1.0 * sphere.velocity.x);
+          sphere.position.x *&#x3D; -1.0;
+        } else {
+          sphere.position.x +&#x3D; sphere.velocity.x;
+        }
+
+        if (sphere.position.z &gt; PLANE_SIZE || sphere.position.z &lt; -PLANE_SIZE) {
+          sphere.position.z +&#x3D; (-1.0 * sphere.velocity.z);
+          sphere.position.z *&#x3D; -1.0;
+        } else {
+          sphere.position.z +&#x3D; sphere.velocity.z;
+        }
       }
 
       function drawScene() {
@@ -795,13 +798,8 @@ function flatFragmentShaderSource() {
           var n &#x3D; searchForObject(sceneElements, i);
           if (n !&#x3D;&#x3D; -1) {
             var sphere &#x3D; sceneElements[n];
-            if (isAboveGround(n)) {
-              sphere.velocity.y +&#x3D; sphere.acceleration.y;
-              sphere.position.y +&#x3D; sphere.velocity.y;
-            } else {
-              sphere.position.y -&#x3D; sphere.velocity.y;
-              sphere.velocity.y *&#x3D; ELASTICITY;
-            }
+            moveObject(sceneElements, n);
+            checkForCollisions(sceneElements, n);
 
             mat4.translate(mvMatrix, mvMatrix, [
               sphere.position.x,
@@ -827,7 +825,7 @@ function flatFragmentShaderSource() {
           gl.bindBuffer(gl.ARRAY_BUFFER, trianglesNormalBuffers[i]);
           gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 
-          if (i &#x3D;&#x3D;&#x3D; 4) {
+          if (i !&#x3D;&#x3D; 0 &amp;&amp; i % 2 &#x3D;&#x3D;&#x3D; 0) {
             gl.disable(gl.DEPTH_TEST);
             gl.enable(gl.BLEND);
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
@@ -838,11 +836,7 @@ function flatFragmentShaderSource() {
           }
 
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexIndexBuffers[i]);
-          if (i &gt; 2) {
-            gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
-          } else {
-            gl.drawArrays(gl.TRIANGLES, 0, trianglesVerticeBuffers[i].numItems);
-          }
+          gl.drawElements(gl.TRIANGLES, vertexIndexBuffers[i].numItems, gl.UNSIGNED_SHORT, 0);
         }
       }
 
@@ -873,6 +867,6 @@ function flatFragmentShaderSource() {
 
     <script src="./resources/common.js"></script>
     <script src="./resources/prism/prism.min.js"></script>
-    <script src="common.js"></script><script src="webgl-physics-gravity.js"></script>
+    <script src="common.js"></script><script src="webgl-physics-inter-collision-detection.js"></script>
   </body>
 </html>
