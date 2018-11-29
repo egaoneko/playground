@@ -65,6 +65,9 @@
 
   <input type="radio" id="fragment4" name="fragment" value="circle_uniform_2">
   <label for="fragment4">CIRCLE UNIFORM 2</label>
+
+  <input type="radio" id="fragment5" name="fragment" value="mandelbrot">
+  <label for="fragment5">MANDELBROT</label>
 </div>
 
         </div>
@@ -114,6 +117,10 @@ var SHADER &#x3D; {
   circle_uniform_2: {
     vertexShader: circleUniform2VertexShaderSource(),
     fragmentShader: circleUniform2FragmentShaderSource()
+  },
+  mandelbrot:  {
+    vertexShader: mandelbrotVertexShaderSource(),
+    fragmentShader: mandelbrotFragmentShaderSource()
   },
 };
 
@@ -304,6 +311,14 @@ function circleUniform2VertexShaderSource() {
 function circleUniform2FragmentShaderSource() {
   return &quot;\n    uniform sampler2D sColors;\n    varying highp vec2 position;\n    \n    void main(void) {   \n      highp float t &#x3D; length(position);\n      highp float x &#x3D; sin(-position.y) * tan(length(position.xx));\n      t &#x3D; t + x;\n      gl_FragColor &#x3D; mix( vec4(0.0, 0.0, 0.0, 1.0), vec4(texture2D(sColors, vec2(0.0, t)).rgb, 1.0), t);\n    }\n  &quot;;
 }
+
+function mandelbrotVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    varying vec2 position;\n    \n    void main(void) {\n      position &#x3D; vec2(aVertexPosition.xy);\n      gl_Position &#x3D; vec4(position, 0.0, 1.0);\n    }\n  &quot;;
+}
+
+function mandelbrotFragmentShaderSource() {
+  return &quot;\n    varying highp vec2 position;\n    const int MAX_ITERATIONS &#x3D; 250;\n    const highp float LIGHTNESS_FACTOR &#x3D; 10.0;\n    \n    void main(void) {   \n      highp vec2 c &#x3D; vec2(position.x - 0.5, position.y); \n      highp vec2 z &#x3D; c;\n      \n      highp vec4 color &#x3D; vec4(0.0, 0.0, 0.0, 1.0);\n      \n      for (int i &#x3D; 0; i &lt; MAX_ITERATIONS; i++) {\n        z &#x3D; vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;\n        \n        if (dot(z, z) &gt; 4.0) {\n          highp float f &#x3D; LIGHTNESS_FACTOR * float(i) / float(MAX_ITERATIONS);\n          color &#x3D; vec4(vec3(0.1, 0.1, 1.0) * f , 1.0);\n          break;\n        }\n      }\n      gl_FragColor &#x3D; color;\n    }\n  &quot;;
+}
 </textarea>
           <textarea class="hidden" name="css">#container {
   position: relative;
@@ -330,6 +345,9 @@ function circleUniform2FragmentShaderSource() {
 
   &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment4&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;circle_uniform_2&quot;&gt;
   &lt;label for&#x3D;&quot;fragment4&quot;&gt;CIRCLE UNIFORM 2&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment5&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;mandelbrot&quot;&gt;
+  &lt;label for&#x3D;&quot;fragment5&quot;&gt;MANDELBROT&lt;/label&gt;
 &lt;/div&gt;
 </textarea>
           <input type="hidden" name="data">
@@ -371,6 +389,9 @@ function circleUniform2FragmentShaderSource() {
 
       &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment4&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;circle_uniform_2&quot;&gt;
       &lt;label for&#x3D;&quot;fragment4&quot;&gt;CIRCLE UNIFORM 2&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;fragment5&quot; name&#x3D;&quot;fragment&quot; value&#x3D;&quot;mandelbrot&quot;&gt;
+      &lt;label for&#x3D;&quot;fragment5&quot;&gt;MANDELBROT&lt;/label&gt;
     &lt;/div&gt;
     &lt;script&gt;
       var gl &#x3D; null;
@@ -400,6 +421,10 @@ function circleUniform2FragmentShaderSource() {
         circle_uniform_2: {
           vertexShader: circleUniform2VertexShaderSource(),
           fragmentShader: circleUniform2FragmentShaderSource()
+        },
+        mandelbrot:  {
+          vertexShader: mandelbrotVertexShaderSource(),
+          fragmentShader: mandelbrotFragmentShaderSource()
         },
       };
 
@@ -589,6 +614,14 @@ function circleUniform2FragmentShaderSource() {
 
       function circleUniform2FragmentShaderSource() {
         return &quot;\n    uniform sampler2D sColors;\n    varying highp vec2 position;\n    \n    void main(void) {   \n      highp float t &#x3D; length(position);\n      highp float x &#x3D; sin(-position.y) * tan(length(position.xx));\n      t &#x3D; t + x;\n      gl_FragColor &#x3D; mix( vec4(0.0, 0.0, 0.0, 1.0), vec4(texture2D(sColors, vec2(0.0, t)).rgb, 1.0), t);\n    }\n  &quot;;
+      }
+
+      function mandelbrotVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    varying vec2 position;\n    \n    void main(void) {\n      position &#x3D; vec2(aVertexPosition.xy);\n      gl_Position &#x3D; vec4(position, 0.0, 1.0);\n    }\n  &quot;;
+      }
+
+      function mandelbrotFragmentShaderSource() {
+        return &quot;\n    varying highp vec2 position;\n    const int MAX_ITERATIONS &#x3D; 250;\n    const highp float LIGHTNESS_FACTOR &#x3D; 10.0;\n    \n    void main(void) {   \n      highp vec2 c &#x3D; vec2(position.x - 0.5, position.y); \n      highp vec2 z &#x3D; c;\n      \n      highp vec4 color &#x3D; vec4(0.0, 0.0, 0.0, 1.0);\n      \n      for (int i &#x3D; 0; i &lt; MAX_ITERATIONS; i++) {\n        z &#x3D; vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;\n        \n        if (dot(z, z) &gt; 4.0) {\n          highp float f &#x3D; LIGHTNESS_FACTOR * float(i) / float(MAX_ITERATIONS);\n          color &#x3D; vec4(vec3(0.1, 0.1, 1.0) * f , 1.0);\n          break;\n        }\n      }\n      gl_FragColor &#x3D; color;\n    }\n  &quot;;
       }
     &lt;/script&gt;
   &lt;/body&gt;
