@@ -326,8 +326,8 @@ function drawScene() {
 function getMatrixUniforms() {
   glProgram.pMatrixUniform = gl.getUniformLocation(glProgram, 'uPMatrix');
   glProgram.mvMatrixUniform = gl.getUniformLocation(glProgram, 'uMVMatrix');
-  glProgram.samplerUnifrom0 = gl.getUniformLocation(glProgram, 'uSampler0');
-  glProgram.samplerUnifrom1 = gl.getUniformLocation(glProgram, 'uSampler1');
+  glProgram.samplerUniform0 = gl.getUniformLocation(glProgram, 'uSampler0');
+  glProgram.samplerUniform1 = gl.getUniformLocation(glProgram, 'uSampler1');
   glProgram.normalMatrixUniform = gl.getUniformLocation(glProgram, "uNormalMatrix");
 }
 
@@ -341,14 +341,14 @@ function loadTexture() {
   textureImages[STONE_TEXTURE] = new Image();
   textureImages[STONE_TEXTURE].onload = () => {
     setupTexture(0);
-    gl.uniform1i(glProgram.samplerUnifrom0, 0);
+    gl.uniform1i(glProgram.samplerUniform0, 0);
   };
   textureImages[STONE_TEXTURE].src = 'data/img/stone-128px.jpg';
 
   textureImages[WEBGL_LOGO_TEXTURE] = new Image();
   textureImages[WEBGL_LOGO_TEXTURE].onload = () => {
     setupTexture(1);
-    gl.uniform1i(glProgram.samplerUnifrom1, 1);
+    gl.uniform1i(glProgram.samplerUniform1, 1);
   };
   textureImages[WEBGL_LOGO_TEXTURE].src = 'data/img/webgl_logo-512px.png';
 }

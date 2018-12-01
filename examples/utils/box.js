@@ -51,7 +51,7 @@ export default class Box {
       canvas: this.container,
       alpha: true,
     });
-    this.renderer.setClearColor(new THREE.Color(0xFFFFFFF, 0.0));
+    this.renderer.setClearColor(0xFFFFFFF, 0.2);
     this.renderer.setPixelRatio(this.ratio);
     this.renderer.shadowMapEnabled = true;
   }

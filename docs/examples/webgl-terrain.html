@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-62717870-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-62717870-1');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
+    <link rel="stylesheet" href="./resources/layout.css" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js"></script>
+<script src="resources/js/stats.js"></script>
+    <link rel="stylesheet" href="webgl-terrain.css">
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+    <title>WebGL terrain</title>
+  </head>
+  <body>
+
+    <header class="navbar" role="navigation">
+      <div class="container">
+        <div class="display-table pull-left" id="navbar-logo-container">
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
+        </div>
+        <!-- menu items that get hidden below 768px width -->
+        <nav class='collapse navbar-collapse navbar-responsive-collapse'>
+          <ul class="nav navbar-nav pull-right">
+            <li><a class="active" href="index.html">Examples</a></li>
+            <li><a href="../apidoc">API</a></li>
+            <li><a href="https://github.com/egaoneko/playground">Code</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container-fluid">
+
+      <div id="latest-check" class="alert alert-warning alert-dismissible" role="alert" style="display:none">
+        <button id="latest-dismiss" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        This example uses Playground v<span>0.0.1</span>. The <a id="latest-link" href="#" class="alert-link">latest</a> is v<span id="latest-version"></span>.
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <h4 id="title">WebGL terrain</h4>
+          <div id="container" class="main">
+  <canvas id="canvas"></canvas>
+</div>
+
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <p id="shortdesc">WebGL terrain.</p>
+          <div id="docs"><p>This page&#39;s try to WebGL terrain.</p>
+</div>
+          <p id="tags">Tags: webgl</p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div id="source-controls">
+          <a id="copy-button" data-clipboard-target="#example-source"><i class="fa fa-clipboard"></i> Copy</a>
+          <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
+        </div>
+        <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
+          <textarea class="hidden" name="title">WebGL terrain</textarea>
+          <textarea class="hidden" name="description">WebGL terrain.</textarea>
+          <textarea class="hidden" name="js">import { createGridMidPoint } from &#x27;./utils/webgl/mesh-utils&#x27;;
+
+var gl &#x3D; null;
+var canvas &#x3D; null;
+var container &#x3D; null;
+var glProgram &#x3D; null;
+var fragmentShader &#x3D; null;
+var vertexShader &#x3D; null;
+
+var vertexPositionAttribute &#x3D; null;
+var buffers &#x3D; {
+  trianglesVerticesBuffer: null,
+  vertexIndexBuffer: null,
+};
+
+var pMatrix &#x3D; mat4.create();
+var mvMatrix &#x3D; mat4.create();
+var normalMatrix &#x3D; mat3.create();
+
+var paused &#x3D; false;
+
+window.addEventListener(&#x27;load&#x27;, initWebGL);
+document.addEventListener(&#x27;keyup&#x27;, function (evt) {
+  switch (evt.keyCode) {
+    case 80: // &#x27;p&#x27;
+      paused &#x3D; !paused;
+      break;
+  }
+});
+
+function initWebGL() {
+  canvas &#x3D; document.querySelector(&#x27;#canvas&#x27;);
+  container &#x3D; document.querySelector(&#x27;#container&#x27;);
+  canvas.width &#x3D; container.clientWidth;
+  canvas.height &#x3D; container.clientHeight;
+
+  try {
+    gl &#x3D; canvas.getContext(&#x27;webgl&#x27;) || canvas.getContext(&#x27;experimental-webgl&#x27;);
+  } catch (e) {
+    console.error(e);
+  }
+
+  if (gl) {
+    initShaders();
+    createGridMidPoint(gl, buffers, 7.0, 7);
+    getMatrixUniforms();
+
+    vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &#x27;aVertexPosition&#x27;);
+    gl.enableVertexAttribArray(vertexPositionAttribute);
+
+    (function animLoop() {
+
+      if (!paused) {
+        setupWebGL();
+        setMatrixUniforms();
+        drawScene();
+      }
+
+      requestAnimationFrame(animLoop);
+    })();
+  }
+}
+
+function setupWebGL() {
+  // set the clear color to a shade of green
+  gl.clearColor(0.1, 0.1, 0.1, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  mat4.perspective(pMatrix, 45, canvas.width / canvas.height, 0.1, 100.0);
+  mat4.identity(mvMatrix);
+  mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -10.0]);
+  mat4.rotate(mvMatrix, mvMatrix, 30*2*Math.PI/180.0, [1.0, 0.0, 0.0]);
+  mat4.rotate(mvMatrix, mvMatrix, 60*2*Math.PI/180.0, [0.0, 1.0, 0.0]);
+  // mat4.rotate(mvMatrix, mvMatrix, 30*2*Math.PI/180.0, [0.0, 0.0, 1.0]);
+
+  var invertedMatrix &#x3D; mat3.create();
+  mat3.fromMat4(invertedMatrix, mvMatrix);
+  mat3.invert(normalMatrix, invertedMatrix);
+  mat3.transpose(normalMatrix, normalMatrix);
+}
+
+function initShaders() {
+  // get shader source
+  var vsSource &#x3D; vertexShaderSource();
+  var fsSource &#x3D; fragmentShaderSource();
+
+  // compile shaders
+  vertexShader &#x3D; makeShader(vsSource, gl.VERTEX_SHADER);
+  fragmentShader &#x3D; makeShader(fsSource, gl.FRAGMENT_SHADER);
+
+  // create program
+  glProgram &#x3D; gl.createProgram();
+
+  // attach and link shaders to the program
+  gl.attachShader(glProgram, vertexShader);
+  gl.attachShader(glProgram, fragmentShader);
+  gl.linkProgram(glProgram);
+
+  if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
+    alert(&#x27;Unable to initialize the shader program.&#x27;);
+  }
+
+  // use program
+  gl.useProgram(glProgram);
+}
+
+function makeShader(source, type) {
+  // compile the shader
+  var shader &#x3D; gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    alert((&quot;Error compiling shader: &quot; + (gl.getShaderInfoLog(shader))));
+  }
+
+  return shader;
+}
+
+function vertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    \n    varying highp vec3 position;\n    \n    void main(void) {\n      position &#x3D; aVertexPosition;\n      position.y *&#x3D; 1.2;\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(position, 1.0);\n    }\n  &quot;;
+}
+
+function fragmentShaderSource() {
+  return &quot;\n    varying highp vec3 position;\n    \n    void main(void) {\n      gl_FragColor &#x3D; vec4(position.y*.025, .1+position.y*.25, position.y*.025, 1.0);\n    }\n  &quot;;
+}
+
+function drawScene() {
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.trianglesVerticesBuffer);
+  gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.vertexIndexBuffer);
+  gl.drawElements(gl.TRIANGLE_STRIP, buffers.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+  //gl.drawElements(gl.POINTS, vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+}
+
+function getMatrixUniforms() {
+  glProgram.pMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uPMatrix&#x27;);
+  glProgram.mvMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uMVMatrix&#x27;);
+}
+
+function setMatrixUniforms() {
+  gl.uniformMatrix4fv(glProgram.pMatrixUniform, false, pMatrix);
+  gl.uniformMatrix4fv(glProgram.mvMatrixUniform, false, mvMatrix);
+}
+</textarea>
+          <textarea class="hidden" name="css">#container {
+  position: relative;
+  overflow: hidden;
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+}
+</textarea>
+          <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+  &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
+&lt;/div&gt;
+</textarea>
+          <input type="hidden" name="data">
+        </form>
+        <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;WebGL terrain&lt;/title&gt;
+    &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
+    &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
+    &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;http://www.3daysofprogramming.com/playground/examples/resources/js/stats.js&quot;&gt;&lt;/script&gt;
+    &lt;style&gt;
+      #container {
+        position: relative;
+        overflow: hidden;
+      }
+
+      #canvas {
+        width: 100%;
+        height: 100%;
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+      &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+      import { createGridMidPoint } from &#x27;./utils/webgl/mesh-utils&#x27;;
+
+      var gl &#x3D; null;
+      var canvas &#x3D; null;
+      var container &#x3D; null;
+      var glProgram &#x3D; null;
+      var fragmentShader &#x3D; null;
+      var vertexShader &#x3D; null;
+
+      var vertexPositionAttribute &#x3D; null;
+      var buffers &#x3D; {
+        trianglesVerticesBuffer: null,
+        vertexIndexBuffer: null,
+      };
+
+      var pMatrix &#x3D; mat4.create();
+      var mvMatrix &#x3D; mat4.create();
+      var normalMatrix &#x3D; mat3.create();
+
+      var paused &#x3D; false;
+
+      window.addEventListener(&#x27;load&#x27;, initWebGL);
+      document.addEventListener(&#x27;keyup&#x27;, function (evt) {
+        switch (evt.keyCode) {
+          case 80: // &#x27;p&#x27;
+            paused &#x3D; !paused;
+            break;
+        }
+      });
+
+      function initWebGL() {
+        canvas &#x3D; document.querySelector(&#x27;#canvas&#x27;);
+        container &#x3D; document.querySelector(&#x27;#container&#x27;);
+        canvas.width &#x3D; container.clientWidth;
+        canvas.height &#x3D; container.clientHeight;
+
+        try {
+          gl &#x3D; canvas.getContext(&#x27;webgl&#x27;) || canvas.getContext(&#x27;experimental-webgl&#x27;);
+        } catch (e) {
+          console.error(e);
+        }
+
+        if (gl) {
+          initShaders();
+          createGridMidPoint(gl, buffers, 7.0, 7);
+          getMatrixUniforms();
+
+          vertexPositionAttribute &#x3D; gl.getAttribLocation(glProgram, &#x27;aVertexPosition&#x27;);
+          gl.enableVertexAttribArray(vertexPositionAttribute);
+
+          (function animLoop() {
+
+            if (!paused) {
+              setupWebGL();
+              setMatrixUniforms();
+              drawScene();
+            }
+
+            requestAnimationFrame(animLoop);
+          })();
+        }
+      }
+
+      function setupWebGL() {
+        // set the clear color to a shade of green
+        gl.clearColor(0.1, 0.1, 0.1, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.enable(gl.DEPTH_TEST);
+
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        mat4.perspective(pMatrix, 45, canvas.width / canvas.height, 0.1, 100.0);
+        mat4.identity(mvMatrix);
+        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -10.0]);
+        mat4.rotate(mvMatrix, mvMatrix, 30*2*Math.PI/180.0, [1.0, 0.0, 0.0]);
+        mat4.rotate(mvMatrix, mvMatrix, 60*2*Math.PI/180.0, [0.0, 1.0, 0.0]);
+        // mat4.rotate(mvMatrix, mvMatrix, 30*2*Math.PI/180.0, [0.0, 0.0, 1.0]);
+
+        var invertedMatrix &#x3D; mat3.create();
+        mat3.fromMat4(invertedMatrix, mvMatrix);
+        mat3.invert(normalMatrix, invertedMatrix);
+        mat3.transpose(normalMatrix, normalMatrix);
+      }
+
+      function initShaders() {
+        // get shader source
+        var vsSource &#x3D; vertexShaderSource();
+        var fsSource &#x3D; fragmentShaderSource();
+
+        // compile shaders
+        vertexShader &#x3D; makeShader(vsSource, gl.VERTEX_SHADER);
+        fragmentShader &#x3D; makeShader(fsSource, gl.FRAGMENT_SHADER);
+
+        // create program
+        glProgram &#x3D; gl.createProgram();
+
+        // attach and link shaders to the program
+        gl.attachShader(glProgram, vertexShader);
+        gl.attachShader(glProgram, fragmentShader);
+        gl.linkProgram(glProgram);
+
+        if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
+          alert(&#x27;Unable to initialize the shader program.&#x27;);
+        }
+
+        // use program
+        gl.useProgram(glProgram);
+      }
+
+      function makeShader(source, type) {
+        // compile the shader
+        var shader &#x3D; gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          alert((&quot;Error compiling shader: &quot; + (gl.getShaderInfoLog(shader))));
+        }
+
+        return shader;
+      }
+
+      function vertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n\n    uniform mat4 uPMatrix;    \n    uniform mat4 uMVMatrix;\n    \n    varying highp vec3 position;\n    \n    void main(void) {\n      position &#x3D; aVertexPosition;\n      position.y *&#x3D; 1.2;\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(position, 1.0);\n    }\n  &quot;;
+      }
+
+      function fragmentShaderSource() {
+        return &quot;\n    varying highp vec3 position;\n    \n    void main(void) {\n      gl_FragColor &#x3D; vec4(position.y*.025, .1+position.y*.25, position.y*.025, 1.0);\n    }\n  &quot;;
+      }
+
+      function drawScene() {
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.trianglesVerticesBuffer);
+        gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.vertexIndexBuffer);
+        gl.drawElements(gl.TRIANGLE_STRIP, buffers.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+        //gl.drawElements(gl.POINTS, vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+
+      function getMatrixUniforms() {
+        glProgram.pMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uPMatrix&#x27;);
+        glProgram.mvMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uMVMatrix&#x27;);
+      }
+
+      function setMatrixUniforms() {
+        gl.uniformMatrix4fv(glProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(glProgram.mvMatrixUniform, false, mvMatrix);
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      </div>
+    </div>
+
+    <script src="./resources/common.js"></script>
+    <script src="./resources/prism/prism.min.js"></script>
+    <script src="common.js"></script><script src="webgl-terrain.js"></script>
+  </body>
+</html>

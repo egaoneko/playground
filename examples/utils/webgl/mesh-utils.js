@@ -218,6 +218,163 @@ export function setupSphereMesh(gl, buffers, n, options) {
   vertexIndexBuffers[n].numItems = indexData.length;
 }
 
+export function createGrid(gl, buffers, size = 1.0, divisions = 10) {
+  const segment_size = size / divisions;
+  const vertexPositionData = [];
+
+  for (let i = 0; i <= divisions; ++i) {
+    for (let j = 0; j <= divisions; ++j) {
+      vertexPositionData.push(i * segment_size);
+      vertexPositionData.push(0.0);
+      vertexPositionData.push(j * segment_size);
+    }
+  }
+
+  const indexData = [0];
+
+  for (let row = 0; row < divisions; ++row) {
+    if (row % 2 === 0) {
+      for (let i = 0; i <= divisions; ++i) {
+        if (i !== 0) {
+          indexData.push(row * (divisions + 1) + i);
+        }
+        indexData.push((row + 1) * (divisions + 1) + i);
+      }
+    } else {
+      for (let i = 0; i <= divisions; ++i) {
+        if (i !== 0) {
+          indexData.push((row + 1) * (divisions + 1) - (i + 1));
+        }
+        indexData.push((row + 2) * (divisions + 1) - (i + 1));
+      }
+    }
+  }
+
+  //indexData = [0,4,1,5,2,6,3,7,11,6,10,5,9,4,8,12,9,13,10,14,11,15];
+  buffers.trianglesVerticesBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.trianglesVerticesBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+  buffers.trianglesVerticesBuffer.itemSize = 3;
+  buffers.trianglesVerticesBuffer.numItems = vertexPositionData.length / 3;
+  buffers.vertexIndexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.vertexIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STREAM_DRAW);
+  buffers.vertexIndexBuffer.itemSize = 3;
+  buffers.vertexIndexBuffer.numItems = indexData.length;
+}
+
+export function createGridMidPoint(gl, buffers, size = 1.0, power = 3) {
+  const divisions = Math.pow(2.0, power);
+  const segmentSize = size / divisions;
+  const vertexPositionData = [];
+
+  for (let i = 0; i <= divisions; ++i) {
+    for (let j = 0; j <= divisions; ++j) {
+      vertexPositionData.push(i * segmentSize - 0.5 * size);
+      vertexPositionData.push(0.0);
+      vertexPositionData.push(j * segmentSize - 0.5 * size);
+    }
+  }
+
+  //seed the corners
+  vertexPositionData[(0 + 0 * (divisions + 1)) * 3 + 1] = 1.5;
+  vertexPositionData[(divisions + 0 * (divisions + 1)) * 3 + 1] = 3.5;
+  vertexPositionData[(0 + divisions * (divisions + 1)) * 3 + 1] = 2.0;
+  vertexPositionData[(divisions + divisions * (divisions + 1)) * 3 + 1] = 1.0;
+  midpointDisplacement(
+    vertexPositionData,
+    [0, 0],
+    [divisions, 0],
+    [0, divisions],
+    [divisions, divisions],
+    divisions, 0
+  );
+
+  let indexData = [0];
+  for (let row = 0; row < divisions; ++row) {
+    if (row % 2 === 0) {
+      for (let i = 0; i <= divisions; ++i) {
+        if (i !== 0) {
+          indexData.push(i + row * (divisions + 1));
+        }
+        indexData.push(i + (row + 1) * (divisions + 1));
+      }
+    } else {
+      for (let i = 0; i <= divisions; ++i) {
+        if (i !== 0) {
+          indexData.push(-(i + 1) + (row + 1) * (divisions + 1));
+        }
+        indexData.push(-(i + 1) + (row + 2) * (divisions + 1));
+      }
+    }
+  }
+
+  buffers.trianglesVerticesBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.trianglesVerticesBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+  buffers.trianglesVerticesBuffer.itemSize = 3;
+  buffers.trianglesVerticesBuffer.numItems = vertexPositionData.length / 3;
+  buffers.vertexIndexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.vertexIndexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indexData), gl.STREAM_DRAW);
+  buffers.vertexIndexBuffer.itemSize = 3;
+  buffers.vertexIndexBuffer.numItems = indexData.length;
+}
+
+function midpointDisplacement(vertexPositionData, tl, tr, bl, br, divisions, iteration) {
+  if ((tl[0] + 1) === br[0] || (tl[1] + 1) === br[1]) {
+    return;
+  }
+
+  //array indices
+  const midpoint = [
+    (tl[0] + br[0]) / 2,
+    (tl[1] + br[1]) / 2
+  ];
+
+  const leftMp = [
+    tl[0],
+    (tl[1] + bl[1]) / 2
+  ];
+  const rightMp = [
+    tr[0],
+    (tr[1] + br[1]) / 2
+  ];
+  const topMp = [
+    (tl[0] + tr[0]) / 2,
+    tl[1]
+  ];
+  const bottomMp = [
+    (bl[0] + br[0]) / 2,
+    bl[1]
+  ];
+
+  //current height values
+  const tlHeight = vertexPositionData[(tl[0] + tl[1] * (divisions + 1)) * 3 + 1];
+  const trHeight = vertexPositionData[(tr[0] + tr[1] * (divisions + 1)) * 3 + 1];
+  const blHeight = vertexPositionData[(bl[0] + bl[1] * (divisions + 1)) * 3 + 1];
+  const brHeight = vertexPositionData[(br[0] + br[1] * (divisions + 1)) * 3 + 1];
+
+  //computer five new points
+  const topValue = (tlHeight + trHeight) / 2.0;
+  vertexPositionData[(topMp[0] + topMp[1] * (divisions + 1)) * 3 + 1] = topValue;
+  const bottomValue = (blHeight + brHeight) / 2.0;
+  vertexPositionData[(bottomMp[0] + bottomMp[1] * (divisions + 1)) * 3 + 1] = bottomValue;
+
+  const leftValue = (tlHeight + blHeight) / 2.0;
+  vertexPositionData[(leftMp[0] + leftMp[1] * (divisions + 1)) * 3 + 1] = leftValue;
+  const rightValue = (trHeight + brHeight) / 2.0;
+  vertexPositionData[(rightMp[0] + rightMp[1] * (divisions + 1)) * 3 + 1] = rightValue;
+  //midpoint has random term
+  vertexPositionData[(midpoint[0] + midpoint[1] * (divisions + 1)) * 3 + 1] = (tlHeight + trHeight + blHeight + brHeight) / 4.0
+    + (-0.5 + Math.random()) * Math.pow(0.65, iteration - 2.0);
+  //repeat with four quads
+  midpointDisplacement(vertexPositionData, tl, topMp, leftMp, midpoint, divisions, iteration + 1);
+  midpointDisplacement(vertexPositionData, topMp, tr, midpoint, rightMp, divisions, iteration + 1);
+  midpointDisplacement(vertexPositionData, leftMp, midpoint, bl, bottomMp, divisions, iteration + 1);
+  midpointDisplacement(vertexPositionData, midpoint, rightMp, bottomMp, br, divisions, iteration + 1);
+}
+
 function calculateFlattenedVertices(origVertices, indices) {
   const vertices = [];
   for (let i = 0; i < indices.length; ++i) {

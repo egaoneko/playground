@@ -345,8 +345,8 @@ function drawScene() {
 function getMatrixUniforms() {
   glProgram.pMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uPMatrix&#x27;);
   glProgram.mvMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uMVMatrix&#x27;);
-  glProgram.samplerUnifrom0 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler0&#x27;);
-  glProgram.samplerUnifrom1 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler1&#x27;);
+  glProgram.samplerUniform0 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler0&#x27;);
+  glProgram.samplerUniform1 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler1&#x27;);
   glProgram.normalMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &quot;uNormalMatrix&quot;);
 }
 
@@ -360,14 +360,14 @@ function loadTexture() {
   textureImages[STONE_TEXTURE] &#x3D; new Image();
   textureImages[STONE_TEXTURE].onload &#x3D; function () {
     setupTexture(0);
-    gl.uniform1i(glProgram.samplerUnifrom0, 0);
+    gl.uniform1i(glProgram.samplerUniform0, 0);
   };
   textureImages[STONE_TEXTURE].src &#x3D; &#x27;data/img/stone-128px.jpg&#x27;;
 
   textureImages[WEBGL_LOGO_TEXTURE] &#x3D; new Image();
   textureImages[WEBGL_LOGO_TEXTURE].onload &#x3D; function () {
     setupTexture(1);
-    gl.uniform1i(glProgram.samplerUnifrom1, 1);
+    gl.uniform1i(glProgram.samplerUniform1, 1);
   };
   textureImages[WEBGL_LOGO_TEXTURE].src &#x3D; &#x27;data/img/webgl_logo-512px.png&#x27;;
 }
@@ -704,8 +704,8 @@ function setupTexture(i) {
       function getMatrixUniforms() {
         glProgram.pMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uPMatrix&#x27;);
         glProgram.mvMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &#x27;uMVMatrix&#x27;);
-        glProgram.samplerUnifrom0 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler0&#x27;);
-        glProgram.samplerUnifrom1 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler1&#x27;);
+        glProgram.samplerUniform0 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler0&#x27;);
+        glProgram.samplerUniform1 &#x3D; gl.getUniformLocation(glProgram, &#x27;uSampler1&#x27;);
         glProgram.normalMatrixUniform &#x3D; gl.getUniformLocation(glProgram, &quot;uNormalMatrix&quot;);
       }
 
@@ -719,14 +719,14 @@ function setupTexture(i) {
         textureImages[STONE_TEXTURE] &#x3D; new Image();
         textureImages[STONE_TEXTURE].onload &#x3D; function () {
           setupTexture(0);
-          gl.uniform1i(glProgram.samplerUnifrom0, 0);
+          gl.uniform1i(glProgram.samplerUniform0, 0);
         };
         textureImages[STONE_TEXTURE].src &#x3D; &#x27;data/img/stone-128px.jpg&#x27;;
 
         textureImages[WEBGL_LOGO_TEXTURE] &#x3D; new Image();
         textureImages[WEBGL_LOGO_TEXTURE].onload &#x3D; function () {
           setupTexture(1);
-          gl.uniform1i(glProgram.samplerUnifrom1, 1);
+          gl.uniform1i(glProgram.samplerUniform1, 1);
         };
         textureImages[WEBGL_LOGO_TEXTURE].src &#x3D; &#x27;data/img/webgl_logo-512px.png&#x27;;
       }

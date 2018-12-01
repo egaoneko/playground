@@ -1,0 +1,20 @@
+---
+layout: example.html
+title: WebGL particle system
+shortdesc: WebGL particle system.
+docs: >
+  This page's try to WebGL particle system.
+
+tags: "webgl"
+resources:
+  - https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js
+  - resources/js/stats.js
+---
+<div id="container" class="main">
+  <canvas id="canvas"></canvas>
+</div>
+
+<div>
+  <input type="range" id="volume" min="1000" max="1000000" value="1000" step="1000">
+  <label for="volume" id="volume_label">Volume</label>
+</div>
