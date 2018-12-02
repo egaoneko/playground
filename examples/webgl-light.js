@@ -1,4 +1,7 @@
-import {setupPlaneMesh, setupSphereMesh} from "./utils/webgl/mesh-utils";
+import {
+  setupPlaneMesh,
+  setupSphereMesh
+} from "./utils/webgl/mesh-utils";
 
 let gl = null;
 let canvas = null;
@@ -55,7 +58,19 @@ const SHADER = {
   fog_spotlight: {
     vertexShader: fogSpotlightVertexShaderSource(),
     fragmentShader: fogSpotlightFragmentShaderSource()
-  }
+  },
+  cartoon: {
+    vertexShader: cartoonVertexShaderSource(),
+    fragmentShader: cartoonFragmentShaderSource()
+  },
+  gooch_vs: {
+    vertexShader: goochVsVertexShaderSource(),
+    fragmentShader: goochVsFragmentShaderSource()
+  },
+  gooch_fs: {
+    vertexShader: goochFsVertexShaderSource(),
+    fragmentShader: goochFsFragmentShaderSource()
+  },
 };
 
 const radios = document.querySelectorAll('input[type=radio][name="light"]');
@@ -76,7 +91,7 @@ function changeHandler() {
   createProgram(this.value);
 }
 
-Array.prototype.forEach.call(radios, function(radio) {
+Array.prototype.forEach.call(radios, function (radio) {
   radio.addEventListener('change', changeHandler);
 });
 
@@ -872,6 +887,198 @@ function fogSpotlightFragmentShaderSource() {
       
       gl_FragColor = mix(fogColor, materialColor, fogFactor); 
     } 
+  `;
+}
+
+function cartoonVertexShaderSource() {
+  return `
+    attribute vec3 aVertexPosition;
+    attribute vec3 aVertexColor;
+    attribute vec3 aVertexNormal;
+
+    uniform mat3 uNormalMatrix;
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec3 vColor;
+    varying float diffuseLambert;
+    varying float specular;
+    
+    void main(void) {
+      gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+      vColor = aVertexColor;
+
+      vec3 pointLightPosition = vec3(1.0,2.0,-1.0);
+      vec3 pointLightDirection = vec3(pointLightPosition.xyz - aVertexPosition.xyz);
+        
+      vec3 L = vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));
+      vec3 N = normalize(uNormalMatrix * aVertexNormal);         
+      vec3 V = -vec3(uPMatrix * uMVMatrix * vec4(aVertexPosition,1.0));
+
+      L = normalize(L);
+      V = normalize(V);
+        
+      vec3 R = reflect(-L, N);
+      float shininess = 128.0;
+        
+      specular = pow(max(0.0,dot(R, V)), shininess);
+      diffuseLambert = dot(L, N);
+    }
+  `;
+}
+
+function cartoonFragmentShaderSource() {
+  return ` 
+    varying highp vec3 vColor;
+    varying highp float diffuseLambert;
+    
+    void main(void) {
+      highp vec4 color = vec4( vColor * .1, 1.0);
+      
+      if (diffuseLambert > 0.9) {
+        color = vec4(vColor * .8, 1.0);
+      } else if (diffuseLambert > 0.6) {
+        color = vec4(vColor * .5, 1.0);
+      } else if (diffuseLambert > 0.3){
+        color = vec4(vColor * .3, 1.0);
+      }
+      
+      gl_FragColor = color;
+      // gl_FragColor = vec4(vColor * floor(diffuseLambert*10.0)*.1, 1.0);         
+    }
+  `;
+}
+
+function goochVsVertexShaderSource() {
+  return `
+    attribute vec3 aVertexPosition;
+    attribute vec3 aVertexColor;
+    attribute vec3 aVertexNormal;
+    
+    uniform mat3 uNormalMatrix;
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    
+    varying vec3 vColor;
+    varying float diffuseLambert;
+    varying float specular;
+    
+    void main(void) {
+      gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+      vColor = aVertexColor;
+      
+      vec3 pointLightPosition = vec3(1.0,2.0,-1.0);
+      vec3 pointLightDirection = vec3(pointLightPosition.xyz - aVertexPosition.xyz);
+      
+      vec3 L = vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));
+      vec3 N = normalize(uNormalMatrix * aVertexNormal);         
+      vec3 V = -vec3(uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0));
+      
+      L = normalize(L);
+      V = normalize(V);
+      
+      vec3 R = reflect(-L, N);
+      float shininess = 128.0;
+      
+      specular = pow(max(0.0,dot(R, V)), shininess);
+      diffuseLambert = dot(L, N);
+    }
+  `;
+}
+
+function goochVsFragmentShaderSource() {
+  return ` 
+    varying highp vec3 vColor;
+    varying highp float diffuseLambert;
+    varying highp float specular;
+    
+    void main(void) {
+      //below is modified from http://3dshaders.com/shaders/CH15-Gooch.frag.txt
+      highp vec3  SurfaceColor = vec3(0.75, 0.75, 0.75);
+      highp vec3  WarmColor = vec3(0.6, 0.6, 0.0);
+      highp vec3  CoolColor = vec3(0.0, 0.0, 0.6);
+      highp float DiffuseWarm = 0.45;
+      highp float DiffuseCool = 0.45;
+      
+      highp vec3 kcool = min(CoolColor + DiffuseCool * SurfaceColor, 1.0);
+      highp vec3 kwarm = min(WarmColor + DiffuseWarm * SurfaceColor, 1.0); 
+      highp vec3 kfinal = mix(kcool, kwarm, diffuseLambert);
+      
+      gl_FragColor = vec4(min(kfinal + specular, 1.0), 1.0);
+    }
+  `;
+}
+
+function goochFsVertexShaderSource() {
+  return `
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    
+    attribute vec3 aVertexPosition;
+    attribute vec4 aVertexColor;
+    attribute vec3 aVertexNormal;
+    
+    varying highp vec4 vColor;
+    varying highp vec3 vPosition;
+    varying highp vec3 N;
+
+    void main(void) {
+      gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+      
+      vColor = aVertexColor;
+      vPosition = aVertexPosition;
+      N = aVertexNormal;         
+    }
+  `;
+}
+
+function goochFsFragmentShaderSource() {
+  return ` 
+    uniform highp mat3 uNormalMatrix;
+    uniform highp mat4 uMVMatrix;
+    uniform highp mat4 uPMatrix;
+    
+    varying highp vec4 vColor;
+    varying highp vec3 vPosition;
+    varying highp vec3 N;
+    
+    void main(void) {        
+      highp vec3 pointLightPosition = vec3(1.0,2.0,1.0);
+      
+      highp vec3 pointLightDirection = vec3(pointLightPosition.xyz - vPosition.xyz);
+      
+      highp mat4 mvp = uPMatrix * uMVMatrix;
+      
+      highp vec3 L = vec3(mvp * vec4(pointLightDirection, 1.0));
+      highp vec3 V = -vec3(mvp * vec4(vPosition,1.0));
+      
+      highp vec3 l = normalize(L);
+      highp vec3 n = normalize(uNormalMatrix * N);
+      highp vec3 v = normalize(V);
+      
+      highp vec3 R = reflect(l, n);
+      
+      highp float diffuseLambert = dot(l,n);
+      highp float Roughness = 1.0;
+      highp vec3 DiffuseLightIntensity = vec3(0.9, 0.9, 0.9);
+      highp float SpecularIntensity = 0.5;
+      highp float shininess = 128.0;
+      
+      highp float specular = pow( max(0.0,dot(R,v)), shininess);
+    
+      //below is modified from http://3dshaders.com/shaders/CH15-Gooch.frag.txt
+      highp vec3  SurfaceColor = vec3(0.75, 0.75, 0.75);
+      highp vec3  WarmColor = vec3(0.6, 0.6, 0.0);
+      highp vec3  CoolColor = vec3(0.0, 0.0, 0.6);
+      highp float DiffuseWarm = 0.45;
+      highp float DiffuseCool = 0.45;
+      
+      highp vec3 kcool = min(CoolColor + DiffuseCool * SurfaceColor, 1.0);
+      highp vec3 kwarm = min(WarmColor + DiffuseWarm * SurfaceColor, 1.0); 
+      highp vec3 kfinal = mix(kcool, kwarm, diffuseLambert);
+      
+      gl_FragColor = vec4(min(kfinal + specular, 1.0), 1.0);
+    }
   `;
 }
 

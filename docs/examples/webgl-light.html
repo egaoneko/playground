@@ -77,6 +77,15 @@
 
   <input type="radio" id="light8" name="light" value="fog_spotlight">
   <label for="light8">FOG SPOTLIGHT</label>
+
+  <input type="radio" id="light9" name="light" value="cartoon">
+  <label for="light9">CARTOON</label>
+
+  <input type="radio" id="light10" name="light" value="gooch_vs">
+  <label for="light10">GOOCH VS</label>
+
+  <input type="radio" id="light11" name="light" value="gooch_fs">
+  <label for="light11">GOOCH FS</label>
 </div>
 
         </div>
@@ -99,7 +108,10 @@
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
           <textarea class="hidden" name="title">WebGL light</textarea>
           <textarea class="hidden" name="description">WebGL light.</textarea>
-          <textarea class="hidden" name="js">import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
+          <textarea class="hidden" name="js">import {
+  setupPlaneMesh,
+  setupSphereMesh
+} from &quot;./utils/webgl/mesh-utils&quot;;
 
 var gl &#x3D; null;
 var canvas &#x3D; null;
@@ -156,7 +168,19 @@ var SHADER &#x3D; {
   fog_spotlight: {
     vertexShader: fogSpotlightVertexShaderSource(),
     fragmentShader: fogSpotlightFragmentShaderSource()
-  }
+  },
+  cartoon: {
+    vertexShader: cartoonVertexShaderSource(),
+    fragmentShader: cartoonFragmentShaderSource()
+  },
+  gooch_vs: {
+    vertexShader: goochVsVertexShaderSource(),
+    fragmentShader: goochVsFragmentShaderSource()
+  },
+  gooch_fs: {
+    vertexShader: goochFsVertexShaderSource(),
+    fragmentShader: goochFsFragmentShaderSource()
+  },
 };
 
 var radios &#x3D; document.querySelectorAll(&#x27;input[type&#x3D;radio][name&#x3D;&quot;light&quot;]&#x27;);
@@ -177,7 +201,7 @@ function changeHandler() {
   createProgram(this.value);
 }
 
-Array.prototype.forEach.call(radios, function(radio) {
+Array.prototype.forEach.call(radios, function (radio) {
   radio.addEventListener(&#x27;change&#x27;, changeHandler);
 });
 
@@ -486,6 +510,30 @@ function fogSpotlightFragmentShaderSource() {
   return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    varying highp float fogZ;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      highp float d &#x3D; length(pointLightDirection);\n      highp float attenuation &#x3D; 1.0/(.01 + .01*d + .02*d*d);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      \n      // spotlight\n      highp float spotCosCutoff &#x3D; 0.6;\n      highp float spotExponent &#x3D; 2.0;\n      highp vec3 spotDirection &#x3D; vec3(0.5, 0.5, 0.5);\n      highp float spotEffect &#x3D; dot(normalize(spotDirection), l);\n      \n      // calculate fog\n      highp float fogDensity &#x3D; 0.075;\n      highp vec4 fogColor &#x3D; vec4(0.1, 0.2, 0.1, 0.6);\n      \n      highp float fogFactor &#x3D; exp(-fogDensity * fogDensity * fogZ * fogZ);\n      fogFactor &#x3D; clamp(fogFactor, 0.0, 1.0);\n      \n      highp vec4 materialColor &#x3D; vec4(0.0, 0.0, 0.0, 1.0);\n      \n      if (diffuseLambert &gt; 0.0) {\n        if(spotEffect &gt; spotCosCutoff) {\n          highp float Roughness &#x3D; 1.0;\n          highp float AmbientIntensity &#x3D; 0.3;\n          highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n          highp float SpecularIntensity &#x3D; 0.5;\n          highp float shininess &#x3D; 32.0;\n\n          highp float specular &#x3D; pow( max(0.0,dot(R,v)), shininess);\n\n          highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1) * attenuation;\n          highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz * attenuation;\n          highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0) * attenuation;\n    \n          materialColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n            diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n            SpecularColour * specular*SpecularIntensity, 1.0);\n        } \n      }\n      \n      gl_FragColor &#x3D; mix(fogColor, materialColor, fogFactor); \n    } \n  &quot;;
 }
 
+function cartoonVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform mat3 uNormalMatrix;\n    uniform mat4 uMVMatrix;\n    uniform mat4 uPMatrix;\n\n    varying vec3 vColor;\n    varying float diffuseLambert;\n    varying float specular;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      vColor &#x3D; aVertexColor;\n\n      vec3 pointLightPosition &#x3D; vec3(1.0,2.0,-1.0);\n      vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - aVertexPosition.xyz);\n        \n      vec3 L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      vec3 N &#x3D; normalize(uNormalMatrix * aVertexNormal);         \n      vec3 V &#x3D; -vec3(uPMatrix * uMVMatrix * vec4(aVertexPosition,1.0));\n\n      L &#x3D; normalize(L);\n      V &#x3D; normalize(V);\n        \n      vec3 R &#x3D; reflect(-L, N);\n      float shininess &#x3D; 128.0;\n        \n      specular &#x3D; pow(max(0.0,dot(R, V)), shininess);\n      diffuseLambert &#x3D; dot(L, N);\n    }\n  &quot;;
+}
+
+function cartoonFragmentShaderSource() {
+  return &quot; \n    varying highp vec3 vColor;\n    varying highp float diffuseLambert;\n    \n    void main(void) {\n      highp vec4 color &#x3D; vec4( vColor * .1, 1.0);\n      \n      if (diffuseLambert &gt; 0.9) {\n        color &#x3D; vec4(vColor * .8, 1.0);\n      } else if (diffuseLambert &gt; 0.6) {\n        color &#x3D; vec4(vColor * .5, 1.0);\n      } else if (diffuseLambert &gt; 0.3){\n        color &#x3D; vec4(vColor * .3, 1.0);\n      }\n      \n      gl_FragColor &#x3D; color;\n      // gl_FragColor &#x3D; vec4(vColor * floor(diffuseLambert*10.0)*.1, 1.0);         \n    }\n  &quot;;
+}
+
+function goochVsVertexShaderSource() {
+  return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n    \n    uniform mat3 uNormalMatrix;\n    uniform mat4 uMVMatrix;\n    uniform mat4 uPMatrix;\n    \n    varying vec3 vColor;\n    varying float diffuseLambert;\n    varying float specular;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      vColor &#x3D; aVertexColor;\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0,2.0,-1.0);\n      vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - aVertexPosition.xyz);\n      \n      vec3 L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      vec3 N &#x3D; normalize(uNormalMatrix * aVertexNormal);         \n      vec3 V &#x3D; -vec3(uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0));\n      \n      L &#x3D; normalize(L);\n      V &#x3D; normalize(V);\n      \n      vec3 R &#x3D; reflect(-L, N);\n      float shininess &#x3D; 128.0;\n      \n      specular &#x3D; pow(max(0.0,dot(R, V)), shininess);\n      diffuseLambert &#x3D; dot(L, N);\n    }\n  &quot;;
+}
+
+function goochVsFragmentShaderSource() {
+  return &quot; \n    varying highp vec3 vColor;\n    varying highp float diffuseLambert;\n    varying highp float specular;\n    \n    void main(void) {\n      //below is modified from http://3dshaders.com/shaders/CH15-Gooch.frag.txt\n      highp vec3  SurfaceColor &#x3D; vec3(0.75, 0.75, 0.75);\n      highp vec3  WarmColor &#x3D; vec3(0.6, 0.6, 0.0);\n      highp vec3  CoolColor &#x3D; vec3(0.0, 0.0, 0.6);\n      highp float DiffuseWarm &#x3D; 0.45;\n      highp float DiffuseCool &#x3D; 0.45;\n      \n      highp vec3 kcool &#x3D; min(CoolColor + DiffuseCool * SurfaceColor, 1.0);\n      highp vec3 kwarm &#x3D; min(WarmColor + DiffuseWarm * SurfaceColor, 1.0); \n      highp vec3 kfinal &#x3D; mix(kcool, kwarm, diffuseLambert);\n      \n      gl_FragColor &#x3D; vec4(min(kfinal + specular, 1.0), 1.0);\n    }\n  &quot;;
+}
+
+function goochFsVertexShaderSource() {
+  return &quot;\n    uniform mat4 uMVMatrix;\n    uniform mat4 uPMatrix;\n    \n    attribute vec3 aVertexPosition;\n    attribute vec4 aVertexColor;\n    attribute vec3 aVertexNormal;\n    \n    varying highp vec4 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n\n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;         \n    }\n  &quot;;
+}
+
+function goochFsFragmentShaderSource() {
+  return &quot; \n    uniform highp mat3 uNormalMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat4 uPMatrix;\n    \n    varying highp vec4 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {        \n      highp vec3 pointLightPosition &#x3D; vec3(1.0,2.0,1.0);\n      \n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n      \n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n      \n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n      \n      highp float diffuseLambert &#x3D; dot(l,n);\n      highp float Roughness &#x3D; 1.0;\n      highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n      highp float SpecularIntensity &#x3D; 0.5;\n      highp float shininess &#x3D; 128.0;\n      \n      highp float specular &#x3D; pow( max(0.0,dot(R,v)), shininess);\n    \n      //below is modified from http://3dshaders.com/shaders/CH15-Gooch.frag.txt\n      highp vec3  SurfaceColor &#x3D; vec3(0.75, 0.75, 0.75);\n      highp vec3  WarmColor &#x3D; vec3(0.6, 0.6, 0.0);\n      highp vec3  CoolColor &#x3D; vec3(0.0, 0.0, 0.6);\n      highp float DiffuseWarm &#x3D; 0.45;\n      highp float DiffuseCool &#x3D; 0.45;\n      \n      highp vec3 kcool &#x3D; min(CoolColor + DiffuseCool * SurfaceColor, 1.0);\n      highp vec3 kwarm &#x3D; min(WarmColor + DiffuseWarm * SurfaceColor, 1.0); \n      highp vec3 kfinal &#x3D; mix(kcool, kwarm, diffuseLambert);\n      \n      gl_FragColor &#x3D; vec4(min(kfinal + specular, 1.0), 1.0);\n    }\n  &quot;;
+}
+
 </textarea>
           <textarea class="hidden" name="css">#container {
   position: relative;
@@ -524,6 +572,15 @@ function fogSpotlightFragmentShaderSource() {
 
   &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light8&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;fog_spotlight&quot;&gt;
   &lt;label for&#x3D;&quot;light8&quot;&gt;FOG SPOTLIGHT&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light9&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;cartoon&quot;&gt;
+  &lt;label for&#x3D;&quot;light9&quot;&gt;CARTOON&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light10&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;gooch_vs&quot;&gt;
+  &lt;label for&#x3D;&quot;light10&quot;&gt;GOOCH VS&lt;/label&gt;
+
+  &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light11&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;gooch_fs&quot;&gt;
+  &lt;label for&#x3D;&quot;light11&quot;&gt;GOOCH FS&lt;/label&gt;
 &lt;/div&gt;
 </textarea>
           <input type="hidden" name="data">
@@ -577,9 +634,21 @@ function fogSpotlightFragmentShaderSource() {
 
       &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light8&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;fog_spotlight&quot;&gt;
       &lt;label for&#x3D;&quot;light8&quot;&gt;FOG SPOTLIGHT&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light9&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;cartoon&quot;&gt;
+      &lt;label for&#x3D;&quot;light9&quot;&gt;CARTOON&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light10&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;gooch_vs&quot;&gt;
+      &lt;label for&#x3D;&quot;light10&quot;&gt;GOOCH VS&lt;/label&gt;
+
+      &lt;input type&#x3D;&quot;radio&quot; id&#x3D;&quot;light11&quot; name&#x3D;&quot;light&quot; value&#x3D;&quot;gooch_fs&quot;&gt;
+      &lt;label for&#x3D;&quot;light11&quot;&gt;GOOCH FS&lt;/label&gt;
     &lt;/div&gt;
     &lt;script&gt;
-      import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
+      import {
+        setupPlaneMesh,
+        setupSphereMesh
+      } from &quot;./utils/webgl/mesh-utils&quot;;
 
       var gl &#x3D; null;
       var canvas &#x3D; null;
@@ -636,7 +705,19 @@ function fogSpotlightFragmentShaderSource() {
         fog_spotlight: {
           vertexShader: fogSpotlightVertexShaderSource(),
           fragmentShader: fogSpotlightFragmentShaderSource()
-        }
+        },
+        cartoon: {
+          vertexShader: cartoonVertexShaderSource(),
+          fragmentShader: cartoonFragmentShaderSource()
+        },
+        gooch_vs: {
+          vertexShader: goochVsVertexShaderSource(),
+          fragmentShader: goochVsFragmentShaderSource()
+        },
+        gooch_fs: {
+          vertexShader: goochFsVertexShaderSource(),
+          fragmentShader: goochFsFragmentShaderSource()
+        },
       };
 
       var radios &#x3D; document.querySelectorAll(&#x27;input[type&#x3D;radio][name&#x3D;&quot;light&quot;]&#x27;);
@@ -657,7 +738,7 @@ function fogSpotlightFragmentShaderSource() {
         createProgram(this.value);
       }
 
-      Array.prototype.forEach.call(radios, function(radio) {
+      Array.prototype.forEach.call(radios, function (radio) {
         radio.addEventListener(&#x27;change&#x27;, changeHandler);
       });
 
@@ -964,6 +1045,30 @@ function fogSpotlightFragmentShaderSource() {
 
       function fogSpotlightFragmentShaderSource() {
         return &quot; \n    uniform highp mat4 uPMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat3 uNormalMatrix;\n\n    varying highp vec3 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    varying highp float fogZ;\n\n    void main(void) {\n      highp vec3 pointLightPosition &#x3D; vec3(5.0, 1.0, 5.0);\n\n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      highp float d &#x3D; length(pointLightDirection);\n      highp float attenuation &#x3D; 1.0/(.01 + .01*d + .02*d*d);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n\n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n\n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n\n      highp float diffuseLambert &#x3D; dot(l,n);\n      \n      // spotlight\n      highp float spotCosCutoff &#x3D; 0.6;\n      highp float spotExponent &#x3D; 2.0;\n      highp vec3 spotDirection &#x3D; vec3(0.5, 0.5, 0.5);\n      highp float spotEffect &#x3D; dot(normalize(spotDirection), l);\n      \n      // calculate fog\n      highp float fogDensity &#x3D; 0.075;\n      highp vec4 fogColor &#x3D; vec4(0.1, 0.2, 0.1, 0.6);\n      \n      highp float fogFactor &#x3D; exp(-fogDensity * fogDensity * fogZ * fogZ);\n      fogFactor &#x3D; clamp(fogFactor, 0.0, 1.0);\n      \n      highp vec4 materialColor &#x3D; vec4(0.0, 0.0, 0.0, 1.0);\n      \n      if (diffuseLambert &gt; 0.0) {\n        if(spotEffect &gt; spotCosCutoff) {\n          highp float Roughness &#x3D; 1.0;\n          highp float AmbientIntensity &#x3D; 0.3;\n          highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n          highp float SpecularIntensity &#x3D; 0.5;\n          highp float shininess &#x3D; 32.0;\n\n          highp float specular &#x3D; pow( max(0.0,dot(R,v)), shininess);\n\n          highp vec3 AmbientColour &#x3D; vec3(0.1, 0.1, 0.1) * attenuation;\n          highp vec3 DiffuseMaterialColour &#x3D; vColor.xyz * attenuation;\n          highp vec3 SpecularColour &#x3D; vec3(1.0, 1.0, 1.0) * attenuation;\n    \n          materialColor &#x3D; vec4(AmbientColour*AmbientIntensity + \n            diffuseLambert * DiffuseMaterialColour*DiffuseLightIntensity +\n            SpecularColour * specular*SpecularIntensity, 1.0);\n        } \n      }\n      \n      gl_FragColor &#x3D; mix(fogColor, materialColor, fogFactor); \n    } \n  &quot;;
+      }
+
+      function cartoonVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n\n    uniform mat3 uNormalMatrix;\n    uniform mat4 uMVMatrix;\n    uniform mat4 uPMatrix;\n\n    varying vec3 vColor;\n    varying float diffuseLambert;\n    varying float specular;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      vColor &#x3D; aVertexColor;\n\n      vec3 pointLightPosition &#x3D; vec3(1.0,2.0,-1.0);\n      vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - aVertexPosition.xyz);\n        \n      vec3 L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      vec3 N &#x3D; normalize(uNormalMatrix * aVertexNormal);         \n      vec3 V &#x3D; -vec3(uPMatrix * uMVMatrix * vec4(aVertexPosition,1.0));\n\n      L &#x3D; normalize(L);\n      V &#x3D; normalize(V);\n        \n      vec3 R &#x3D; reflect(-L, N);\n      float shininess &#x3D; 128.0;\n        \n      specular &#x3D; pow(max(0.0,dot(R, V)), shininess);\n      diffuseLambert &#x3D; dot(L, N);\n    }\n  &quot;;
+      }
+
+      function cartoonFragmentShaderSource() {
+        return &quot; \n    varying highp vec3 vColor;\n    varying highp float diffuseLambert;\n    \n    void main(void) {\n      highp vec4 color &#x3D; vec4( vColor * .1, 1.0);\n      \n      if (diffuseLambert &gt; 0.9) {\n        color &#x3D; vec4(vColor * .8, 1.0);\n      } else if (diffuseLambert &gt; 0.6) {\n        color &#x3D; vec4(vColor * .5, 1.0);\n      } else if (diffuseLambert &gt; 0.3){\n        color &#x3D; vec4(vColor * .3, 1.0);\n      }\n      \n      gl_FragColor &#x3D; color;\n      // gl_FragColor &#x3D; vec4(vColor * floor(diffuseLambert*10.0)*.1, 1.0);         \n    }\n  &quot;;
+      }
+
+      function goochVsVertexShaderSource() {
+        return &quot;\n    attribute vec3 aVertexPosition;\n    attribute vec3 aVertexColor;\n    attribute vec3 aVertexNormal;\n    \n    uniform mat3 uNormalMatrix;\n    uniform mat4 uMVMatrix;\n    uniform mat4 uPMatrix;\n    \n    varying vec3 vColor;\n    varying float diffuseLambert;\n    varying float specular;\n    \n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      vColor &#x3D; aVertexColor;\n      \n      vec3 pointLightPosition &#x3D; vec3(1.0,2.0,-1.0);\n      vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - aVertexPosition.xyz);\n      \n      vec3 L &#x3D; vec3(uPMatrix * uMVMatrix * vec4(pointLightDirection, 1.0));\n      vec3 N &#x3D; normalize(uNormalMatrix * aVertexNormal);         \n      vec3 V &#x3D; -vec3(uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0));\n      \n      L &#x3D; normalize(L);\n      V &#x3D; normalize(V);\n      \n      vec3 R &#x3D; reflect(-L, N);\n      float shininess &#x3D; 128.0;\n      \n      specular &#x3D; pow(max(0.0,dot(R, V)), shininess);\n      diffuseLambert &#x3D; dot(L, N);\n    }\n  &quot;;
+      }
+
+      function goochVsFragmentShaderSource() {
+        return &quot; \n    varying highp vec3 vColor;\n    varying highp float diffuseLambert;\n    varying highp float specular;\n    \n    void main(void) {\n      //below is modified from http://3dshaders.com/shaders/CH15-Gooch.frag.txt\n      highp vec3  SurfaceColor &#x3D; vec3(0.75, 0.75, 0.75);\n      highp vec3  WarmColor &#x3D; vec3(0.6, 0.6, 0.0);\n      highp vec3  CoolColor &#x3D; vec3(0.0, 0.0, 0.6);\n      highp float DiffuseWarm &#x3D; 0.45;\n      highp float DiffuseCool &#x3D; 0.45;\n      \n      highp vec3 kcool &#x3D; min(CoolColor + DiffuseCool * SurfaceColor, 1.0);\n      highp vec3 kwarm &#x3D; min(WarmColor + DiffuseWarm * SurfaceColor, 1.0); \n      highp vec3 kfinal &#x3D; mix(kcool, kwarm, diffuseLambert);\n      \n      gl_FragColor &#x3D; vec4(min(kfinal + specular, 1.0), 1.0);\n    }\n  &quot;;
+      }
+
+      function goochFsVertexShaderSource() {
+        return &quot;\n    uniform mat4 uMVMatrix;\n    uniform mat4 uPMatrix;\n    \n    attribute vec3 aVertexPosition;\n    attribute vec4 aVertexColor;\n    attribute vec3 aVertexNormal;\n    \n    varying highp vec4 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n\n    void main(void) {\n      gl_Position &#x3D; uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n      \n      vColor &#x3D; aVertexColor;\n      vPosition &#x3D; aVertexPosition;\n      N &#x3D; aVertexNormal;         \n    }\n  &quot;;
+      }
+
+      function goochFsFragmentShaderSource() {
+        return &quot; \n    uniform highp mat3 uNormalMatrix;\n    uniform highp mat4 uMVMatrix;\n    uniform highp mat4 uPMatrix;\n    \n    varying highp vec4 vColor;\n    varying highp vec3 vPosition;\n    varying highp vec3 N;\n    \n    void main(void) {        \n      highp vec3 pointLightPosition &#x3D; vec3(1.0,2.0,1.0);\n      \n      highp vec3 pointLightDirection &#x3D; vec3(pointLightPosition.xyz - vPosition.xyz);\n      \n      highp mat4 mvp &#x3D; uPMatrix * uMVMatrix;\n      \n      highp vec3 L &#x3D; vec3(mvp * vec4(pointLightDirection, 1.0));\n      highp vec3 V &#x3D; -vec3(mvp * vec4(vPosition,1.0));\n      \n      highp vec3 l &#x3D; normalize(L);\n      highp vec3 n &#x3D; normalize(uNormalMatrix * N);\n      highp vec3 v &#x3D; normalize(V);\n      \n      highp vec3 R &#x3D; reflect(l, n);\n      \n      highp float diffuseLambert &#x3D; dot(l,n);\n      highp float Roughness &#x3D; 1.0;\n      highp vec3 DiffuseLightIntensity &#x3D; vec3(0.9, 0.9, 0.9);\n      highp float SpecularIntensity &#x3D; 0.5;\n      highp float shininess &#x3D; 128.0;\n      \n      highp float specular &#x3D; pow( max(0.0,dot(R,v)), shininess);\n    \n      //below is modified from http://3dshaders.com/shaders/CH15-Gooch.frag.txt\n      highp vec3  SurfaceColor &#x3D; vec3(0.75, 0.75, 0.75);\n      highp vec3  WarmColor &#x3D; vec3(0.6, 0.6, 0.0);\n      highp vec3  CoolColor &#x3D; vec3(0.0, 0.0, 0.6);\n      highp float DiffuseWarm &#x3D; 0.45;\n      highp float DiffuseCool &#x3D; 0.45;\n      \n      highp vec3 kcool &#x3D; min(CoolColor + DiffuseCool * SurfaceColor, 1.0);\n      highp vec3 kwarm &#x3D; min(WarmColor + DiffuseWarm * SurfaceColor, 1.0); \n      highp vec3 kfinal &#x3D; mix(kcool, kwarm, diffuseLambert);\n      \n      gl_FragColor &#x3D; vec4(min(kfinal + specular, 1.0), 1.0);\n    }\n  &quot;;
       }
 
     &lt;/script&gt;
