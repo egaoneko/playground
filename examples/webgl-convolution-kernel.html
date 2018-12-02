@@ -1,0 +1,56 @@
+---
+layout: example.html
+title: WebGL convolution kernel
+shortdesc: WebGL convolution kernel.
+docs: >
+  This page's try to WebGL convolution kernel.
+
+tags: "webgl"
+resources:
+  - https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.7.1/gl-matrix-min.js
+  - resources/js/stats.js
+---
+<div id="container" class="main">
+  <canvas id="canvas"></canvas>
+</div>
+
+<div>
+  <input type="radio" id="kernel1" name="kernel" value="no_effect" checked>
+  <label for="kernel1">NO EFFECT</label>
+
+  <input type="radio" id="kernel2" name="kernel" value="sharpen1">
+  <label for="kernel2">SHARPEN 1</label>
+
+  <input type="radio" id="kernel3" name="kernel" value="sharpen2">
+  <label for="kernel3">SHARPEN 2</label>
+
+  <input type="radio" id="kernel4" name="kernel" value="sobel_edges_y">
+  <label for="kernel4">SOBEL EDGES Y</label>
+
+  <input type="radio" id="kernel5" name="kernel" value="sobel_edges_x">
+  <label for="kernel5">SOBEL EDGES X</label>
+
+  <input type="radio" id="kernel6" name="kernel" value="sobel_both">
+  <label for="kernel6">SOBEL BOTH</label>
+
+  <input type="radio" id="kernel7" name="kernel" value="blur">
+  <label for="kernel7">BLUR</label>
+
+  <input type="radio" id="kernel8" name="kernel" value="gaussian_blur">
+  <label for="kernel8">GAUSSIAN BLUR</label>
+
+  <input type="radio" id="kernel9" name="kernel" value="edge_detect">
+  <label for="kernel9">EDGE DETECT</label>
+
+  <input type="radio" id="kernel10" name="kernel" value="emboss1">
+  <label for="kernel10">EMBOSS 1</label>
+
+  <input type="radio" id="kernel11" name="kernel" value="emboss2">
+  <label for="kernel11">EMBOSS 2</label>
+
+  <input type="radio" id="kernel12" name="kernel" value="emboss3">
+  <label for="kernel12">EMBOSS 3</label>
+
+  <input type="radio" id="kernel13" name="kernel" value="emboss4">
+  <label for="kernel13">EMBOSS 4</label>
+</div>
