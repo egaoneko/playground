@@ -1,9 +1,15 @@
-const rasterTile = new ol.layer.Tile({
-  source: new ol.source.OSM()
-});
-
 const map = new ol.Map({
-  layers: [rasterTile],
+  layers: [
+    new ol.layer.Tile({
+      source: new ol.source.OSM()
+    }),
+    new ol.layer.Tile({
+      source: new ol.source.TileDebug({
+        projection: 'EPSG:3857',
+        tileGrid: new ol.source.OSM().getTileGrid()
+      }),
+    })
+  ],
   target: 'map',
   view: new ol.View({
     center: [0, 0],

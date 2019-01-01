@@ -74,12 +74,18 @@
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
           <textarea class="hidden" name="title">Openlayers event</textarea>
           <textarea class="hidden" name="description">Openlayers event.</textarea>
-          <textarea class="hidden" name="js">var rasterTile &#x3D; new ol.layer.Tile({
-  source: new ol.source.OSM()
-});
-
-var map &#x3D; new ol.Map({
-  layers: [rasterTile],
+          <textarea class="hidden" name="js">var map &#x3D; new ol.Map({
+  layers: [
+    new ol.layer.Tile({
+      source: new ol.source.OSM()
+    }),
+    new ol.layer.Tile({
+      source: new ol.source.TileDebug({
+        projection: &#x27;EPSG:3857&#x27;,
+        tileGrid: new ol.source.OSM().getTileGrid()
+      }),
+    })
+  ],
   target: &#x27;map&#x27;,
   view: new ol.View({
     center: [0, 0],
@@ -150,12 +156,18 @@ window.DEBUG &#x3D; {
       &lt;div id&#x3D;&quot;map&quot;&gt;&lt;/div&gt;
     &lt;/div&gt;
     &lt;script&gt;
-      var rasterTile &#x3D; new ol.layer.Tile({
-        source: new ol.source.OSM()
-      });
-
       var map &#x3D; new ol.Map({
-        layers: [rasterTile],
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          }),
+          new ol.layer.Tile({
+            source: new ol.source.TileDebug({
+              projection: &#x27;EPSG:3857&#x27;,
+              tileGrid: new ol.source.OSM().getTileGrid()
+            }),
+          })
+        ],
         target: &#x27;map&#x27;,
         view: new ol.View({
           center: [0, 0],
