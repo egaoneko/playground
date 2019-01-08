@@ -124,6 +124,7 @@ function init() {
 
   window.addEventListener('resize', onWindowResize, false);
   window.addEventListener('click', onClick);
+  window.addEventListener('dblclick', onDBClick);
 
   loadGeojson();
 }
@@ -249,6 +250,23 @@ function onClick(event) {
 
   for (let i = 0; i < intersects.length; i++) {
     console.log(convertVector3ToLngLat(intersects[i].point));
+  }
+}
+
+function onDBClick(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObject(globe, true);
+
+  for (let i = 0; i < intersects.length; i++) {
+    const geometry = new THREE.SphereGeometry(0.5);
+    const material = new THREE.MeshBasicMaterial({color: '#ff0000'});
+    const sphere = new THREE.Mesh(geometry, material);
+    sphere.position.copy(intersects[i].point);
+    scene.add(sphere);
   }
 }
 

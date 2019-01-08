@@ -201,6 +201,7 @@ function init() {
 
   window.addEventListener(&#x27;resize&#x27;, onWindowResize, false);
   window.addEventListener(&#x27;click&#x27;, onClick);
+  window.addEventListener(&#x27;dblclick&#x27;, onDBClick);
 
   loadGeojson();
 }
@@ -328,6 +329,23 @@ function onClick(event) {
 
   for (var i &#x3D; 0; i &lt; intersects.length; i++) {
     console.log(convertVector3ToLngLat(intersects[i].point));
+  }
+}
+
+function onDBClick(event) {
+  mouse.x &#x3D; (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y &#x3D; -(event.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  var intersects &#x3D; raycaster.intersectObject(globe, true);
+
+  for (var i &#x3D; 0; i &lt; intersects.length; i++) {
+    var geometry &#x3D; new THREE.SphereGeometry(0.5);
+    var material &#x3D; new THREE.MeshBasicMaterial({color: &#x27;#ff0000&#x27;});
+    var sphere &#x3D; new THREE.Mesh(geometry, material);
+    sphere.position.copy(intersects[i].point);
+    scene.add(sphere);
   }
 }
 
@@ -525,6 +543,7 @@ function rad2deg(radians) {
 
         window.addEventListener(&#x27;resize&#x27;, onWindowResize, false);
         window.addEventListener(&#x27;click&#x27;, onClick);
+        window.addEventListener(&#x27;dblclick&#x27;, onDBClick);
 
         loadGeojson();
       }
@@ -652,6 +671,23 @@ function rad2deg(radians) {
 
         for (var i &#x3D; 0; i &lt; intersects.length; i++) {
           console.log(convertVector3ToLngLat(intersects[i].point));
+        }
+      }
+
+      function onDBClick(event) {
+        mouse.x &#x3D; (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y &#x3D; -(event.clientY / window.innerHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+
+        var intersects &#x3D; raycaster.intersectObject(globe, true);
+
+        for (var i &#x3D; 0; i &lt; intersects.length; i++) {
+          var geometry &#x3D; new THREE.SphereGeometry(0.5);
+          var material &#x3D; new THREE.MeshBasicMaterial({color: &#x27;#ff0000&#x27;});
+          var sphere &#x3D; new THREE.Mesh(geometry, material);
+          sphere.position.copy(intersects[i].point);
+          scene.add(sphere);
         }
       }
 
