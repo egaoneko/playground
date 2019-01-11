@@ -90,6 +90,7 @@ var width;
 var height;
 var container;
 var globe;
+var capitals &#x3D; [];
 
 var raycaster &#x3D; new THREE.Raycaster();
 var mouse &#x3D; new THREE.Vector2();
@@ -139,13 +140,18 @@ function init() {
 
   var loader &#x3D; new THREE.TextureLoader();
   loader.load(
-    &#x27;data/img/land_ocean_ice_cloud_2048.jpg&#x27;,
+    &#x27;http://i.imgur.com/puZgGjm.jpg&#x27;,
     function (texture) {
       // Create the sphere
       var sphere &#x3D; new THREE.SphereGeometry(radius, segments, rings);
 
       // Map the texture to the material.
-      var material &#x3D; new THREE.MeshBasicMaterial({map: texture, overdraw: 0.5});
+      var material &#x3D; new THREE.MeshBasicMaterial({
+        map: texture,
+        overdraw: 0.5,
+        transparent: true,
+        opacity: 0.5
+      });
 
       // Create a new mesh with sphere geometry.
       var mesh &#x3D; new THREE.Mesh(sphere, material);
@@ -154,7 +160,6 @@ function init() {
       globe.add(mesh);
     }
   );
-  globe.position.set(0, 0, 0);
 
   // stars
   var starSize &#x3D; 45000;
@@ -162,7 +167,6 @@ function init() {
 
   var materialOptions &#x3D; {
     size: 1.0, //I know this is the default, it&#x27;s for you.  Play with it if you want.
-    transparency: true,
     opacity: 0.7
   };
 
@@ -172,9 +176,9 @@ function init() {
 
   for (var i &#x3D; 0; i &lt; starSize; i++) {
     var vector &#x3D; new THREE.Vector3();
-    vector.x &#x3D; Math.random() * 2000 - 1000;
-    vector.y &#x3D; Math.random() * 2000 - 1000;
-    vector.z &#x3D; Math.random() * 2000 - 1000;
+    vector.x &#x3D; (Math.random() * 1000 + 1000) * (Math.round(Math.random()) ? 1 : -1);
+    vector.y &#x3D; (Math.random() * 1000 + 1000) * (Math.round(Math.random()) ? 1 : -1);
+    vector.z &#x3D; (Math.random() * 1000 + 1000) * (Math.round(Math.random()) ? 1 : -1);
 
     geometry.vertices.push(vector);
   }
@@ -221,13 +225,24 @@ function animate() {
 
 function render() {
   renderer.render(scene, camera);
+  capitals.forEach(function (capital) {
+    if (
+      globe.position.distanceTo(camera.position) &lt; capital.position.distanceTo(camera.position)
+    ) {
+      capital.sphere.visible &#x3D; false;
+      capital.text.visible &#x3D; false;
+    } else {
+      capital.sphere.visible &#x3D; true;
+      capital.text.visible &#x3D; true;
+    }
+  });
 }
 
 function loadGeojson() {
   fetch(&#x27;data/geojson/capitals.geojson&#x27;)
     .then(function (response) { return response.json(); })
     .then(function (geojson) {
-      var capitals &#x3D; geojson.features
+      capitals &#x3D; geojson.features
         .map(function (feature) {
           return Object.assign(
             {},
@@ -236,8 +251,8 @@ function loadGeojson() {
               coordinates: turf.getCoord(feature)
             }
           );
-        });
-
+        })
+        .filter(function (capital) { return capital.city; });
 
       capitals.forEach(function (capital) {
         var ref &#x3D; capital.coordinates;
@@ -252,14 +267,48 @@ function loadGeojson() {
         var geometry &#x3D; new THREE.SphereGeometry(1);
         var material &#x3D; new THREE.MeshBasicMaterial({color: &#x27;#ff0000&#x27;});
         var sphere &#x3D; new THREE.Mesh(geometry, material);
-        sphere.position.copy(convertLngLatToVector3(lng, lat, RADIUS));
+        var position &#x3D; convertLngLatToVector3(lng, lat, RADIUS);
+
+        sphere.position.copy(position);
         scene.add(sphere);
+        capital.position &#x3D; position;
+        capital.sphere &#x3D; sphere;
 
         var text &#x3D; makeTextSprite(capital.city, {fontsize: 50});
+
         text.position.copy(convertLngLatToVector3(lng, lat, RADIUS + 10));
         scene.add(text);
+        capital.text &#x3D; text;
       });
     });
+
+  fetch(&#x27;data/geojson/countries.geojson&#x27;)
+    .then(function (response) { return response.json(); })
+    .then(function (geojson) {
+      var countries &#x3D; geojson.features;
+      countries.forEach(function (country) {
+        var type &#x3D; country.geometry.type;
+        if (type &#x3D;&#x3D;&#x3D; &#x27;Polygon&#x27;) {
+          scene.add(getLineMesh(country.geometry.coordinates[0]));
+        } else if (type &#x3D;&#x3D;&#x3D; &#x27;MultiPolygon&#x27;) {
+          country.geometry.coordinates.forEach(function (coordinates) { return scene.add(getLineMesh(coordinates[0])); });
+        }
+      });
+
+    });
+}
+
+function getLineMesh(coordinates) {
+  var material &#x3D; new THREE.LineBasicMaterial({color: 0xffffff});
+  var geometry &#x3D; new THREE.Geometry();
+
+  coordinates.forEach(function (coordinate) {
+    var lng &#x3D; coordinate[0];
+    var lat &#x3D; coordinate[1];
+    var position &#x3D; convertLngLatToVector3(lng, lat, RADIUS);
+    geometry.vertices.push(position);
+  });
+  return new THREE.Line(geometry, material);
 }
 
 function makeTextSprite(message, parameters) {
@@ -295,7 +344,7 @@ function makeTextSprite(message, parameters) {
   var texture &#x3D; new THREE.Texture(canvas);
   texture.needsUpdate &#x3D; true;
 
-  var spriteMaterial &#x3D; new THREE.SpriteMaterial({map: texture, useScreenCoordinates: false});
+  var spriteMaterial &#x3D; new THREE.SpriteMaterial({map: texture});
   var sprite &#x3D; new THREE.Sprite(spriteMaterial);
   sprite.scale.set(0.5 * fontsize, 0.25 * fontsize, 0.75 * fontsize);
   return sprite;
@@ -362,7 +411,7 @@ function convertLngLatToVector3(lng, lat, radius) {
 
 function convertVector3ToLngLat(vector) {
   vector.normalize();
-  var lng &#x3D; (270 + rad2deg(Math.atan2(vector.x , vector.z))) % 360;
+  var lng &#x3D; (270 + rad2deg(Math.atan2(vector.x, vector.z))) % 360;
 
   var p &#x3D; new THREE.Vector3(vector.x, 0, vector.z);
   p.normalize();
@@ -432,6 +481,7 @@ function rad2deg(radians) {
       var height;
       var container;
       var globe;
+      var capitals &#x3D; [];
 
       var raycaster &#x3D; new THREE.Raycaster();
       var mouse &#x3D; new THREE.Vector2();
@@ -481,13 +531,18 @@ function rad2deg(radians) {
 
         var loader &#x3D; new THREE.TextureLoader();
         loader.load(
-          &#x27;data/img/land_ocean_ice_cloud_2048.jpg&#x27;,
+          &#x27;http://i.imgur.com/puZgGjm.jpg&#x27;,
           function (texture) {
             // Create the sphere
             var sphere &#x3D; new THREE.SphereGeometry(radius, segments, rings);
 
             // Map the texture to the material.
-            var material &#x3D; new THREE.MeshBasicMaterial({map: texture, overdraw: 0.5});
+            var material &#x3D; new THREE.MeshBasicMaterial({
+              map: texture,
+              overdraw: 0.5,
+              transparent: true,
+              opacity: 0.5
+            });
 
             // Create a new mesh with sphere geometry.
             var mesh &#x3D; new THREE.Mesh(sphere, material);
@@ -496,7 +551,6 @@ function rad2deg(radians) {
             globe.add(mesh);
           }
         );
-        globe.position.set(0, 0, 0);
 
         // stars
         var starSize &#x3D; 45000;
@@ -504,7 +558,6 @@ function rad2deg(radians) {
 
         var materialOptions &#x3D; {
           size: 1.0, //I know this is the default, it&#x27;s for you.  Play with it if you want.
-          transparency: true,
           opacity: 0.7
         };
 
@@ -514,9 +567,9 @@ function rad2deg(radians) {
 
         for (var i &#x3D; 0; i &lt; starSize; i++) {
           var vector &#x3D; new THREE.Vector3();
-          vector.x &#x3D; Math.random() * 2000 - 1000;
-          vector.y &#x3D; Math.random() * 2000 - 1000;
-          vector.z &#x3D; Math.random() * 2000 - 1000;
+          vector.x &#x3D; (Math.random() * 1000 + 1000) * (Math.round(Math.random()) ? 1 : -1);
+          vector.y &#x3D; (Math.random() * 1000 + 1000) * (Math.round(Math.random()) ? 1 : -1);
+          vector.z &#x3D; (Math.random() * 1000 + 1000) * (Math.round(Math.random()) ? 1 : -1);
 
           geometry.vertices.push(vector);
         }
@@ -563,13 +616,24 @@ function rad2deg(radians) {
 
       function render() {
         renderer.render(scene, camera);
+        capitals.forEach(function (capital) {
+          if (
+            globe.position.distanceTo(camera.position) &lt; capital.position.distanceTo(camera.position)
+          ) {
+            capital.sphere.visible &#x3D; false;
+            capital.text.visible &#x3D; false;
+          } else {
+            capital.sphere.visible &#x3D; true;
+            capital.text.visible &#x3D; true;
+          }
+        });
       }
 
       function loadGeojson() {
         fetch(&#x27;data/geojson/capitals.geojson&#x27;)
           .then(function (response) { return response.json(); })
           .then(function (geojson) {
-            var capitals &#x3D; geojson.features
+            capitals &#x3D; geojson.features
               .map(function (feature) {
                 return Object.assign(
                   {},
@@ -578,8 +642,8 @@ function rad2deg(radians) {
                     coordinates: turf.getCoord(feature)
                   }
                 );
-              });
-
+              })
+              .filter(function (capital) { return capital.city; });
 
             capitals.forEach(function (capital) {
               var ref &#x3D; capital.coordinates;
@@ -594,14 +658,48 @@ function rad2deg(radians) {
               var geometry &#x3D; new THREE.SphereGeometry(1);
               var material &#x3D; new THREE.MeshBasicMaterial({color: &#x27;#ff0000&#x27;});
               var sphere &#x3D; new THREE.Mesh(geometry, material);
-              sphere.position.copy(convertLngLatToVector3(lng, lat, RADIUS));
+              var position &#x3D; convertLngLatToVector3(lng, lat, RADIUS);
+
+              sphere.position.copy(position);
               scene.add(sphere);
+              capital.position &#x3D; position;
+              capital.sphere &#x3D; sphere;
 
               var text &#x3D; makeTextSprite(capital.city, {fontsize: 50});
+
               text.position.copy(convertLngLatToVector3(lng, lat, RADIUS + 10));
               scene.add(text);
+              capital.text &#x3D; text;
             });
           });
+
+        fetch(&#x27;data/geojson/countries.geojson&#x27;)
+          .then(function (response) { return response.json(); })
+          .then(function (geojson) {
+            var countries &#x3D; geojson.features;
+            countries.forEach(function (country) {
+              var type &#x3D; country.geometry.type;
+              if (type &#x3D;&#x3D;&#x3D; &#x27;Polygon&#x27;) {
+                scene.add(getLineMesh(country.geometry.coordinates[0]));
+              } else if (type &#x3D;&#x3D;&#x3D; &#x27;MultiPolygon&#x27;) {
+                country.geometry.coordinates.forEach(function (coordinates) { return scene.add(getLineMesh(coordinates[0])); });
+              }
+            });
+
+          });
+      }
+
+      function getLineMesh(coordinates) {
+        var material &#x3D; new THREE.LineBasicMaterial({color: 0xffffff});
+        var geometry &#x3D; new THREE.Geometry();
+
+        coordinates.forEach(function (coordinate) {
+          var lng &#x3D; coordinate[0];
+          var lat &#x3D; coordinate[1];
+          var position &#x3D; convertLngLatToVector3(lng, lat, RADIUS);
+          geometry.vertices.push(position);
+        });
+        return new THREE.Line(geometry, material);
       }
 
       function makeTextSprite(message, parameters) {
@@ -637,7 +735,7 @@ function rad2deg(radians) {
         var texture &#x3D; new THREE.Texture(canvas);
         texture.needsUpdate &#x3D; true;
 
-        var spriteMaterial &#x3D; new THREE.SpriteMaterial({map: texture, useScreenCoordinates: false});
+        var spriteMaterial &#x3D; new THREE.SpriteMaterial({map: texture});
         var sprite &#x3D; new THREE.Sprite(spriteMaterial);
         sprite.scale.set(0.5 * fontsize, 0.25 * fontsize, 0.75 * fontsize);
         return sprite;
@@ -704,7 +802,7 @@ function rad2deg(radians) {
 
       function convertVector3ToLngLat(vector) {
         vector.normalize();
-        var lng &#x3D; (270 + rad2deg(Math.atan2(vector.x , vector.z))) % 360;
+        var lng &#x3D; (270 + rad2deg(Math.atan2(vector.x, vector.z))) % 360;
 
         var p &#x3D; new THREE.Vector3(vector.x, 0, vector.z);
         p.normalize();
