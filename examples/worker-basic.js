@@ -1,3 +1,5 @@
+import {sleep} from "./utils/common";
+
 const logAreaElement = document.querySelector('#log-area');
 const timeBoxElement = document.querySelector('#time-box');
 
@@ -13,13 +15,8 @@ const sleep1BtnElement = document.querySelector('#sleep1-btn');
 sleep1BtnElement.addEventListener('click', function () {
   logAreaElement.innerHTML += 'Sleep without worker!\n';
   sleep(3000);
-});
-
-function sleep(delay) {
-  const start = new Date().getTime();
   console.log('Sleeping without worker!');
-  while (new Date().getTime() < start + delay);
-}
+});
 
 const sleep2BtnElement = document.querySelector('#sleep2-btn');
 

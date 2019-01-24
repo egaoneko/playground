@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="./resources/layout.css" type="text/css">
     
     <link rel="stylesheet" href="worker-basic.css">
-    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2Cperformance.now%2CrequestAnimationFrame%2Cfetch%2CElement.prototype.classList%2CURL%2CMap%2CSet%2CPromise%2CObject.values"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
     <title>Worker basic</title>
   </head>
@@ -90,7 +90,9 @@
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
           <textarea class="hidden" name="title">Worker basic</textarea>
           <textarea class="hidden" name="description">Worker basic example.</textarea>
-          <textarea class="hidden" name="js">var logAreaElement &#x3D; document.querySelector(&#x27;#log-area&#x27;);
+          <textarea class="hidden" name="js">import {sleep} from &quot;./utils/common&quot;;
+
+var logAreaElement &#x3D; document.querySelector(&#x27;#log-area&#x27;);
 var timeBoxElement &#x3D; document.querySelector(&#x27;#time-box&#x27;);
 
 requestAnimationFrame(updateTimeBox);
@@ -105,13 +107,8 @@ var sleep1BtnElement &#x3D; document.querySelector(&#x27;#sleep1-btn&#x27;);
 sleep1BtnElement.addEventListener(&#x27;click&#x27;, function () {
   logAreaElement.innerHTML +&#x3D; &#x27;Sleep without worker!\n&#x27;;
   sleep(3000);
-});
-
-function sleep(delay) {
-  var start &#x3D; new Date().getTime();
   console.log(&#x27;Sleeping without worker!&#x27;);
-  while (new Date().getTime() &lt; start + delay){ ; }
-}
+});
 
 var sleep2BtnElement &#x3D; document.querySelector(&#x27;#sleep2-btn&#x27;);
 
@@ -228,6 +225,8 @@ sleep2BtnElement.addEventListener(&#x27;click&#x27;, function () {
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;script&gt;
+      import {sleep} from &quot;./utils/common&quot;;
+
       var logAreaElement &#x3D; document.querySelector(&#x27;#log-area&#x27;);
       var timeBoxElement &#x3D; document.querySelector(&#x27;#time-box&#x27;);
 
@@ -243,13 +242,8 @@ sleep2BtnElement.addEventListener(&#x27;click&#x27;, function () {
       sleep1BtnElement.addEventListener(&#x27;click&#x27;, function () {
         logAreaElement.innerHTML +&#x3D; &#x27;Sleep without worker!\n&#x27;;
         sleep(3000);
-      });
-
-      function sleep(delay) {
-        var start &#x3D; new Date().getTime();
         console.log(&#x27;Sleeping without worker!&#x27;);
-        while (new Date().getTime() &lt; start + delay){ ; }
-      }
+      });
 
       var sleep2BtnElement &#x3D; document.querySelector(&#x27;#sleep2-btn&#x27;);
 
