@@ -12,7 +12,7 @@ import Event from './events/Event';
  * @fires import("./events/Event.js")
  * @api
  */
-var Three = (function (EventEmitter) {
+var Three = /*@__PURE__*/(function (EventEmitter) {
   function Three() {
     EventEmitter.call(this);
 

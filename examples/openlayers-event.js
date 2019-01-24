@@ -1,3 +1,5 @@
+const logEle = document.querySelector('#log');
+
 const map = new ol.Map({
   layers: [
     new ol.layer.Tile({
@@ -26,8 +28,8 @@ const map = new ol.Map({
   ['pointerdrag', '#3D9970'],
   ['pointermove', '#2ECC40'],
   ['singleclick', '#FFDC00'],
-  // ['', '#FF851B'],
-  // ['', '#FF4136'],
+  ['pointerdown', '#FF851B'],
+  ['pointerup', '#FF4136'],
   // ['', '#85144b'],
   // ['', '#F012BE'],
   // ['', '#B10DC9'],
@@ -41,6 +43,10 @@ const map = new ol.Map({
 
 function log(type, typeColor) {
   console.log(`%c${type}`, `color: ${typeColor}`);
+  const p = document.createElement('p');
+  p.innerHTML = `${type}`;
+  logEle.appendChild(p);
+  logEle.scrollTop = logEle.scrollHeight;
 }
 
 window.DEBUG = {

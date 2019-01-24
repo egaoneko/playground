@@ -52,6 +52,7 @@
           <h4 id="title">Openlayers event</h4>
           <div id="container" class="main">
   <div id="map"></div>
+  <div id="log"></div>
 </div>
 
         </div>
@@ -74,7 +75,9 @@
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
           <textarea class="hidden" name="title">Openlayers event</textarea>
           <textarea class="hidden" name="description">Openlayers event.</textarea>
-          <textarea class="hidden" name="js">var map &#x3D; new ol.Map({
+          <textarea class="hidden" name="js">var logEle &#x3D; document.querySelector(&#x27;#log&#x27;);
+
+var map &#x3D; new ol.Map({
   layers: [
     new ol.layer.Tile({
       source: new ol.source.OSM()
@@ -101,7 +104,9 @@
   [&#x27;moveend&#x27;, &#x27;#39CCCC&#x27;],
   [&#x27;pointerdrag&#x27;, &#x27;#3D9970&#x27;],
   [&#x27;pointermove&#x27;, &#x27;#2ECC40&#x27;],
-  [&#x27;singleclick&#x27;, &#x27;#FFDC00&#x27;] ].forEach(function (ref) {
+  [&#x27;singleclick&#x27;, &#x27;#FFDC00&#x27;],
+  [&#x27;pointerdown&#x27;, &#x27;#FF851B&#x27;],
+  [&#x27;pointerup&#x27;, &#x27;#FF4136&#x27;] ].forEach(function (ref) {
   var type &#x3D; ref[0];
   var typeColor &#x3D; ref[1];
 
@@ -112,22 +117,42 @@
 
 function log(type, typeColor) {
   console.log((&quot;%c&quot; + type), (&quot;color: &quot; + typeColor));
+  var p &#x3D; document.createElement(&#x27;p&#x27;);
+  p.innerHTML &#x3D; &quot;&quot; + type;
+  logEle.appendChild(p);
+  logEle.scrollTop &#x3D; logEle.scrollHeight;
 }
 
 window.DEBUG &#x3D; {
   map: map,
 };
 </textarea>
-          <textarea class="hidden" name="css">/**
+          <textarea class="hidden" name="css">#container {
+  position: relative;
+}
+
+/**
   * Create a position for the map
   * on the page */
 #map {
   width: 100%;
   height: 100%;
 }
+
+#log {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 200px;
+  height: 100px;
+  overflow: auto;
+  color: #caca1b;
+  background-color: rgba(42, 42, 42, 0.86);
+}
 </textarea>
           <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
   &lt;div id&#x3D;&quot;map&quot;&gt;&lt;/div&gt;
+  &lt;div id&#x3D;&quot;log&quot;&gt;&lt;/div&gt;
 &lt;/div&gt;
 </textarea>
           <input type="hidden" name="data">
@@ -142,6 +167,10 @@ window.DEBUG &#x3D; {
     &lt;link rel&#x3D;&quot;stylesheet&quot; href&#x3D;&quot;https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/css/ol.css&quot;&gt;
     &lt;script src&#x3D;&quot;https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js&quot;&gt;&lt;/script&gt;
     &lt;style&gt;
+      #container {
+        position: relative;
+      }
+
       /**
         * Create a position for the map
         * on the page */
@@ -149,13 +178,27 @@ window.DEBUG &#x3D; {
         width: 100%;
         height: 100%;
       }
+
+      #log {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 200px;
+        height: 100px;
+        overflow: auto;
+        color: #caca1b;
+        background-color: rgba(42, 42, 42, 0.86);
+      }
     &lt;/style&gt;
   &lt;/head&gt;
   &lt;body&gt;
     &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
       &lt;div id&#x3D;&quot;map&quot;&gt;&lt;/div&gt;
+      &lt;div id&#x3D;&quot;log&quot;&gt;&lt;/div&gt;
     &lt;/div&gt;
     &lt;script&gt;
+      var logEle &#x3D; document.querySelector(&#x27;#log&#x27;);
+
       var map &#x3D; new ol.Map({
         layers: [
           new ol.layer.Tile({
@@ -183,7 +226,9 @@ window.DEBUG &#x3D; {
         [&#x27;moveend&#x27;, &#x27;#39CCCC&#x27;],
         [&#x27;pointerdrag&#x27;, &#x27;#3D9970&#x27;],
         [&#x27;pointermove&#x27;, &#x27;#2ECC40&#x27;],
-        [&#x27;singleclick&#x27;, &#x27;#FFDC00&#x27;] ].forEach(function (ref) {
+        [&#x27;singleclick&#x27;, &#x27;#FFDC00&#x27;],
+        [&#x27;pointerdown&#x27;, &#x27;#FF851B&#x27;],
+        [&#x27;pointerup&#x27;, &#x27;#FF4136&#x27;] ].forEach(function (ref) {
         var type &#x3D; ref[0];
         var typeColor &#x3D; ref[1];
 
@@ -194,6 +239,10 @@ window.DEBUG &#x3D; {
 
       function log(type, typeColor) {
         console.log((&quot;%c&quot; + type), (&quot;color: &quot; + typeColor));
+        var p &#x3D; document.createElement(&#x27;p&#x27;);
+        p.innerHTML &#x3D; &quot;&quot; + type;
+        logEle.appendChild(p);
+        logEle.scrollTop &#x3D; logEle.scrollHeight;
       }
 
       window.DEBUG &#x3D; {

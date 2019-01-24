@@ -1,7 +1,22 @@
+#container {
+  position: relative;
+}
+
 /**
   * Create a position for the map
   * on the page */
 #map {
   width: 100%;
   height: 100%;
+}
+
+#log {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 200px;
+  height: 100px;
+  overflow: auto;
+  color: #caca1b;
+  background-color: rgba(42, 42, 42, 0.86);
 }
