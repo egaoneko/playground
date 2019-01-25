@@ -1,6 +1,11 @@
 import {sleep} from "./utils/common";
 import {randomInt} from "../src/pg/utils/math";
-import {Task, TASK_PRIORITY, TaskRunner} from "./utils/task-runner";
+import {
+  Task,
+  TASK_PRIORITY,
+  TaskRunner,
+  WorkerTask
+} from "./utils/task-runner";
 
 let chart;
 let taskRunner;
@@ -23,11 +28,12 @@ function init() {
   taskRunner = new TaskRunner();
   taskRunner.on('task:enroll', chartUpdate);
   taskRunner.on('task:process', chartUpdate);
+  taskRunner.on('worker-task:process', chartUpdate);
 
   chart = new Chart(ctx, {
     type: 'horizontalBar',
     data: {
-      labels: ["ESSENTIAL", "CRITICAL", "NORMAL", "IDLE"],
+      labels: ["ESSENTIAL", "CRITICAL", "NORMAL", "IDLE", "WORKER"],
       datasets: [{
         label: '# of tasks',
         data: taskRunner.status.map(s => s.queue),
@@ -68,15 +74,31 @@ function init() {
       const promises = [];
       const size = randomInt(100, 1000);
       for (let i = 0; i < size; i++) {
-        promises.push(taskRunner.enroll(p, getTask()));
+        promises.push(taskRunner.enroll(getTask(), p));
       }
-      Promise.all(promises).then(() => console.log(`${p.key} finished`))
+      Promise.all(promises).then(() => console.log(`${p.key} finished`));
     });
+  });
+
+  const button = document.getElementById('worker');
+  button.addEventListener('click', () => {
+    taskRunner.enroll(getWorkerTask()).then(() => console.log('worker finished'));
   });
 
   function getTask() {
     return new Task(() => {
-      sleep(randomInt(1, 4))
+      sleep(randomInt(1, 4));
+    });
+  }
+
+  function getWorkerTask() {
+    return new WorkerTask((params, done) => {
+      const delay = 3000;
+      const start = new Date().getTime();
+      console.time('worker');
+      while (new Date().getTime() < start + delay);
+      console.timeEnd('worker');
+      done();
     });
   }
 }

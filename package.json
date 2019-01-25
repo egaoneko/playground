@@ -106,6 +106,7 @@
     "example.css"
   ],
   "dependencies": {
-    "eventemitter3": "^3.1.0"
+    "eventemitter3": "^3.1.0",
+    "threadpool-js": "^0.5.0"
   }
 }
