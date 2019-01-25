@@ -37,6 +37,22 @@ export class TaskRunner extends EventEmitter {
     requestAnimationFrame(this.run.bind(this));
   }
 
+  terminate(priority) {
+    if (!priority || !this._taskQueueMap.has(priority.key)) {
+      throw new Error(`This priority is not exist: ${priority.key}`);
+    }
+
+    this._taskQueueMap.get(priority.key).clear();
+    this.emit('terminate:priority', priority);
+  }
+
+  terminateAll() {
+    this._taskQueues.forEach(p => this._taskQueueMap.get(p.key).clear());
+    this._threadMap.clear();
+    this._threadPool.terminateAll();
+    this.emit('terminate:all');
+  }
+
   enroll(task, priority) {
     if (!(task instanceof Task)) {
       throw new Error('This task is not instance of Task');
@@ -104,6 +120,13 @@ export class TaskRunner extends EventEmitter {
   }
 }
 
+export const TASK_STATUS = {
+  NORMAL: 0,
+  DONE: 1,
+  ERROR: 2,
+  ABORT: 3,
+};
+
 export class Task extends EventEmitter {
 
   get uuid() {
@@ -112,13 +135,21 @@ export class Task extends EventEmitter {
 
   constructor(action, ...args) {
     super();
-    const deferred = defer();
+    this._deferred = defer();
     this._uuid = this._uuidv4();
-    this._initAction(deferred, action, args);
-    this.promise = deferred.promise;
+    this._initAction(this._deferred, action, args);
+    this.status = TASK_STATUS.NORMAL;
+    this.promise = this._deferred.promise;
   }
 
   process() {
+    if (this.status !== TASK_STATUS.NORMAL) {
+      if (this.status === TASK_STATUS.ABORT) {
+        this._abort();
+      }
+      return;
+    }
+
     this.action();
   }
 
@@ -128,12 +159,10 @@ export class Task extends EventEmitter {
       try {
         r = action.apply(null, args);
       } catch (e) {
-        deferred.reject(e);
-        this.emit('error', e);
+        this._error(e);
         return;
       }
-      deferred.resolve(r);
-      this.emit('done', r);
+      this._done(r);
     };
   }
 
@@ -143,6 +172,24 @@ export class Task extends EventEmitter {
       return v.toString(16);
     });
   }
+
+  _error(e) {
+    this._deferred.reject(e);
+    this.status = TASK_STATUS.ERROR;
+    this.emit('error', e);
+  }
+
+  _done(r) {
+    this._deferred.resolve(r);
+    this.status = TASK_STATUS.DONE;
+    this.emit('done', r);
+  }
+
+  _abort() {
+    this._deferred.resolve();
+    this.status = TASK_STATUS.ABORT;
+    this.emit('abort');
+  }
 }
 
 export class WorkerTask extends Task {
@@ -151,6 +198,10 @@ export class WorkerTask extends Task {
   }
 
   process(pool) {
+    if (this.status === TASK_STATUS.ABORT) {
+      this._abort();
+    }
+
     this.action(pool);
   }
 
@@ -159,12 +210,10 @@ export class WorkerTask extends Task {
       pool
         .run(action, args)
         .error((e) => {
-          deferred.reject(e);
-          this.emit('error', e);
+          this._error(e);
         })
         .done((r) => {
-          deferred.resolve(r);
-          this.emit('done', r);
+          this._done(r);
         });
     };
   }

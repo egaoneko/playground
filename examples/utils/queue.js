@@ -4,6 +4,10 @@ export default class Queue {
   }
 
   constructor() {
+    this.clear();
+  }
+
+  clear() {
     this.store = {};
     this.front = 0;
     this.end = 0;
@@ -26,7 +30,7 @@ export default class Queue {
   }
 
   peek() {
-    if (this.size() === 0) {
+    if (this.size === 0) {
       return null;
     }
 

@@ -2,7 +2,7 @@ import {sleep} from "./utils/common";
 import {randomInt} from "../src/pg/utils/math";
 import {
   Task,
-  TASK_PRIORITY,
+  TASK_PRIORITY, TASK_STATUS,
   TaskRunner,
   WorkerTask
 } from "./utils/task-runner";
@@ -29,6 +29,8 @@ function init() {
   taskRunner.on('task:enroll', chartUpdate);
   taskRunner.on('task:process', chartUpdate);
   taskRunner.on('worker-task:process', chartUpdate);
+  taskRunner.on('terminate:priority', chartUpdate);
+  taskRunner.on('terminate:all', chartUpdate);
 
   chart = new Chart(ctx, {
     type: 'horizontalBar',
@@ -64,7 +66,7 @@ function init() {
   });
 
   Object.values(TASK_PRIORITY).forEach(p => {
-    const button = document.getElementById(p.key.toLowerCase());
+    const button = document.getElementById(`enroll-${p.key.toLowerCase()}`);
 
     if (!button) {
       return;
@@ -72,7 +74,7 @@ function init() {
 
     button.addEventListener('click', () => {
       const promises = [];
-      const size = randomInt(100, 1000);
+      const size = randomInt(100, 500);
       for (let i = 0; i < size; i++) {
         promises.push(taskRunner.enroll(getTask(), p));
       }
@@ -80,9 +82,38 @@ function init() {
     });
   });
 
-  const button = document.getElementById('worker');
+  Object.values(TASK_PRIORITY).forEach(p => {
+    const button = document.getElementById(`terminate-${p.key.toLowerCase()}`);
+
+    if (!button) {
+      return;
+    }
+
+    button.addEventListener('click', () => {
+      taskRunner.terminate(p);
+    });
+  });
+
+  let button = document.getElementById('enroll-worker');
   button.addEventListener('click', () => {
     taskRunner.enroll(getWorkerTask()).then(() => console.log('worker finished'));
+  });
+
+  button = document.getElementById('terminate-all');
+  button.addEventListener('click', () => {
+    taskRunner.terminateAll();
+  });
+
+  button = document.getElementById('enroll-abort');
+  button.addEventListener('click', () => {
+    const promises = [];
+    const size = randomInt(500, 1000);
+    for (let i = 0; i < size; i++) {
+      const task = getTask();
+      promises.push(taskRunner.enroll(task, TASK_PRIORITY.ESSENTIAL));
+      task.status = TASK_STATUS.ABORT;
+    }
+    Promise.all(promises).then(() => console.log(`Aborted finished`));
   });
 
   function getTask() {
@@ -96,7 +127,7 @@ function init() {
       const delay = 3000;
       const start = new Date().getTime();
       console.time('worker');
-      while (new Date().getTime() < start + delay);
+      while (new Date().getTime() < start + delay) ;
       console.timeEnd('worker');
       done();
     });

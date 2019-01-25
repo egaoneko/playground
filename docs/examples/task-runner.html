@@ -56,11 +56,22 @@
   <canvas id="chart"></canvas>
 </div>
 
-<button id="essential">Add ESSENTIAL</button>
-<button id="critical">Add CRITICAL</button>
-<button id="normal">Add NORMAL</button>
-<button id="idle">Add IDLE</button>
-<button id="worker">Add Worker Task</button>
+<div>
+  <button id="enroll-essential">Enroll ESSENTIAL</button>
+  <button id="enroll-critical">Enroll CRITICAL</button>
+  <button id="enroll-normal">Enroll NORMAL</button>
+  <button id="enroll-idle">Enroll IDLE</button>
+  <button id="enroll-worker">Enroll Worker Task</button>
+  <button id="enroll-abort">Enroll Aborted ESSENTIAL Task</button>
+</div>
+
+<div>
+  <button id="terminate-essential">Terminate ESSENTIAL</button>
+  <button id="terminate-critical">Terminate CRITICAL</button>
+  <button id="terminate-normal">Terminate NORMAL</button>
+  <button id="terminate-idle">Terminate IDLE</button>
+  <button id="terminate-all">Terminate ALL</button>
+</div>
 
         </div>
       </div>
@@ -86,7 +97,7 @@
 import {randomInt} from &quot;../src/pg/utils/math&quot;;
 import {
   Task,
-  TASK_PRIORITY,
+  TASK_PRIORITY, TASK_STATUS,
   TaskRunner,
   WorkerTask
 } from &quot;./utils/task-runner&quot;;
@@ -113,6 +124,8 @@ function init() {
   taskRunner.on(&#x27;task:enroll&#x27;, chartUpdate);
   taskRunner.on(&#x27;task:process&#x27;, chartUpdate);
   taskRunner.on(&#x27;worker-task:process&#x27;, chartUpdate);
+  taskRunner.on(&#x27;terminate:priority&#x27;, chartUpdate);
+  taskRunner.on(&#x27;terminate:all&#x27;, chartUpdate);
 
   chart &#x3D; new Chart(ctx, {
     type: &#x27;horizontalBar&#x27;,
@@ -146,7 +159,7 @@ function init() {
   });
 
   Object.values(TASK_PRIORITY).forEach(function (p) {
-    var button &#x3D; document.getElementById(p.key.toLowerCase());
+    var button &#x3D; document.getElementById((&quot;enroll-&quot; + (p.key.toLowerCase())));
 
     if (!button) {
       return;
@@ -154,7 +167,7 @@ function init() {
 
     button.addEventListener(&#x27;click&#x27;, function () {
       var promises &#x3D; [];
-      var size &#x3D; randomInt(100, 1000);
+      var size &#x3D; randomInt(100, 500);
       for (var i &#x3D; 0; i &lt; size; i++) {
         promises.push(taskRunner.enroll(getTask(), p));
       }
@@ -162,9 +175,38 @@ function init() {
     });
   });
 
-  var button &#x3D; document.getElementById(&#x27;worker&#x27;);
+  Object.values(TASK_PRIORITY).forEach(function (p) {
+    var button &#x3D; document.getElementById((&quot;terminate-&quot; + (p.key.toLowerCase())));
+
+    if (!button) {
+      return;
+    }
+
+    button.addEventListener(&#x27;click&#x27;, function () {
+      taskRunner.terminate(p);
+    });
+  });
+
+  var button &#x3D; document.getElementById(&#x27;enroll-worker&#x27;);
   button.addEventListener(&#x27;click&#x27;, function () {
     taskRunner.enroll(getWorkerTask()).then(function () { return console.log(&#x27;worker finished&#x27;); });
+  });
+
+  button &#x3D; document.getElementById(&#x27;terminate-all&#x27;);
+  button.addEventListener(&#x27;click&#x27;, function () {
+    taskRunner.terminateAll();
+  });
+
+  button &#x3D; document.getElementById(&#x27;enroll-abort&#x27;);
+  button.addEventListener(&#x27;click&#x27;, function () {
+    var promises &#x3D; [];
+    var size &#x3D; randomInt(500, 1000);
+    for (var i &#x3D; 0; i &lt; size; i++) {
+      var task &#x3D; getTask();
+      promises.push(taskRunner.enroll(task, TASK_PRIORITY.ESSENTIAL));
+      task.status &#x3D; TASK_STATUS.ABORT;
+    }
+    Promise.all(promises).then(function () { return console.log(&quot;Aborted finished&quot;); });
   });
 
   function getTask() {
@@ -178,7 +220,7 @@ function init() {
       var delay &#x3D; 3000;
       var start &#x3D; new Date().getTime();
       console.time(&#x27;worker&#x27;);
-      while (new Date().getTime() &lt; start + delay){ ; }
+      while (new Date().getTime() &lt; start + delay) { ; }
       console.timeEnd(&#x27;worker&#x27;);
       done();
     });
@@ -203,11 +245,22 @@ window.DEBUG &#x3D; {
   &lt;canvas id&#x3D;&quot;chart&quot;&gt;&lt;/canvas&gt;
 &lt;/div&gt;
 
-&lt;button id&#x3D;&quot;essential&quot;&gt;Add ESSENTIAL&lt;/button&gt;
-&lt;button id&#x3D;&quot;critical&quot;&gt;Add CRITICAL&lt;/button&gt;
-&lt;button id&#x3D;&quot;normal&quot;&gt;Add NORMAL&lt;/button&gt;
-&lt;button id&#x3D;&quot;idle&quot;&gt;Add IDLE&lt;/button&gt;
-&lt;button id&#x3D;&quot;worker&quot;&gt;Add Worker Task&lt;/button&gt;
+&lt;div&gt;
+  &lt;button id&#x3D;&quot;enroll-essential&quot;&gt;Enroll ESSENTIAL&lt;/button&gt;
+  &lt;button id&#x3D;&quot;enroll-critical&quot;&gt;Enroll CRITICAL&lt;/button&gt;
+  &lt;button id&#x3D;&quot;enroll-normal&quot;&gt;Enroll NORMAL&lt;/button&gt;
+  &lt;button id&#x3D;&quot;enroll-idle&quot;&gt;Enroll IDLE&lt;/button&gt;
+  &lt;button id&#x3D;&quot;enroll-worker&quot;&gt;Enroll Worker Task&lt;/button&gt;
+  &lt;button id&#x3D;&quot;enroll-abort&quot;&gt;Enroll Aborted ESSENTIAL Task&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div&gt;
+  &lt;button id&#x3D;&quot;terminate-essential&quot;&gt;Terminate ESSENTIAL&lt;/button&gt;
+  &lt;button id&#x3D;&quot;terminate-critical&quot;&gt;Terminate CRITICAL&lt;/button&gt;
+  &lt;button id&#x3D;&quot;terminate-normal&quot;&gt;Terminate NORMAL&lt;/button&gt;
+  &lt;button id&#x3D;&quot;terminate-idle&quot;&gt;Terminate IDLE&lt;/button&gt;
+  &lt;button id&#x3D;&quot;terminate-all&quot;&gt;Terminate ALL&lt;/button&gt;
+&lt;/div&gt;
 </textarea>
           <input type="hidden" name="data">
         </form>
@@ -237,17 +290,28 @@ window.DEBUG &#x3D; {
       &lt;canvas id&#x3D;&quot;chart&quot;&gt;&lt;/canvas&gt;
     &lt;/div&gt;
 
-    &lt;button id&#x3D;&quot;essential&quot;&gt;Add ESSENTIAL&lt;/button&gt;
-    &lt;button id&#x3D;&quot;critical&quot;&gt;Add CRITICAL&lt;/button&gt;
-    &lt;button id&#x3D;&quot;normal&quot;&gt;Add NORMAL&lt;/button&gt;
-    &lt;button id&#x3D;&quot;idle&quot;&gt;Add IDLE&lt;/button&gt;
-    &lt;button id&#x3D;&quot;worker&quot;&gt;Add Worker Task&lt;/button&gt;
+    &lt;div&gt;
+      &lt;button id&#x3D;&quot;enroll-essential&quot;&gt;Enroll ESSENTIAL&lt;/button&gt;
+      &lt;button id&#x3D;&quot;enroll-critical&quot;&gt;Enroll CRITICAL&lt;/button&gt;
+      &lt;button id&#x3D;&quot;enroll-normal&quot;&gt;Enroll NORMAL&lt;/button&gt;
+      &lt;button id&#x3D;&quot;enroll-idle&quot;&gt;Enroll IDLE&lt;/button&gt;
+      &lt;button id&#x3D;&quot;enroll-worker&quot;&gt;Enroll Worker Task&lt;/button&gt;
+      &lt;button id&#x3D;&quot;enroll-abort&quot;&gt;Enroll Aborted ESSENTIAL Task&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;div&gt;
+      &lt;button id&#x3D;&quot;terminate-essential&quot;&gt;Terminate ESSENTIAL&lt;/button&gt;
+      &lt;button id&#x3D;&quot;terminate-critical&quot;&gt;Terminate CRITICAL&lt;/button&gt;
+      &lt;button id&#x3D;&quot;terminate-normal&quot;&gt;Terminate NORMAL&lt;/button&gt;
+      &lt;button id&#x3D;&quot;terminate-idle&quot;&gt;Terminate IDLE&lt;/button&gt;
+      &lt;button id&#x3D;&quot;terminate-all&quot;&gt;Terminate ALL&lt;/button&gt;
+    &lt;/div&gt;
     &lt;script&gt;
       import {sleep} from &quot;./utils/common&quot;;
       import {randomInt} from &quot;../src/pg/utils/math&quot;;
       import {
         Task,
-        TASK_PRIORITY,
+        TASK_PRIORITY, TASK_STATUS,
         TaskRunner,
         WorkerTask
       } from &quot;./utils/task-runner&quot;;
@@ -274,6 +338,8 @@ window.DEBUG &#x3D; {
         taskRunner.on(&#x27;task:enroll&#x27;, chartUpdate);
         taskRunner.on(&#x27;task:process&#x27;, chartUpdate);
         taskRunner.on(&#x27;worker-task:process&#x27;, chartUpdate);
+        taskRunner.on(&#x27;terminate:priority&#x27;, chartUpdate);
+        taskRunner.on(&#x27;terminate:all&#x27;, chartUpdate);
 
         chart &#x3D; new Chart(ctx, {
           type: &#x27;horizontalBar&#x27;,
@@ -307,7 +373,7 @@ window.DEBUG &#x3D; {
         });
 
         Object.values(TASK_PRIORITY).forEach(function (p) {
-          var button &#x3D; document.getElementById(p.key.toLowerCase());
+          var button &#x3D; document.getElementById((&quot;enroll-&quot; + (p.key.toLowerCase())));
 
           if (!button) {
             return;
@@ -315,7 +381,7 @@ window.DEBUG &#x3D; {
 
           button.addEventListener(&#x27;click&#x27;, function () {
             var promises &#x3D; [];
-            var size &#x3D; randomInt(100, 1000);
+            var size &#x3D; randomInt(100, 500);
             for (var i &#x3D; 0; i &lt; size; i++) {
               promises.push(taskRunner.enroll(getTask(), p));
             }
@@ -323,9 +389,38 @@ window.DEBUG &#x3D; {
           });
         });
 
-        var button &#x3D; document.getElementById(&#x27;worker&#x27;);
+        Object.values(TASK_PRIORITY).forEach(function (p) {
+          var button &#x3D; document.getElementById((&quot;terminate-&quot; + (p.key.toLowerCase())));
+
+          if (!button) {
+            return;
+          }
+
+          button.addEventListener(&#x27;click&#x27;, function () {
+            taskRunner.terminate(p);
+          });
+        });
+
+        var button &#x3D; document.getElementById(&#x27;enroll-worker&#x27;);
         button.addEventListener(&#x27;click&#x27;, function () {
           taskRunner.enroll(getWorkerTask()).then(function () { return console.log(&#x27;worker finished&#x27;); });
+        });
+
+        button &#x3D; document.getElementById(&#x27;terminate-all&#x27;);
+        button.addEventListener(&#x27;click&#x27;, function () {
+          taskRunner.terminateAll();
+        });
+
+        button &#x3D; document.getElementById(&#x27;enroll-abort&#x27;);
+        button.addEventListener(&#x27;click&#x27;, function () {
+          var promises &#x3D; [];
+          var size &#x3D; randomInt(500, 1000);
+          for (var i &#x3D; 0; i &lt; size; i++) {
+            var task &#x3D; getTask();
+            promises.push(taskRunner.enroll(task, TASK_PRIORITY.ESSENTIAL));
+            task.status &#x3D; TASK_STATUS.ABORT;
+          }
+          Promise.all(promises).then(function () { return console.log(&quot;Aborted finished&quot;); });
         });
 
         function getTask() {
@@ -339,7 +434,7 @@ window.DEBUG &#x3D; {
             var delay &#x3D; 3000;
             var start &#x3D; new Date().getTime();
             console.time(&#x27;worker&#x27;);
-            while (new Date().getTime() &lt; start + delay){ ; }
+            while (new Date().getTime() &lt; start + delay) { ; }
             console.timeEnd(&#x27;worker&#x27;);
             done();
           });
