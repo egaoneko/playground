@@ -1,9 +1,11 @@
+const source1 = new ol.source.OSM();
 const rasterTile1 = new ol.layer.Tile({
-  source: new ol.source.OSM()
+  source: source1,
 });
 
+const source2 = new ol.source.OSM();
 const rasterTile2 = new ol.layer.Tile({
-  source: new ol.source.OSM()
+  source: source2,
 });
 
 const styleFunction = (color) => {
@@ -18,50 +20,54 @@ const styleFunction = (color) => {
   });
 };
 
+const source3 = new ol.source.Vector({
+  features: (new ol.format.GeoJSON()).readFeatures({
+    'type': 'FeatureCollection',
+    'crs': {
+      'type': 'name',
+      'properties': {
+        'name': 'EPSG:3857'
+      }
+    },
+    'features': [{
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Point',
+        'coordinates': getRandomCoordinates()
+      }
+    }]
+  })
+});
+
 const vector1 = new ol.layer.Vector({
-  source: new ol.source.Vector({
-    features: (new ol.format.GeoJSON()).readFeatures({
-      'type': 'FeatureCollection',
-      'crs': {
-        'type': 'name',
-        'properties': {
-          'name': 'EPSG:3857'
-        }
-      },
-      'features': [{
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Point',
-          'coordinates': getRandomCoordinates()
-        }
-      }]
-    })
-  }),
+  source: source3,
   style: () => {
     console.log(`%cvector1`, `background-color: red; color: white`);
     return styleFunction('magenta');
   }
 });
 
+const source4 = new ol.source.Vector({
+  features: (new ol.format.GeoJSON()).readFeatures({
+    'type': 'FeatureCollection',
+    'crs': {
+      'type': 'name',
+      'properties': {
+        'name': 'EPSG:3857'
+      }
+    },
+    'features': [{
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Point',
+        'coordinates': getRandomCoordinates()
+      }
+    }]
+  })
+});
+
 const vector2 = new ol.layer.Vector({
-  source: new ol.source.Vector({
-    features: (new ol.format.GeoJSON()).readFeatures({
-      'type': 'FeatureCollection',
-      'crs': {
-        'type': 'name',
-        'properties': {
-          'name': 'EPSG:3857'
-        }
-      },
-      'features': [{
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Point',
-          'coordinates': getRandomCoordinates()
-        }
-      }]
-    })
-  }),
+  source: source4,
   style: () => {
     console.log(`%cvector2`, `background-color: red; color: white`);
     return styleFunction('magenta');
@@ -147,13 +153,23 @@ document
 
 // render event
 [
-  ['precompose', '#8be9fd'],
-  ['postcompose', '#50fa7b'],
-  ['render', '#ffb86c'],
-  ['postrender', '#ff79c6'],
-  ['rendercomplete', '#bd93f9'],
-  // ['', '#ff5555'],
-  // ['', '#f1fa8c'],
+  ['precompose', '#001f3f'],
+  ['postcompose', '#0074D9'],
+  ['render', '#7FDBFF'],
+  ['postrender', '#39CCCC'],
+  ['rendercomplete', '#3D9970'],
+  ['tileloadstart', '#2ECC40'],
+  ['tileloadend', '#01FF70'],
+  ['tileloaderror', '#FFDC00'],
+  // ['', '#FF851B'],
+  // ['', '#FF4136'],
+  // ['', '#85144b'],
+  // ['', '#F012BE'],
+  // ['', '#B10DC9'],
+  // ['', '#111111'],
+  // ['', '#AAAAAA'],
+  // ['', '#DDDDDD'],
+  // ['', '#FFFFFF'],
 ].forEach(([type, typeColor]) => {
   [
     [map, 'map', '#0074D9'],
@@ -162,10 +178,10 @@ document
     [vectorTile, 'vectorTile', '#39CCCC'],
     [vector1, 'vector1', '#3D9970'],
     [vector2, 'vector2', '#2ECC40'],
-    // [null, '', '#FFDC00'],
-    // [null, '', '#FF851B'],
-    // [null, '', '#FF4136'],
-    // [null, '', '#85144b'],
+    [source1, 'source1', '#FFDC00'],
+    [source2, 'source2', '#FF851B'],
+    [source3, 'source3', '#FF4136'],
+    [source4, 'source4', '#85144b'],
     // [null, '', '#F012BE'],
     // [null, '', '#B10DC9'],
     // [null, '', '#AAAAAA'],
