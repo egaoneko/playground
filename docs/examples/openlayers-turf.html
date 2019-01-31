@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="./resources/layout-full.css" type="text/css">
     <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/css/ol.css">
 <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script>
     <link rel="stylesheet" href="openlayers-turf.css">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2CrequestAnimationFrame%2Cfetch%2CElement.prototype.classList%2CURL%2CMap%2CSet%2CPromise%2CObject.values"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
@@ -73,15 +74,199 @@
             <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
               <textarea class="hidden" name="title">Openlayers turf</textarea>
               <textarea class="hidden" name="description">Openlayers turf.</textarea>
-              <textarea class="hidden" name="js">var map &#x3D; new ol.Map({
+              <textarea class="hidden" name="js">var coordinates &#x3D; [
+  [
+    127.09610939025879,
+    37.351464686498815
+  ],
+  [
+    127.10108757019043,
+    37.35214697629814
+  ],
+  [
+    127.10505723953246,
+    37.354739620980915
+  ],
+  [
+    127.10668802261353,
+    37.35787796578827
+  ],
+  [
+    127.10939168930054,
+    37.35895247760407
+  ],
+  [
+    127.11222410202026,
+    37.36563798323926
+  ],
+  [
+    127.11662292480467,
+    37.352129919128714
+  ],
+  [
+    127.11984157562254,
+    37.358730754203336
+  ]
+];
+
+var geojson;
+var collection;
+
+geojson &#x3D; {
+  &#x27;type&#x27;: &#x27;FeatureCollection&#x27;,
+  &#x27;features&#x27;: [
+    {
+      &#x27;type&#x27;: &#x27;Feature&#x27;,
+      &#x27;properties&#x27;: {},
+      &#x27;geometry&#x27;: {
+        &#x27;type&#x27;: &#x27;LineString&#x27;,
+        &#x27;coordinates&#x27;: coordinates
+      }
+    }
+  ]
+};
+
+var vector1 &#x3D; new ol.layer.Vector({
+  source: new ol.source.Vector({
+    features: (new ol.format.GeoJSON()).readFeatures(geojson)
+  }),
+  style: [
+    new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: &#x27;rgba(91,113,171,1.0)&#x27;,
+        width: 3
+      })
+    }) ]
+});
+
+var line &#x3D; turf.lineString(coordinates);
+var bbox &#x3D; turf.bbox(line);
+var bboxPolygon &#x3D; turf.bboxPolygon(bbox);
+
+var vector2 &#x3D; new ol.layer.Vector({
+  source: new ol.source.Vector({
+    features: (new ol.format.GeoJSON()).readFeatures(bboxPolygon)
+  }),
+  style: [
+    new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: &#x27;rgba(42,53,81,1.0)&#x27;,
+        width: 3
+      }),
+      fill: new ol.style.Fill({
+        color: &#x27;rgba(42,53,81,0.1)&#x27;
+      })
+    }) ]
+});
+
+geojson &#x3D; {
+  &#x27;type&#x27;: &#x27;FeatureCollection&#x27;,
+  &#x27;features&#x27;: [
+    {
+      &#x27;type&#x27;: &#x27;Feature&#x27;,
+      &#x27;properties&#x27;: {},
+      &#x27;geometry&#x27;: {
+        &#x27;type&#x27;: &#x27;LineString&#x27;,
+        &#x27;coordinates&#x27;: [[bbox[0], bbox[3]], [bbox[2], bbox[1]]]
+      }
+    },
+    {
+      &#x27;type&#x27;: &#x27;Feature&#x27;,
+      &#x27;properties&#x27;: {},
+      &#x27;geometry&#x27;: {
+        &#x27;type&#x27;: &#x27;LineString&#x27;,
+        &#x27;coordinates&#x27;: [[bbox[0], bbox[1]], [bbox[2], bbox[3]]]
+      }
+    }
+  ]
+};
+
+var vector3 &#x3D; new ol.layer.Vector({
+  source: new ol.source.Vector({
+    features: (new ol.format.GeoJSON()).readFeatures(geojson)
+  }),
+  style: [
+    new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: &#x27;rgba(42,53,81,1.0)&#x27;,
+        width: 3
+      })
+    }) ]
+});
+
+var origin &#x3D; turf.lineString(coordinates);
+var line1 &#x3D; turf.lineString([[bbox[0], bbox[3]], [bbox[2], bbox[1]]]);
+var line2 &#x3D; turf.lineString([[bbox[0], bbox[1]], [bbox[2], bbox[3]]]);
+var intersects1 &#x3D; turf.lineIntersect(origin, line1);
+var intersects2 &#x3D; turf.lineIntersect(origin, line2);
+
+var collectionFeatures &#x3D; [];
+collectionFeatures &#x3D; collectionFeatures.concat(intersects1.features);
+collectionFeatures &#x3D; collectionFeatures.concat(intersects2.features);
+
+function getBBoxOnLine(coordinates) {
+  var size &#x3D; coordinates.length;
+  var bboxes &#x3D; [];
+
+  for (var i &#x3D; 0; i &lt; size - 2; i++) {
+    bboxes.push(coordinates[i].concat( coordinates[i + 1]));
+  }
+
+  return bboxes;
+}
+
+collectionFeatures &#x3D; collectionFeatures.concat(
+  getBBoxOnLine(coordinates)
+    .map(function (bbox) {
+      return turf.bboxPolygon(bbox);
+    })
+);
+
+collection &#x3D; turf.featureCollection(collectionFeatures);
+
+var vector4 &#x3D; new ol.layer.Vector({
+  source: new ol.source.Vector({
+    features: (new ol.format.GeoJSON()).readFeatures(collection)
+  }),
+  style: function (f) {
+    console.log();
+
+    var type &#x3D; f.getGeometry().getType();
+    if (type &#x3D;&#x3D;&#x3D; &#x27;Point&#x27;) {
+      return new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: 10,
+          fill: null,
+          stroke: new ol.style.Stroke({
+            color: &#x27;rgba(249,99,99,1.0)&#x27;,
+            width: 2
+          })
+        })
+      });
+    } else if (type &#x3D;&#x3D;&#x3D; &#x27;Polygon&#x27;) {
+      return new ol.style.Style({
+        stroke: new ol.style.Stroke({
+          color: &#x27;rgba(249,99,99,1.0)&#x27;,
+          width: 2
+        })
+      })
+    }
+  }
+});
+
+var map &#x3D; new ol.Map({
   layers: [
     new ol.layer.Tile({
       source: new ol.source.OSM()
-    }) ],
+    }),
+    vector3,
+    vector2,
+    vector1,
+    vector4 ],
   target: &#x27;map&#x27;,
   view: new ol.View({
     projection: &#x27;EPSG:4326&#x27;,
-    center: [127.10534,37.35941],
+    center: [127.10534, 37.35941],
     zoom: 15
   })
 });
@@ -113,6 +298,7 @@ window.DEBUG &#x3D; {
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
     &lt;link rel&#x3D;&quot;stylesheet&quot; href&#x3D;&quot;https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/css/ol.css&quot;&gt;
     &lt;script src&#x3D;&quot;https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js&quot;&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js&quot;&gt;&lt;/script&gt;
     &lt;style&gt;
       /**
         * Create a position for the map
@@ -128,15 +314,199 @@ window.DEBUG &#x3D; {
       &lt;div id&#x3D;&quot;map&quot;&gt;&lt;/div&gt;
     &lt;/div&gt;
     &lt;script&gt;
+      var coordinates &#x3D; [
+        [
+          127.09610939025879,
+          37.351464686498815
+        ],
+        [
+          127.10108757019043,
+          37.35214697629814
+        ],
+        [
+          127.10505723953246,
+          37.354739620980915
+        ],
+        [
+          127.10668802261353,
+          37.35787796578827
+        ],
+        [
+          127.10939168930054,
+          37.35895247760407
+        ],
+        [
+          127.11222410202026,
+          37.36563798323926
+        ],
+        [
+          127.11662292480467,
+          37.352129919128714
+        ],
+        [
+          127.11984157562254,
+          37.358730754203336
+        ]
+      ];
+
+      var geojson;
+      var collection;
+
+      geojson &#x3D; {
+        &#x27;type&#x27;: &#x27;FeatureCollection&#x27;,
+        &#x27;features&#x27;: [
+          {
+            &#x27;type&#x27;: &#x27;Feature&#x27;,
+            &#x27;properties&#x27;: {},
+            &#x27;geometry&#x27;: {
+              &#x27;type&#x27;: &#x27;LineString&#x27;,
+              &#x27;coordinates&#x27;: coordinates
+            }
+          }
+        ]
+      };
+
+      var vector1 &#x3D; new ol.layer.Vector({
+        source: new ol.source.Vector({
+          features: (new ol.format.GeoJSON()).readFeatures(geojson)
+        }),
+        style: [
+          new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color: &#x27;rgba(91,113,171,1.0)&#x27;,
+              width: 3
+            })
+          }) ]
+      });
+
+      var line &#x3D; turf.lineString(coordinates);
+      var bbox &#x3D; turf.bbox(line);
+      var bboxPolygon &#x3D; turf.bboxPolygon(bbox);
+
+      var vector2 &#x3D; new ol.layer.Vector({
+        source: new ol.source.Vector({
+          features: (new ol.format.GeoJSON()).readFeatures(bboxPolygon)
+        }),
+        style: [
+          new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color: &#x27;rgba(42,53,81,1.0)&#x27;,
+              width: 3
+            }),
+            fill: new ol.style.Fill({
+              color: &#x27;rgba(42,53,81,0.1)&#x27;
+            })
+          }) ]
+      });
+
+      geojson &#x3D; {
+        &#x27;type&#x27;: &#x27;FeatureCollection&#x27;,
+        &#x27;features&#x27;: [
+          {
+            &#x27;type&#x27;: &#x27;Feature&#x27;,
+            &#x27;properties&#x27;: {},
+            &#x27;geometry&#x27;: {
+              &#x27;type&#x27;: &#x27;LineString&#x27;,
+              &#x27;coordinates&#x27;: [[bbox[0], bbox[3]], [bbox[2], bbox[1]]]
+            }
+          },
+          {
+            &#x27;type&#x27;: &#x27;Feature&#x27;,
+            &#x27;properties&#x27;: {},
+            &#x27;geometry&#x27;: {
+              &#x27;type&#x27;: &#x27;LineString&#x27;,
+              &#x27;coordinates&#x27;: [[bbox[0], bbox[1]], [bbox[2], bbox[3]]]
+            }
+          }
+        ]
+      };
+
+      var vector3 &#x3D; new ol.layer.Vector({
+        source: new ol.source.Vector({
+          features: (new ol.format.GeoJSON()).readFeatures(geojson)
+        }),
+        style: [
+          new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color: &#x27;rgba(42,53,81,1.0)&#x27;,
+              width: 3
+            })
+          }) ]
+      });
+
+      var origin &#x3D; turf.lineString(coordinates);
+      var line1 &#x3D; turf.lineString([[bbox[0], bbox[3]], [bbox[2], bbox[1]]]);
+      var line2 &#x3D; turf.lineString([[bbox[0], bbox[1]], [bbox[2], bbox[3]]]);
+      var intersects1 &#x3D; turf.lineIntersect(origin, line1);
+      var intersects2 &#x3D; turf.lineIntersect(origin, line2);
+
+      var collectionFeatures &#x3D; [];
+      collectionFeatures &#x3D; collectionFeatures.concat(intersects1.features);
+      collectionFeatures &#x3D; collectionFeatures.concat(intersects2.features);
+
+      function getBBoxOnLine(coordinates) {
+        var size &#x3D; coordinates.length;
+        var bboxes &#x3D; [];
+
+        for (var i &#x3D; 0; i &lt; size - 2; i++) {
+          bboxes.push(coordinates[i].concat( coordinates[i + 1]));
+        }
+
+        return bboxes;
+      }
+
+      collectionFeatures &#x3D; collectionFeatures.concat(
+        getBBoxOnLine(coordinates)
+          .map(function (bbox) {
+            return turf.bboxPolygon(bbox);
+          })
+      );
+
+      collection &#x3D; turf.featureCollection(collectionFeatures);
+
+      var vector4 &#x3D; new ol.layer.Vector({
+        source: new ol.source.Vector({
+          features: (new ol.format.GeoJSON()).readFeatures(collection)
+        }),
+        style: function (f) {
+          console.log();
+
+          var type &#x3D; f.getGeometry().getType();
+          if (type &#x3D;&#x3D;&#x3D; &#x27;Point&#x27;) {
+            return new ol.style.Style({
+              image: new ol.style.Circle({
+                radius: 10,
+                fill: null,
+                stroke: new ol.style.Stroke({
+                  color: &#x27;rgba(249,99,99,1.0)&#x27;,
+                  width: 2
+                })
+              })
+            });
+          } else if (type &#x3D;&#x3D;&#x3D; &#x27;Polygon&#x27;) {
+            return new ol.style.Style({
+              stroke: new ol.style.Stroke({
+                color: &#x27;rgba(249,99,99,1.0)&#x27;,
+                width: 2
+              })
+            })
+          }
+        }
+      });
+
       var map &#x3D; new ol.Map({
         layers: [
           new ol.layer.Tile({
             source: new ol.source.OSM()
-          }) ],
+          }),
+          vector3,
+          vector2,
+          vector1,
+          vector4 ],
         target: &#x27;map&#x27;,
         view: new ol.View({
           projection: &#x27;EPSG:4326&#x27;,
-          center: [127.10534,37.35941],
+          center: [127.10534, 37.35941],
           zoom: 15
         })
       });
