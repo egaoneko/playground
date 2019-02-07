@@ -74,38 +74,122 @@
             <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
               <textarea class="hidden" name="title">Openlayers turf</textarea>
               <textarea class="hidden" name="description">Openlayers turf.</textarea>
-              <textarea class="hidden" name="js">var coordinates &#x3D; [
+              <textarea class="hidden" name="js">var coordinates;
+
+// coordinates &#x3D; [
+//   [
+//     127.09610939025879,
+//     37.351464686498815
+//   ],
+//   [
+//     127.10108757019043,
+//     37.35214697629814
+//   ],
+//   [
+//     127.10505723953246,
+//     37.354739620980915
+//   ],
+//   [
+//     127.10668802261353,
+//     37.35787796578827
+//   ],
+//   [
+//     127.10939168930054,
+//     37.35895247760407
+//   ],
+//   [
+//     127.11222410202026,
+//     37.36563798323926
+//   ],
+//   [
+//     127.11662292480467,
+//     37.352129919128714
+//   ],
+//   [
+//     127.11984157562254,
+//     37.358730754203336
+//   ]
+// ];
+
+// coordinates &#x3D; [
+//   [
+//     127.09726810455322,
+//     37.35509780827176
+//   ],
+//   [
+//     127.10087299346922,
+//     37.36492170755341
+//   ],
+//   [
+//     127.10422039031981,
+//     37.35796324506581
+//   ],
+//   [
+//     127.10692405700685,
+//     37.352419890481514
+//   ],
+//   [
+//     127.11267471313475,
+//     37.35020243402261
+//   ],
+//   [
+//     127.11718082427977,
+//     37.35721278409788
+//   ],
+//   [
+//     127.11949825286865,
+//     37.36285811318619
+//   ],
+//   [
+//     127.12260961532593,
+//     37.364068989488395
+//   ],
+//   [
+//     127.12679386138916,
+//     37.354364375319165
+//   ]
+// ];
+
+coordinates &#x3D; [
   [
-    127.09610939025879,
-    37.351464686498815
+    127.09359884262085,
+    37.35185700389112
   ],
   [
-    127.10108757019043,
-    37.35214697629814
+    127.09507942199708,
+    37.35815085913536
   ],
   [
-    127.10505723953246,
-    37.354739620980915
+    127.09840536117554,
+    37.364614730166345
   ],
   [
-    127.10668802261353,
-    37.35787796578827
+    127.10488557815552,
+    37.35966881026814
   ],
   [
-    127.10939168930054,
-    37.35895247760407
+    127.10492849349976,
+    37.35554127588281
   ],
   [
-    127.11222410202026,
-    37.36563798323926
+    127.1119236946106,
+    37.35364799202858
   ],
   [
-    127.11662292480467,
-    37.352129919128714
+    127.11548566818237,
+    37.361459612015395
   ],
   [
     127.11984157562254,
-    37.358730754203336
+    37.366746491654546
+  ],
+  [
+    127.1242833137512,
+    37.35941297795872
+  ],
+  [
+    127.12857484817505,
+    37.35567772692831
   ]
 ];
 
@@ -143,6 +227,14 @@ var line &#x3D; turf.lineString(coordinates);
 var bbox &#x3D; turf.bbox(line);
 var bboxPolygon &#x3D; turf.bboxPolygon(bbox);
 
+var mid &#x3D; [(bbox[0] + bbox[2]) * 0.5, (bbox[1] + bbox[3]) * 0.5];
+var lines &#x3D; [
+  [[bbox[0], bbox[1]], mid],
+  [[bbox[2], bbox[3]], mid],
+  [[bbox[2], bbox[1]], mid],
+  [[bbox[0], bbox[3]], mid]
+];
+
 var vector2 &#x3D; new ol.layer.Vector({
   source: new ol.source.Vector({
     features: (new ol.format.GeoJSON()).readFeatures(bboxPolygon)
@@ -161,24 +253,16 @@ var vector2 &#x3D; new ol.layer.Vector({
 
 geojson &#x3D; {
   &#x27;type&#x27;: &#x27;FeatureCollection&#x27;,
-  &#x27;features&#x27;: [
-    {
+  &#x27;features&#x27;: lines.map(function (line) {
+    return {
       &#x27;type&#x27;: &#x27;Feature&#x27;,
       &#x27;properties&#x27;: {},
       &#x27;geometry&#x27;: {
         &#x27;type&#x27;: &#x27;LineString&#x27;,
-        &#x27;coordinates&#x27;: [[bbox[0], bbox[3]], [bbox[2], bbox[1]]]
+        &#x27;coordinates&#x27;: line
       }
-    },
-    {
-      &#x27;type&#x27;: &#x27;Feature&#x27;,
-      &#x27;properties&#x27;: {},
-      &#x27;geometry&#x27;: {
-        &#x27;type&#x27;: &#x27;LineString&#x27;,
-        &#x27;coordinates&#x27;: [[bbox[0], bbox[1]], [bbox[2], bbox[3]]]
-      }
-    }
-  ]
+    };
+  }),
 };
 
 var vector3 &#x3D; new ol.layer.Vector({
@@ -195,14 +279,15 @@ var vector3 &#x3D; new ol.layer.Vector({
 });
 
 var origin &#x3D; turf.lineString(coordinates);
-var line1 &#x3D; turf.lineString([[bbox[0], bbox[3]], [bbox[2], bbox[1]]]);
-var line2 &#x3D; turf.lineString([[bbox[0], bbox[1]], [bbox[2], bbox[3]]]);
-var intersects1 &#x3D; turf.lineIntersect(origin, line1);
-var intersects2 &#x3D; turf.lineIntersect(origin, line2);
 
 var collectionFeatures &#x3D; [];
-collectionFeatures &#x3D; collectionFeatures.concat(intersects1.features);
-collectionFeatures &#x3D; collectionFeatures.concat(intersects2.features);
+collectionFeatures &#x3D; collectionFeatures.concat(lines.map(function (line) {
+    return turf.lineIntersect(origin, turf.lineString(line))
+  })
+    .reduce(function (prev, current) {
+      return prev.concat(current.features);
+    }, [])
+);
 
 function getBBoxOnLine(coordinates) {
   var size &#x3D; coordinates.length;
@@ -314,38 +399,122 @@ window.DEBUG &#x3D; {
       &lt;div id&#x3D;&quot;map&quot;&gt;&lt;/div&gt;
     &lt;/div&gt;
     &lt;script&gt;
-      var coordinates &#x3D; [
+      var coordinates;
+
+      // coordinates &#x3D; [
+      //   [
+      //     127.09610939025879,
+      //     37.351464686498815
+      //   ],
+      //   [
+      //     127.10108757019043,
+      //     37.35214697629814
+      //   ],
+      //   [
+      //     127.10505723953246,
+      //     37.354739620980915
+      //   ],
+      //   [
+      //     127.10668802261353,
+      //     37.35787796578827
+      //   ],
+      //   [
+      //     127.10939168930054,
+      //     37.35895247760407
+      //   ],
+      //   [
+      //     127.11222410202026,
+      //     37.36563798323926
+      //   ],
+      //   [
+      //     127.11662292480467,
+      //     37.352129919128714
+      //   ],
+      //   [
+      //     127.11984157562254,
+      //     37.358730754203336
+      //   ]
+      // ];
+
+      // coordinates &#x3D; [
+      //   [
+      //     127.09726810455322,
+      //     37.35509780827176
+      //   ],
+      //   [
+      //     127.10087299346922,
+      //     37.36492170755341
+      //   ],
+      //   [
+      //     127.10422039031981,
+      //     37.35796324506581
+      //   ],
+      //   [
+      //     127.10692405700685,
+      //     37.352419890481514
+      //   ],
+      //   [
+      //     127.11267471313475,
+      //     37.35020243402261
+      //   ],
+      //   [
+      //     127.11718082427977,
+      //     37.35721278409788
+      //   ],
+      //   [
+      //     127.11949825286865,
+      //     37.36285811318619
+      //   ],
+      //   [
+      //     127.12260961532593,
+      //     37.364068989488395
+      //   ],
+      //   [
+      //     127.12679386138916,
+      //     37.354364375319165
+      //   ]
+      // ];
+
+      coordinates &#x3D; [
         [
-          127.09610939025879,
-          37.351464686498815
+          127.09359884262085,
+          37.35185700389112
         ],
         [
-          127.10108757019043,
-          37.35214697629814
+          127.09507942199708,
+          37.35815085913536
         ],
         [
-          127.10505723953246,
-          37.354739620980915
+          127.09840536117554,
+          37.364614730166345
         ],
         [
-          127.10668802261353,
-          37.35787796578827
+          127.10488557815552,
+          37.35966881026814
         ],
         [
-          127.10939168930054,
-          37.35895247760407
+          127.10492849349976,
+          37.35554127588281
         ],
         [
-          127.11222410202026,
-          37.36563798323926
+          127.1119236946106,
+          37.35364799202858
         ],
         [
-          127.11662292480467,
-          37.352129919128714
+          127.11548566818237,
+          37.361459612015395
         ],
         [
           127.11984157562254,
-          37.358730754203336
+          37.366746491654546
+        ],
+        [
+          127.1242833137512,
+          37.35941297795872
+        ],
+        [
+          127.12857484817505,
+          37.35567772692831
         ]
       ];
 
@@ -383,6 +552,14 @@ window.DEBUG &#x3D; {
       var bbox &#x3D; turf.bbox(line);
       var bboxPolygon &#x3D; turf.bboxPolygon(bbox);
 
+      var mid &#x3D; [(bbox[0] + bbox[2]) * 0.5, (bbox[1] + bbox[3]) * 0.5];
+      var lines &#x3D; [
+        [[bbox[0], bbox[1]], mid],
+        [[bbox[2], bbox[3]], mid],
+        [[bbox[2], bbox[1]], mid],
+        [[bbox[0], bbox[3]], mid]
+      ];
+
       var vector2 &#x3D; new ol.layer.Vector({
         source: new ol.source.Vector({
           features: (new ol.format.GeoJSON()).readFeatures(bboxPolygon)
@@ -401,24 +578,16 @@ window.DEBUG &#x3D; {
 
       geojson &#x3D; {
         &#x27;type&#x27;: &#x27;FeatureCollection&#x27;,
-        &#x27;features&#x27;: [
-          {
+        &#x27;features&#x27;: lines.map(function (line) {
+          return {
             &#x27;type&#x27;: &#x27;Feature&#x27;,
             &#x27;properties&#x27;: {},
             &#x27;geometry&#x27;: {
               &#x27;type&#x27;: &#x27;LineString&#x27;,
-              &#x27;coordinates&#x27;: [[bbox[0], bbox[3]], [bbox[2], bbox[1]]]
+              &#x27;coordinates&#x27;: line
             }
-          },
-          {
-            &#x27;type&#x27;: &#x27;Feature&#x27;,
-            &#x27;properties&#x27;: {},
-            &#x27;geometry&#x27;: {
-              &#x27;type&#x27;: &#x27;LineString&#x27;,
-              &#x27;coordinates&#x27;: [[bbox[0], bbox[1]], [bbox[2], bbox[3]]]
-            }
-          }
-        ]
+          };
+        }),
       };
 
       var vector3 &#x3D; new ol.layer.Vector({
@@ -435,14 +604,15 @@ window.DEBUG &#x3D; {
       });
 
       var origin &#x3D; turf.lineString(coordinates);
-      var line1 &#x3D; turf.lineString([[bbox[0], bbox[3]], [bbox[2], bbox[1]]]);
-      var line2 &#x3D; turf.lineString([[bbox[0], bbox[1]], [bbox[2], bbox[3]]]);
-      var intersects1 &#x3D; turf.lineIntersect(origin, line1);
-      var intersects2 &#x3D; turf.lineIntersect(origin, line2);
 
       var collectionFeatures &#x3D; [];
-      collectionFeatures &#x3D; collectionFeatures.concat(intersects1.features);
-      collectionFeatures &#x3D; collectionFeatures.concat(intersects2.features);
+      collectionFeatures &#x3D; collectionFeatures.concat(lines.map(function (line) {
+          return turf.lineIntersect(origin, turf.lineString(line))
+        })
+          .reduce(function (prev, current) {
+            return prev.concat(current.features);
+          }, [])
+      );
 
       function getBBoxOnLine(coordinates) {
         var size &#x3D; coordinates.length;
