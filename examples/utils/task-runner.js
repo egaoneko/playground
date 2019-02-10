@@ -27,8 +27,11 @@ export class TaskRunner extends EventEmitter {
     return status;
   }
 
-  constructor() {
+  constructor(options = {}) {
     super();
+
+    this.processLimitTime = options.processLimitTime ? options.processLimitTime : 3;
+
     this._taskQueues = Object.values(TASK_PRIORITY).sort((a, b) => a.priority - b.priority);
     this._taskQueueMap = new Map();
     this._taskQueues.forEach(p => this._taskQueueMap.set(p.key, new Queue()));
@@ -87,7 +90,7 @@ export class TaskRunner extends EventEmitter {
       this._processTask(nextTask);
 
       taskFinishTime = window.performance.now();
-    } while (taskFinishTime - taskStartTime < 2);
+    } while (taskFinishTime - taskStartTime < this.processLimitTime);
 
     requestAnimationFrame(this.run.bind(this));
   }
