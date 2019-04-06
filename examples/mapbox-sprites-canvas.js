@@ -35,55 +35,57 @@ const sprites = {
   }
 };
 
-getSpritesFromCanvas('data/img/butterfly.png', sprites)
-  .then(sprites => {
+map.on('load', () => {
+  getSpritesFromCanvas('data/img/butterfly.png', sprites)
+    .then(sprites => {
 
-    const spritesCount = sprites.length;
-    const images = new Array(spritesCount);
-    for (let i = 0; i < spritesCount; ++i) {
-      const [name, image] = sprites[i];
-      const ctx = image.getContext('2d');
-      map.addImage(name, ctx.getImageData(0, 0, image.width, image.height));
-      images[i] = name;
-    }
+      const spritesCount = sprites.length;
+      const images = new Array(spritesCount);
+      for (let i = 0; i < spritesCount; ++i) {
+        const [name, image] = sprites[i];
+        const ctx = image.getContext('2d');
+        map.addImage(name, ctx.getImageData(0, 0, image.width, image.height));
+        images[i] = name;
+      }
 
-    const featureCount = 500;
-    const features = new Array(featureCount);
-    const lng = 180;
-    const lat = 90;
-    for (let i = 0; i < featureCount; ++i) {
-      features[i] = {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [2 * lng * Math.random() - lng, 2 * lat * Math.random() - lat],
-        },
-        properties: {
-          icon: images[i % (spritesCount - 1)]
-        }
-      };
-    }
+      const featureCount = 500;
+      const features = new Array(featureCount);
+      const lng = 180;
+      const lat = 90;
+      for (let i = 0; i < featureCount; ++i) {
+        features[i] = {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [2 * lng * Math.random() - lng, 2 * lat * Math.random() - lat],
+          },
+          properties: {
+            icon: images[i % (spritesCount - 1)]
+          }
+        };
+      }
 
-    map.addSource(
-      "points",
-      {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features: features,
+      map.addSource(
+        "points",
+        {
+          type: "geojson",
+          data: {
+            type: "FeatureCollection",
+            features: features,
+          }
+        });
+
+      map.addLayer({
+        "id": "points",
+        "type": "symbol",
+        "source": "points",
+        "layout": {
+          "icon-image": "{icon}",
+          "icon-size": 1
         }
       });
-
-    map.addLayer({
-      "id": "points",
-      "type": "symbol",
-      "source": "points",
-      "layout": {
-        "icon-image": "{icon}",
-        "icon-size": 1
-      }
     });
-  });
+});
 
 function getSpritesFromCanvas(spriteSheet, sprites) {
   return new Promise((resolve, reject) => {

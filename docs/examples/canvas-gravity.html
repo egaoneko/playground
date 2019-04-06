@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
     <link rel="stylesheet" href="./resources/layout-full.css" type="text/css">
     <script src="resources/js/stats.js"></script>
-    <link rel="stylesheet" href="canvas-gravity2.css">
+    <link rel="stylesheet" href="canvas-gravity.css">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2CrequestAnimationFrame%2Cfetch%2CElement.prototype.classList%2CURL%2CMap%2CSet%2CPromise%2CObject.values"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
     <script
@@ -24,7 +24,7 @@
       integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
       crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <title>Canvas Gravity 2</title>
+    <title>Canvas Gravity</title>
   </head>
   <body>
   <header class="navbar dropdown" role="navigation">
@@ -52,12 +52,12 @@
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-          <h4 class="modal-title" id="modalLabel">Canvas Gravity 2</h4>
+          <h4 class="modal-title" id="modalLabel">Canvas Gravity</h4>
         </div>
         <div class="modal-body">
           <div class="row-fluid">
             <div class="span12">
-              <p id="shortdesc">How to Code Gravity 2.</p>
+              <p id="shortdesc">How to Code Gravity.</p>
               <div id="docs"><p>How to Code Gravity. Ref <a href="https://www.youtube.com/playlist?list=PLpPnRKq7eNW3We9VdCfx9fprhqXHwTPXL">HTML5 Canvas Tutorials for Beginners | Become a Canvas Pro</a>.</p>
 </div>
               <p id="tags">Tags: canvas</p>
@@ -70,12 +70,9 @@
               <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
             </div>
             <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
-              <textarea class="hidden" name="title">Canvas Gravity 2</textarea>
-              <textarea class="hidden" name="description">How to Code Gravity 2.</textarea>
-              <textarea class="hidden" name="js">import {
-  randomInt,
-  resolveCollision
-} from &#x27;pg/utils/math&#x27;;
+              <textarea class="hidden" name="title">Canvas Gravity</textarea>
+              <textarea class="hidden" name="description">How to Code Gravity.</textarea>
+              <textarea class="hidden" name="js">import {randomInt} from &#x27;pg/utils/math&#x27;;
 
 var GRAVITY &#x3D; 1;
 var FRICTION &#x3D; 0.79;
@@ -108,16 +105,13 @@ window.addEventListener(&#x27;resize&#x27;, function () {
   resize();
 });
 
-var Ball &#x3D; function Ball(x, y, dx, dy, radius, color, mass) {
+var Ball &#x3D; function Ball(x, y, dx, dy, radius, color) {
   this.x &#x3D; x;
   this.y &#x3D; y;
-  this.velocity &#x3D; {
-    x: dx,
-    y: dy
-  };
+  this.dx &#x3D; dx;
+  this.dy &#x3D; dy;
   this.radius &#x3D; radius;
   this.color &#x3D; color;
-  this.mass &#x3D; mass;
 };
 
 Ball.prototype.draw &#x3D; function draw () {
@@ -127,92 +121,39 @@ Ball.prototype.draw &#x3D; function draw () {
   ctx.fill();
 };
 
-Ball.prototype.update &#x3D; function update (balls) {
-    var this$1 &#x3D; this;
-
-  if (
-    this.x + this.radius + this.velocity.x &gt;&#x3D; canvas.width ||
-    this.x - this.radius + this.velocity.x &lt; 0
-  ) {
-    this.velocity.x *&#x3D; -1 * FRICTION;
+Ball.prototype.update &#x3D; function update () {
+  if (this.x + this.radius + this.dx &gt;&#x3D; canvas.width || this.x - this.radius + this.dx &lt; 0) {
+    this.dx *&#x3D; -1 * FRICTION;
   }
 
-  if (this.y + this.radius + this.velocity.y &gt;&#x3D; canvas.height) {
-    this.velocity.y *&#x3D; -1 * FRICTION;
-    this.velocity.x *&#x3D; FRICTION;
+  if (this.y + this.radius + this.dy &gt;&#x3D; canvas.height) {
+    this.dy *&#x3D; -1 * FRICTION;
+    this.dx *&#x3D; FRICTION;
   } else {
-    this.velocity.y +&#x3D; GRAVITY;
+    this.dy +&#x3D; GRAVITY;
   }
 
-  if (this.x - this.radius &lt; 0) {
-    this.x &#x3D; this.radius
-  }
-
-  if (this.y - this.radius &lt; 0) {
-    this.y &#x3D; this.radius
-  }
-
-  if (this.x + this.radius &gt; window.innerWidth) {
-    this.x &#x3D; window.innerWidth - this.radius;
-  }
-
-  if (this.y + this.radius &gt; window.innerHeight) {
-    this.y &#x3D; window.innerHeight - this.radius;
-  }
-
-  this.x +&#x3D; this.velocity.x;
-  this.y +&#x3D; this.velocity.y;
-
-  // check collided
-  balls
-    .filter(function (ball) { return this$1 !&#x3D;&#x3D; ball; })
-    .filter(function (ball) { return this$1.isCollided(ball); })
-    .forEach(function (ball) {
-      resolveCollision(this$1, ball);
-    });
-
+  this.x +&#x3D; this.dx;
+  this.y +&#x3D; this.dy;
   this.draw();
 };
 
-Ball.prototype.isCollided &#x3D; function isCollided (ball) {
-  var x &#x3D; this.x - ball.x;
-  var y &#x3D; this.y - ball.y;
-  return (Math.pow(x, 2) + Math.pow(y, 2)) &lt;&#x3D; Math.pow((this.radius + ball.radius), 2);
-};
-
 var balls &#x3D; [];
-var cnt &#x3D; 0;
 
 function init() {
 
   balls &#x3D; [];
 
-  var loop &#x3D; function ( i$1 ) {
+  for (var i &#x3D; 0; i &lt; 500; i++) {
     var radius &#x3D; randomInt(8, 20);
     var x &#x3D; randomInt(radius, window.innerWidth - radius);
     var dx &#x3D; randomInt(-20, 20);
     var y &#x3D; randomInt(radius, window.innerHeight - radius);
     var dy &#x3D; randomInt(-2, 2);
     var color &#x3D; colorSet[randomInt(0, colorSet.length)];
-    var ball &#x3D; new Ball(x, y, dx, dy, radius, color, 1);
 
-    if (balls.some(function (b) { return ball.isCollided(b); })) {
-      cnt +&#x3D; 1;
-
-      if (cnt &gt; 100) {
-        return;
-      }
-
-      i$1 -&#x3D; 1;
-    } else {
-      cnt &#x3D; 0;
-      balls.push(ball);
-    }
-
-    i &#x3D; i$1;
-  };
-
-  for (var i &#x3D; 0; i &lt; 100; i++) loop( i );
+    balls.push(new Ball(x, y, dx, dy, radius, color));
+  }
 }
 
 function resize() {
@@ -224,7 +165,7 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle &#x3D; &#x27;#282a36&#x27;;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  balls.forEach(function (circle) { return circle.update(balls); });
+  balls.forEach(function (circle) { return circle.update(); });
   requestAnimationFrame(animate);
 }
 
@@ -248,7 +189,7 @@ animate();
             <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
-    &lt;title&gt;Canvas Gravity 2&lt;/title&gt;
+    &lt;title&gt;Canvas Gravity&lt;/title&gt;
     &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
     &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
@@ -267,10 +208,7 @@ animate();
       &lt;canvas&gt;&lt;/canvas&gt;
     &lt;/div&gt;
     &lt;script&gt;
-      import {
-        randomInt,
-        resolveCollision
-      } from &#x27;pg/utils/math&#x27;;
+      import {randomInt} from &#x27;pg/utils/math&#x27;;
 
       var GRAVITY &#x3D; 1;
       var FRICTION &#x3D; 0.79;
@@ -303,16 +241,13 @@ animate();
         resize();
       });
 
-      var Ball &#x3D; function Ball(x, y, dx, dy, radius, color, mass) {
+      var Ball &#x3D; function Ball(x, y, dx, dy, radius, color) {
         this.x &#x3D; x;
         this.y &#x3D; y;
-        this.velocity &#x3D; {
-          x: dx,
-          y: dy
-        };
+        this.dx &#x3D; dx;
+        this.dy &#x3D; dy;
         this.radius &#x3D; radius;
         this.color &#x3D; color;
-        this.mass &#x3D; mass;
       };
 
       Ball.prototype.draw &#x3D; function draw () {
@@ -322,92 +257,39 @@ animate();
         ctx.fill();
       };
 
-      Ball.prototype.update &#x3D; function update (balls) {
-          var this$1 &#x3D; this;
-
-        if (
-          this.x + this.radius + this.velocity.x &gt;&#x3D; canvas.width ||
-          this.x - this.radius + this.velocity.x &lt; 0
-        ) {
-          this.velocity.x *&#x3D; -1 * FRICTION;
+      Ball.prototype.update &#x3D; function update () {
+        if (this.x + this.radius + this.dx &gt;&#x3D; canvas.width || this.x - this.radius + this.dx &lt; 0) {
+          this.dx *&#x3D; -1 * FRICTION;
         }
 
-        if (this.y + this.radius + this.velocity.y &gt;&#x3D; canvas.height) {
-          this.velocity.y *&#x3D; -1 * FRICTION;
-          this.velocity.x *&#x3D; FRICTION;
+        if (this.y + this.radius + this.dy &gt;&#x3D; canvas.height) {
+          this.dy *&#x3D; -1 * FRICTION;
+          this.dx *&#x3D; FRICTION;
         } else {
-          this.velocity.y +&#x3D; GRAVITY;
+          this.dy +&#x3D; GRAVITY;
         }
 
-        if (this.x - this.radius &lt; 0) {
-          this.x &#x3D; this.radius
-        }
-
-        if (this.y - this.radius &lt; 0) {
-          this.y &#x3D; this.radius
-        }
-
-        if (this.x + this.radius &gt; window.innerWidth) {
-          this.x &#x3D; window.innerWidth - this.radius;
-        }
-
-        if (this.y + this.radius &gt; window.innerHeight) {
-          this.y &#x3D; window.innerHeight - this.radius;
-        }
-
-        this.x +&#x3D; this.velocity.x;
-        this.y +&#x3D; this.velocity.y;
-
-        // check collided
-        balls
-          .filter(function (ball) { return this$1 !&#x3D;&#x3D; ball; })
-          .filter(function (ball) { return this$1.isCollided(ball); })
-          .forEach(function (ball) {
-            resolveCollision(this$1, ball);
-          });
-
+        this.x +&#x3D; this.dx;
+        this.y +&#x3D; this.dy;
         this.draw();
       };
 
-      Ball.prototype.isCollided &#x3D; function isCollided (ball) {
-        var x &#x3D; this.x - ball.x;
-        var y &#x3D; this.y - ball.y;
-        return (Math.pow(x, 2) + Math.pow(y, 2)) &lt;&#x3D; Math.pow((this.radius + ball.radius), 2);
-      };
-
       var balls &#x3D; [];
-      var cnt &#x3D; 0;
 
       function init() {
 
         balls &#x3D; [];
 
-        var loop &#x3D; function ( i$1 ) {
+        for (var i &#x3D; 0; i &lt; 500; i++) {
           var radius &#x3D; randomInt(8, 20);
           var x &#x3D; randomInt(radius, window.innerWidth - radius);
           var dx &#x3D; randomInt(-20, 20);
           var y &#x3D; randomInt(radius, window.innerHeight - radius);
           var dy &#x3D; randomInt(-2, 2);
           var color &#x3D; colorSet[randomInt(0, colorSet.length)];
-          var ball &#x3D; new Ball(x, y, dx, dy, radius, color, 1);
 
-          if (balls.some(function (b) { return ball.isCollided(b); })) {
-            cnt +&#x3D; 1;
-
-            if (cnt &gt; 100) {
-              return;
-            }
-
-            i$1 -&#x3D; 1;
-          } else {
-            cnt &#x3D; 0;
-            balls.push(ball);
-          }
-
-          i &#x3D; i$1;
-        };
-
-        for (var i &#x3D; 0; i &lt; 100; i++) loop( i );
+          balls.push(new Ball(x, y, dx, dy, radius, color));
+        }
       }
 
       function resize() {
@@ -419,7 +301,7 @@ animate();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle &#x3D; &#x27;#282a36&#x27;;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        balls.forEach(function (circle) { return circle.update(balls); });
+        balls.forEach(function (circle) { return circle.update(); });
         requestAnimationFrame(animate);
       }
 
@@ -438,6 +320,6 @@ animate();
 
   <script src="./resources/common.js"></script>
   <script src="./resources/prism/prism.min.js"></script>
-  <script src="common.js"></script><script src="canvas-gravity2.js"></script>
+  <script src="common.js"></script><script src="canvas-gravity.js"></script>
   </body>
 </html>

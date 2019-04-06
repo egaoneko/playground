@@ -111,57 +111,59 @@ var sprites &#x3D; {
   }
 };
 
-getSpritesFromCanvas(&#x27;data/img/butterfly.png&#x27;, sprites)
-  .then(function (sprites) {
+map.on(&#x27;load&#x27;, function () {
+  getSpritesFromCanvas(&#x27;data/img/butterfly.png&#x27;, sprites)
+    .then(function (sprites) {
 
-    var spritesCount &#x3D; sprites.length;
-    var images &#x3D; new Array(spritesCount);
-    for (var i &#x3D; 0; i &lt; spritesCount; ++i) {
-      var ref &#x3D; sprites[i];
-      var name &#x3D; ref[0];
-      var image &#x3D; ref[1];
-      var ctx &#x3D; image.getContext(&#x27;2d&#x27;);
-      map.addImage(name, ctx.getImageData(0, 0, image.width, image.height));
-      images[i] &#x3D; name;
-    }
+      var spritesCount &#x3D; sprites.length;
+      var images &#x3D; new Array(spritesCount);
+      for (var i &#x3D; 0; i &lt; spritesCount; ++i) {
+        var ref &#x3D; sprites[i];
+        var name &#x3D; ref[0];
+        var image &#x3D; ref[1];
+        var ctx &#x3D; image.getContext(&#x27;2d&#x27;);
+        map.addImage(name, ctx.getImageData(0, 0, image.width, image.height));
+        images[i] &#x3D; name;
+      }
 
-    var featureCount &#x3D; 500;
-    var features &#x3D; new Array(featureCount);
-    var lng &#x3D; 180;
-    var lat &#x3D; 90;
-    for (var i$1 &#x3D; 0; i$1 &lt; featureCount; ++i$1) {
-      features[i$1] &#x3D; {
-        type: &quot;Feature&quot;,
-        geometry: {
-          type: &quot;Point&quot;,
-          coordinates: [2 * lng * Math.random() - lng, 2 * lat * Math.random() - lat],
-        },
-        properties: {
-          icon: images[i$1 % (spritesCount - 1)]
-        }
-      };
-    }
+      var featureCount &#x3D; 500;
+      var features &#x3D; new Array(featureCount);
+      var lng &#x3D; 180;
+      var lat &#x3D; 90;
+      for (var i$1 &#x3D; 0; i$1 &lt; featureCount; ++i$1) {
+        features[i$1] &#x3D; {
+          type: &quot;Feature&quot;,
+          geometry: {
+            type: &quot;Point&quot;,
+            coordinates: [2 * lng * Math.random() - lng, 2 * lat * Math.random() - lat],
+          },
+          properties: {
+            icon: images[i$1 % (spritesCount - 1)]
+          }
+        };
+      }
 
-    map.addSource(
-      &quot;points&quot;,
-      {
-        type: &quot;geojson&quot;,
-        data: {
-          type: &quot;FeatureCollection&quot;,
-          features: features,
+      map.addSource(
+        &quot;points&quot;,
+        {
+          type: &quot;geojson&quot;,
+          data: {
+            type: &quot;FeatureCollection&quot;,
+            features: features,
+          }
+        });
+
+      map.addLayer({
+        &quot;id&quot;: &quot;points&quot;,
+        &quot;type&quot;: &quot;symbol&quot;,
+        &quot;source&quot;: &quot;points&quot;,
+        &quot;layout&quot;: {
+          &quot;icon-image&quot;: &quot;{icon}&quot;,
+          &quot;icon-size&quot;: 1
         }
       });
-
-    map.addLayer({
-      &quot;id&quot;: &quot;points&quot;,
-      &quot;type&quot;: &quot;symbol&quot;,
-      &quot;source&quot;: &quot;points&quot;,
-      &quot;layout&quot;: {
-        &quot;icon-image&quot;: &quot;{icon}&quot;,
-        &quot;icon-size&quot;: 1
-      }
     });
-  });
+});
 
 function getSpritesFromCanvas(spriteSheet, sprites) {
   return new Promise(function (resolve, reject) {
@@ -273,57 +275,59 @@ function getSprite(spriteSheet, sprites, spriteName) {
         }
       };
 
-      getSpritesFromCanvas(&#x27;data/img/butterfly.png&#x27;, sprites)
-        .then(function (sprites) {
+      map.on(&#x27;load&#x27;, function () {
+        getSpritesFromCanvas(&#x27;data/img/butterfly.png&#x27;, sprites)
+          .then(function (sprites) {
 
-          var spritesCount &#x3D; sprites.length;
-          var images &#x3D; new Array(spritesCount);
-          for (var i &#x3D; 0; i &lt; spritesCount; ++i) {
-            var ref &#x3D; sprites[i];
-            var name &#x3D; ref[0];
-            var image &#x3D; ref[1];
-            var ctx &#x3D; image.getContext(&#x27;2d&#x27;);
-            map.addImage(name, ctx.getImageData(0, 0, image.width, image.height));
-            images[i] &#x3D; name;
-          }
+            var spritesCount &#x3D; sprites.length;
+            var images &#x3D; new Array(spritesCount);
+            for (var i &#x3D; 0; i &lt; spritesCount; ++i) {
+              var ref &#x3D; sprites[i];
+              var name &#x3D; ref[0];
+              var image &#x3D; ref[1];
+              var ctx &#x3D; image.getContext(&#x27;2d&#x27;);
+              map.addImage(name, ctx.getImageData(0, 0, image.width, image.height));
+              images[i] &#x3D; name;
+            }
 
-          var featureCount &#x3D; 500;
-          var features &#x3D; new Array(featureCount);
-          var lng &#x3D; 180;
-          var lat &#x3D; 90;
-          for (var i$1 &#x3D; 0; i$1 &lt; featureCount; ++i$1) {
-            features[i$1] &#x3D; {
-              type: &quot;Feature&quot;,
-              geometry: {
-                type: &quot;Point&quot;,
-                coordinates: [2 * lng * Math.random() - lng, 2 * lat * Math.random() - lat],
-              },
-              properties: {
-                icon: images[i$1 % (spritesCount - 1)]
-              }
-            };
-          }
+            var featureCount &#x3D; 500;
+            var features &#x3D; new Array(featureCount);
+            var lng &#x3D; 180;
+            var lat &#x3D; 90;
+            for (var i$1 &#x3D; 0; i$1 &lt; featureCount; ++i$1) {
+              features[i$1] &#x3D; {
+                type: &quot;Feature&quot;,
+                geometry: {
+                  type: &quot;Point&quot;,
+                  coordinates: [2 * lng * Math.random() - lng, 2 * lat * Math.random() - lat],
+                },
+                properties: {
+                  icon: images[i$1 % (spritesCount - 1)]
+                }
+              };
+            }
 
-          map.addSource(
-            &quot;points&quot;,
-            {
-              type: &quot;geojson&quot;,
-              data: {
-                type: &quot;FeatureCollection&quot;,
-                features: features,
+            map.addSource(
+              &quot;points&quot;,
+              {
+                type: &quot;geojson&quot;,
+                data: {
+                  type: &quot;FeatureCollection&quot;,
+                  features: features,
+                }
+              });
+
+            map.addLayer({
+              &quot;id&quot;: &quot;points&quot;,
+              &quot;type&quot;: &quot;symbol&quot;,
+              &quot;source&quot;: &quot;points&quot;,
+              &quot;layout&quot;: {
+                &quot;icon-image&quot;: &quot;{icon}&quot;,
+                &quot;icon-size&quot;: 1
               }
             });
-
-          map.addLayer({
-            &quot;id&quot;: &quot;points&quot;,
-            &quot;type&quot;: &quot;symbol&quot;,
-            &quot;source&quot;: &quot;points&quot;,
-            &quot;layout&quot;: {
-              &quot;icon-image&quot;: &quot;{icon}&quot;,
-              &quot;icon-size&quot;: 1
-            }
           });
-        });
+      });
 
       function getSpritesFromCanvas(spriteSheet, sprites) {
         return new Promise(function (resolve, reject) {
