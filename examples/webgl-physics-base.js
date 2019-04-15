@@ -1,5 +1,5 @@
-import {setupPlaneMesh, setupSphereMesh} from "./utils/webgl/mesh-utils";
-import {SphereObject} from "./utils/webgl/object-utils";
+import {setupPlaneMesh, setupSphereMesh} from "./utils/graphics/webgl/mesh-utils";
+import {SphereObject} from "./utils/graphics/webgl/object-utils";
 
 let gl = null;
 let canvas = null;

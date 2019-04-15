@@ -1,4 +1,4 @@
-import { Particle } from './utils/webgl/object-utils';
+import { Particle } from './utils/graphics/webgl/object-utils';
 
 let gl = null;
 let canvas = null;

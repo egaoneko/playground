@@ -1,7 +1,7 @@
 import {
   setupPlaneMesh,
   setupSphereMesh
-} from "./utils/webgl/mesh-utils";
+} from "./utils/graphics/webgl/mesh-utils";
 
 let gl = null;
 let canvas = null;

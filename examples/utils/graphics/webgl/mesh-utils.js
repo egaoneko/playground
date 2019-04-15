@@ -1,4 +1,4 @@
-import Vector3 from "../../../src/pg/math/vector3";
+import Vector3 from "../../../../src/pg/math/vector3";
 
 export function setupPlaneMesh(gl, buffers, n, options) {
   options = Object.assign({}, {

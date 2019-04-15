@@ -1,4 +1,4 @@
-import {randomInt} from "../../../src/pg/utils/math";
+import {randomInt} from "../../../../src/pg/utils/math";
 
 export function generatePoints(size, extent) {
   const points = [];

@@ -1,4 +1,4 @@
-import { createGridMidPoint } from './utils/webgl/mesh-utils';
+import { createGridMidPoint } from './utils/graphics/webgl/mesh-utils';
 
 let gl = null;
 let canvas = null;

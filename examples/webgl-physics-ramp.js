@@ -1,11 +1,11 @@
 import {
   setupPlaneMesh,
   setupSphereMesh
-} from "./utils/webgl/mesh-utils";
+} from "./utils/graphics/webgl/mesh-utils";
 import {
   SphereObject,
   WallObject
-} from "./utils/webgl/object-utils";
+} from "./utils/graphics/webgl/object-utils";
 import Vector3 from "../src/pg/math/vector3";
 
 let gl = null;

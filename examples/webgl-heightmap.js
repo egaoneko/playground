@@ -1,4 +1,4 @@
-import { createGrid } from './utils/webgl/mesh-utils';
+import { createGrid } from './utils/graphics/webgl/mesh-utils';
 
 let gl = null;
 let canvas = null;
