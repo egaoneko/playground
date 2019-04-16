@@ -1,3 +1,5 @@
+import {dotProduct} from './utils';
+
 export default class Vector {
 
   constructor(x, y) {
@@ -14,5 +16,9 @@ export default class Vector {
 
   perpendicular() {
     return new Vector(-this.y, this.x);
+  }
+
+  dot(other) {
+    return dotProduct(this, other);
   }
 }

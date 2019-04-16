@@ -6,9 +6,9 @@ import {
   initApp
 } from './utils/graphics/pixi/utils';
 import {generatePoints} from './utils/graphics/pixi/figure';
-import convexHull from "./utils/graphics/convex-hull";
-import Shape from "./utils/graphics/shape";
-import Vector from "./utils/graphics/vector";
+import convexHull from './utils/graphics/2d/convex-hull';
+import Shape from './utils/graphics/2d/shape';
+import Vector from './utils/graphics/2d/vector';
 
 const colorSet = [
   0x8be9fd,

@@ -1,4 +1,7 @@
+import Projection from './projection';
+
 export default class Shape {
+
   constructor(vertices) {
     this.vertices = vertices;
   }
@@ -21,5 +24,23 @@ export default class Shape {
       axes.push(normal);
     }
     return axes;
+  }
+
+  project(axis) {
+    let min = axis.dot(this.vertices[0]);
+    let max = min;
+    const length = this.vertices.length;
+
+    for (let i = 1; i < length; i++) {
+      // NOTE: the axis must be normalized to get accurate projections
+      const p = axis.dot(this.vertices[i]);
+      if (p < min) {
+        min = p;
+      } else if (p > max) {
+        max = p;
+      }
+    }
+
+    return new Projection(min, max);
   }
 }
