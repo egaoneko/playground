@@ -30,8 +30,7 @@ export function drawPoints(app, basis, points, style) {
   const graphics = new PIXI.Graphics();
 
   points.forEach(point => {
-    point = new PIXI.Point(point.x, point.y);
-    point = basis.apply(point);
+    point = getPixiPoint(point, basis);
 
     graphics.lineStyle(0);
     graphics.beginFill(style.color, 1);
@@ -48,8 +47,7 @@ export function drawPolygon(app, basis, points, style) {
   graphics.beginFill(style.color, 0.3);
 
   points.forEach((point, index) => {
-    point = new PIXI.Point(point.x, point.y);
-    point = basis.apply(point);
+    point = getPixiPoint(point, basis);
 
     if (index === 0) {
       graphics.moveTo(point.x, point.y);
@@ -60,4 +58,27 @@ export function drawPolygon(app, basis, points, style) {
   graphics.endFill();
 
   app.stage.addChild(graphics);
+}
+
+export function drawLine(app, basis, from, to, style) {
+  const graphics = new PIXI.Graphics();
+  from = getPixiPoint(from, basis);
+  to = getPixiPoint(to, basis);
+
+  graphics.lineStyle(2, style.color, 1);
+  graphics.moveTo(from.x, from.y);
+  graphics.lineTo(to.x, to.y);
+  graphics.lineStyle(0);
+
+  app.stage.addChild(graphics);
+}
+
+function getPixiPoint(point, basis) {
+  point = new PIXI.Point(point.x, point.y);
+
+  if (basis) {
+    point = basis.apply(point);
+  }
+
+  return point;
 }

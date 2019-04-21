@@ -1,5 +1,6 @@
 export default class MTV {
-  constructor(axis, overlap) {
+  constructor(shape, axis, overlap) {
+    this.shape = shape;
     this.axis = axis;
     this.overlap = overlap;
   }

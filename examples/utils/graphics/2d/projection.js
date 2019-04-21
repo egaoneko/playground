@@ -23,4 +23,8 @@ export default class Projection {
 
     return overlap;
   }
+
+  contains(other) {
+    return this.max > other.max && this.min < other.min;
+  }
 }

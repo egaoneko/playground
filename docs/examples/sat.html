@@ -74,6 +74,7 @@
           <textarea class="hidden" name="title">SAT</textarea>
           <textarea class="hidden" name="description">Separating Axis Theorem.</textarea>
           <textarea class="hidden" name="js">import {
+  drawLine,
   drawGrid,
   drawPoints,
   drawPolygon,
@@ -99,19 +100,35 @@ var basis &#x3D; generateBasis(app);
 
 drawGrid(app);
 
-var points1 &#x3D; convexHull(generatePoints(5, [-150, -50, 300,100]));
-var points2 &#x3D; convexHull(generatePoints(5, [-300, -100, 150,50]));
+var points1 &#x3D; convexHull(generatePoints(5, [-200, -100, 300, 100]));
+var points2 &#x3D; convexHull(generatePoints(5, [-300, -100, 200, 100]));
 
-drawPoints(app, basis, points1,{color: colorSet[1], size: 3});
+drawPoints(app, basis, points1, {color: colorSet[1], size: 3});
 drawPoints(app, basis, points2, {color: colorSet[5], size: 3});
 drawPolygon(app, basis, points1.concat( [points1[0]]), {color: colorSet[1], size: 3});
 drawPolygon(app, basis, points2.concat( [points2[0]]), {color: colorSet[5], size: 3});
 
 var shape1 &#x3D; new Shape(points1.map(function (p) { return new Vector(p.x, p.y); }));
 var shape2 &#x3D; new Shape(points2.map(function (p) { return new Vector(p.x, p.y); }));
-console.log(
-  SAT.getMTV(shape1, shape2)
-);
+var mtv &#x3D; SAT.getMTV(shape1, shape2);
+console.log(mtv);
+
+if (mtv) {
+  var points &#x3D; [].concat( mtv.shape.vertices );
+  var dx &#x3D; mtv.axis.x * mtv.overlap;
+  var dy &#x3D; mtv.axis.y * mtv.overlap;
+
+  drawLine(app, basis, {x: 0, y: 0}, {x: dx, y: dy}, {color: colorSet[3]});
+
+  points &#x3D; points.map(function (p) {
+    var point &#x3D; new Vector(p.x + dx, p.y + dy);
+    drawLine(app, basis, p, point, {color: colorSet[4]});
+    return point;
+  });
+  drawPoints(app, basis, points, {color: colorSet[4], size: 3});
+  drawPolygon(app, basis, points.concat( [points[0]]), {color: colorSet[4], size: 3});
+}
+
 </textarea>
           <textarea class="hidden" name="css"></textarea>
           <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
@@ -134,6 +151,7 @@ console.log(
     &lt;/div&gt;
     &lt;script&gt;
       import {
+        drawLine,
         drawGrid,
         drawPoints,
         drawPolygon,
@@ -159,19 +177,35 @@ console.log(
 
       drawGrid(app);
 
-      var points1 &#x3D; convexHull(generatePoints(5, [-150, -50, 300,100]));
-      var points2 &#x3D; convexHull(generatePoints(5, [-300, -100, 150,50]));
+      var points1 &#x3D; convexHull(generatePoints(5, [-200, -100, 300, 100]));
+      var points2 &#x3D; convexHull(generatePoints(5, [-300, -100, 200, 100]));
 
-      drawPoints(app, basis, points1,{color: colorSet[1], size: 3});
+      drawPoints(app, basis, points1, {color: colorSet[1], size: 3});
       drawPoints(app, basis, points2, {color: colorSet[5], size: 3});
       drawPolygon(app, basis, points1.concat( [points1[0]]), {color: colorSet[1], size: 3});
       drawPolygon(app, basis, points2.concat( [points2[0]]), {color: colorSet[5], size: 3});
 
       var shape1 &#x3D; new Shape(points1.map(function (p) { return new Vector(p.x, p.y); }));
       var shape2 &#x3D; new Shape(points2.map(function (p) { return new Vector(p.x, p.y); }));
-      console.log(
-        SAT.getMTV(shape1, shape2)
-      );
+      var mtv &#x3D; SAT.getMTV(shape1, shape2);
+      console.log(mtv);
+
+      if (mtv) {
+        var points &#x3D; [].concat( mtv.shape.vertices );
+        var dx &#x3D; mtv.axis.x * mtv.overlap;
+        var dy &#x3D; mtv.axis.y * mtv.overlap;
+
+        drawLine(app, basis, {x: 0, y: 0}, {x: dx, y: dy}, {color: colorSet[3]});
+
+        points &#x3D; points.map(function (p) {
+          var point &#x3D; new Vector(p.x + dx, p.y + dy);
+          drawLine(app, basis, p, point, {color: colorSet[4]});
+          return point;
+        });
+        drawPoints(app, basis, points, {color: colorSet[4], size: 3});
+        drawPolygon(app, basis, points.concat( [points[0]]), {color: colorSet[4], size: 3});
+      }
+
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>

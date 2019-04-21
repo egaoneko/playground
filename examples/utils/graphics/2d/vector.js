@@ -2,7 +2,7 @@ import {dotProduct} from './utils';
 
 export default class Vector {
   get length() {
-    return Math.sqrt(this.x * this. x + this.y * this.y);
+    return Math.sqrt(this.x * this.x + this.y * this.y);
   }
 
   constructor(x, y) {
@@ -25,7 +25,7 @@ export default class Vector {
     return dotProduct(this, other);
   }
 
-  normalization() {
+  normalize() {
     const length = this.length;
     return new Vector(this.x / length, this.y / length);
   }
