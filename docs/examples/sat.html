@@ -79,9 +79,12 @@
   drawPolygon,
   generateBasis,
   initApp
-} from &#x27;./utils/pixi/utils&#x27;;
-import {generatePoints} from &#x27;./utils/pixi/figure&#x27;;
-import convexHull from &quot;./utils/convex-hull&quot;;
+} from &#x27;./utils/graphics/pixi/utils&#x27;;
+import {generatePoints} from &#x27;./utils/graphics/pixi/figure&#x27;;
+import convexHull from &#x27;./utils/graphics/2d/convex-hull&#x27;;
+import Shape from &#x27;./utils/graphics/2d/shape&#x27;;
+import Vector from &#x27;./utils/graphics/2d/vector&#x27;;
+import SAT from &#x27;./utils/graphics/collision/sat&#x27;;
 
 var colorSet &#x3D; [
   0x8be9fd,
@@ -103,6 +106,12 @@ drawPoints(app, basis, points1,{color: colorSet[1], size: 3});
 drawPoints(app, basis, points2, {color: colorSet[5], size: 3});
 drawPolygon(app, basis, points1.concat( [points1[0]]), {color: colorSet[1], size: 3});
 drawPolygon(app, basis, points2.concat( [points2[0]]), {color: colorSet[5], size: 3});
+
+var shape1 &#x3D; new Shape(points1.map(function (p) { return new Vector(p.x, p.y); }));
+var shape2 &#x3D; new Shape(points2.map(function (p) { return new Vector(p.x, p.y); }));
+console.log(
+  SAT.getMTV(shape1, shape2)
+);
 </textarea>
           <textarea class="hidden" name="css"></textarea>
           <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
@@ -130,9 +139,12 @@ drawPolygon(app, basis, points2.concat( [points2[0]]), {color: colorSet[5], size
         drawPolygon,
         generateBasis,
         initApp
-      } from &#x27;./utils/pixi/utils&#x27;;
-      import {generatePoints} from &#x27;./utils/pixi/figure&#x27;;
-      import convexHull from &quot;./utils/convex-hull&quot;;
+      } from &#x27;./utils/graphics/pixi/utils&#x27;;
+      import {generatePoints} from &#x27;./utils/graphics/pixi/figure&#x27;;
+      import convexHull from &#x27;./utils/graphics/2d/convex-hull&#x27;;
+      import Shape from &#x27;./utils/graphics/2d/shape&#x27;;
+      import Vector from &#x27;./utils/graphics/2d/vector&#x27;;
+      import SAT from &#x27;./utils/graphics/collision/sat&#x27;;
 
       var colorSet &#x3D; [
         0x8be9fd,
@@ -154,6 +166,12 @@ drawPolygon(app, basis, points2.concat( [points2[0]]), {color: colorSet[5], size
       drawPoints(app, basis, points2, {color: colorSet[5], size: 3});
       drawPolygon(app, basis, points1.concat( [points1[0]]), {color: colorSet[1], size: 3});
       drawPolygon(app, basis, points2.concat( [points2[0]]), {color: colorSet[5], size: 3});
+
+      var shape1 &#x3D; new Shape(points1.map(function (p) { return new Vector(p.x, p.y); }));
+      var shape2 &#x3D; new Shape(points2.map(function (p) { return new Vector(p.x, p.y); }));
+      console.log(
+        SAT.getMTV(shape1, shape2)
+      );
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>

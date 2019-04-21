@@ -74,8 +74,8 @@
         <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
           <textarea class="hidden" name="title">WebGL physics collision detection</textarea>
           <textarea class="hidden" name="description">WebGL physics collision detection.</textarea>
-          <textarea class="hidden" name="js">import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
-import {SphereObject} from &quot;./utils/webgl/object-utils&quot;;
+          <textarea class="hidden" name="js">import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/graphics/webgl/mesh-utils&quot;;
+import {SphereObject} from &quot;./utils/graphics/webgl/object-utils&quot;;
 import Vector3 from &quot;../src/pg/math/vector3&quot;;
 
 var gl &#x3D; null;
@@ -428,8 +428,8 @@ function flatFragmentShaderSource() {
       &lt;canvas id&#x3D;&quot;canvas&quot;&gt;&lt;/canvas&gt;
     &lt;/div&gt;
     &lt;script&gt;
-      import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/webgl/mesh-utils&quot;;
-      import {SphereObject} from &quot;./utils/webgl/object-utils&quot;;
+      import {setupPlaneMesh, setupSphereMesh} from &quot;./utils/graphics/webgl/mesh-utils&quot;;
+      import {SphereObject} from &quot;./utils/graphics/webgl/object-utils&quot;;
       import Vector3 from &quot;../src/pg/math/vector3&quot;;
 
       var gl &#x3D; null;

@@ -9,6 +9,7 @@ import {generatePoints} from './utils/graphics/pixi/figure';
 import convexHull from './utils/graphics/2d/convex-hull';
 import Shape from './utils/graphics/2d/shape';
 import Vector from './utils/graphics/2d/vector';
+import SAT from './utils/graphics/collision/sat';
 
 const colorSet = [
   0x8be9fd,
@@ -32,6 +33,8 @@ drawPoints(app, basis, points2, {color: colorSet[5], size: 3});
 drawPolygon(app, basis, [...points1, points1[0]], {color: colorSet[1], size: 3});
 drawPolygon(app, basis, [...points2, points2[0]], {color: colorSet[5], size: 3});
 
+const shape1 = new Shape(points1.map(p => new Vector(p.x, p.y)));
+const shape2 = new Shape(points2.map(p => new Vector(p.x, p.y)));
 console.log(
-  new Shape(points1.map(p => new Vector(p.x, p.y)))
+  SAT.getMTV(shape1, shape2)
 );

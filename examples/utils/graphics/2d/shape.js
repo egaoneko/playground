@@ -19,7 +19,7 @@ export default class Shape {
       // subtract the two to get the edge vector
       const edge = p1.subtract(p2);
       // get either perpendicular vector
-      const normal = edge.perpendicular();
+      const normal = edge.perpendicular().normalization();
       // the perp method is just (x, y) => (-y, x) or (y, -x)
       axes.push(normal);
     }
