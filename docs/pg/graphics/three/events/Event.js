@@ -8,7 +8,7 @@ import Event from './../../../events/Event';
  * @classdesc
  * Three Event.
  */
-var ThreeEvent = /*@__PURE__*/(function (Event) {
+var ThreeEvent = (function (Event) {
 	function ThreeEvent () {
 		Event.apply(this, arguments);
 	}if ( Event ) ThreeEvent.__proto__ = Event;
