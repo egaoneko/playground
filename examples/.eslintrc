@@ -26,7 +26,8 @@
     "EventEmitter3": false,
     "_": false,
     "panzoom": false,
-    "PIXI": false
+    "PIXI": false,
+    "L": false,
   },
   "rules": {
     "no-unused-vars": [2, {"varsIgnorePattern": "^map"}]
