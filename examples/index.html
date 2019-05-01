@@ -174,7 +174,17 @@
         }
         template = new jugl.Template("template");
         target = document.getElementById("examples");
-        listExamples(info.examples);
+
+        var examples = info.examples.slice();
+        examples.sort(function(a, b) {
+          a = a.title.toLowerCase();
+          b = b.title.toLowerCase();
+          if (a > b) return 1;
+          if (b > a) return -1;
+          return 0;
+        });
+
+        listExamples(examples);
         document.getElementById("keywords").onkeyup = inputChange;
         parseQuery();
       };
