@@ -54,6 +54,8 @@
 <button class="action-btn" id="send-beacon-2">sendBeacon() with beforeunload</button>
 <button class="action-btn" id="send-beacon-3">sendBeacon() with unload</button>
 <button class="action-btn" id="send-beacon-4">sendBeacon() with pagehide</button>
+<button class="action-btn" id="send-beacon-5">sendBeacon() with global error</button>
+<button class="action-btn" id="send-beacon-6">sendBeacon() with ReportObserver</button>
 <button class="action-btn" id="async-xmlhttprequest">Async XMLHttpRequest</button>
 <button class="action-btn" id="sync-xmlhttprequest">Sync XMLHttpRequest</button>
 
@@ -63,7 +65,7 @@
       <div class="row-fluid">
         <div class="span12">
           <p id="shortdesc">sendBeacon examples.</p>
-          <div id="docs"><p>Separating Axis Theorem.</p>
+          <div id="docs"><p>sendBeacon examples.</p>
 </div>
           <p id="tags">Tags: sendBeacon</p>
         </div>
@@ -104,7 +106,7 @@ document.querySelector(&#x27;#send-beacon-2&#x27;)
       alert(&#x27;Not support sendBeacon in this browser.&#x27;);
     }
 
-    window.addEventListener(&#x27;beforeunload&#x27;, function() {
+    window.addEventListener(&#x27;beforeunload&#x27;, function () {
       sendBeacon(putsReqUrl, (&quot;Sent by a beacon when beforeunload! @&quot; + (new Date())));
     }, false);
   });
@@ -115,7 +117,7 @@ document.querySelector(&#x27;#send-beacon-3&#x27;)
       alert(&#x27;Not support sendBeacon in this browser.&#x27;);
     }
 
-    window.addEventListener(&#x27;unload&#x27;, function() {
+    window.addEventListener(&#x27;unload&#x27;, function () {
       sendBeacon(putsReqUrl, (&quot;Sent by a beacon when unload! @&quot; + (new Date())));
     }, false);
   });
@@ -126,21 +128,84 @@ document.querySelector(&#x27;#send-beacon-4&#x27;)
       alert(&#x27;Not support sendBeacon in this browser.&#x27;);
     }
 
-    window.addEventListener(&#x27;pagehide&#x27;, function() {
+    window.addEventListener(&#x27;pagehide&#x27;, function () {
       sendBeacon(putsReqUrl, (&quot;Sent by a beacon when pagehide! @&quot; + (new Date())));
     }, false);
   });
 
+document.querySelector(&#x27;#send-beacon-5&#x27;)
+  .addEventListener(&#x27;click&#x27;, function () {
+    if (!(&#x27;sendBeacon&#x27; in navigator)) {
+      alert(&#x27;Not support sendBeacon in this browser.&#x27;);
+    }
+
+    throw new Error(&#x27;Global Error Test&#x27;);
+  });
+
+document.querySelector(&#x27;#send-beacon-5&#x27;)
+  .addEventListener(&#x27;click&#x27;, function () {
+    if (!(&#x27;sendBeacon&#x27; in navigator)) {
+      alert(&#x27;Not support sendBeacon in this browser.&#x27;);
+    }
+
+    var handler &#x3D; function (ref) {
+      var message &#x3D; ref.message;
+      var filename &#x3D; ref.filename;
+      var lineno &#x3D; ref.lineno;
+      var colno &#x3D; ref.colno;
+      var error &#x3D; ref.error;
+
+      var formData &#x3D; new FormData();
+      formData.append(&#x27;message&#x27;, message);
+      formData.append(&#x27;filename&#x27;, filename);
+      formData.append(&#x27;lineno&#x27;, lineno);
+      formData.append(&#x27;colno&#x27;, colno);
+      formData.append(&#x27;error&#x27;, error);
+
+      sendBeacon(putsReqUrl, formData);
+      window.removeEventListener(&#x27;error&#x27;, handler, false);
+    };
+
+    window.addEventListener(&#x27;error&#x27;, handler, false);
+
+    throw (&quot;Sent by a beacon when global error! @&quot; + (new Date()));
+  });
+
+document.querySelector(&#x27;#send-beacon-6&#x27;)
+  .addEventListener(&#x27;click&#x27;, function () {
+    if (!(&#x27;sendBeacon&#x27; in navigator)) {
+      alert(&#x27;Not support sendBeacon in this browser.&#x27;);
+    }
+
+    var request &#x3D; new XMLHttpRequest();
+    request.open(&#x27;GET&#x27;, &#x27;http://numbersapi.com/42&#x27;, false);
+    request.send(null);
+    if (request.status &#x3D;&#x3D;&#x3D; 200) {
+      console.log(request.responseText);
+    }
+
+    var observer &#x3D; new ReportingObserver(function (reports, observer) {
+      reports.forEach(function (report) {
+        sendBeacon(putsReqUrl, JSON.stringify(report.body, [&#x27;id&#x27;, &#x27;columnNumber&#x27;, &#x27;lineNumber&#x27;, &#x27;message&#x27;, &#x27;sourceFile&#x27;]));
+      });
+      observer.disconnect();
+    }, {types: [&#x27;intervention&#x27;, &#x27;deprecation&#x27;], buffered: true});
+
+    observer.observe();
+
+    // throw &#x60;Sent by a beacon when ReportObserver! @${new Date()}&#x60;;
+  });
+
 document.querySelector(&#x27;#async-xmlhttprequest&#x27;)
   .addEventListener(&#x27;click&#x27;, function () {
-    window.addEventListener(&#x27;beforeunload&#x27;, function() {
+    window.addEventListener(&#x27;beforeunload&#x27;, function () {
       sendXMLHttpRequest(putsReqUrl, (&quot;Sent by a async XMLHttpRequest when beforeunload! @&quot; + (new Date())), true);
     }, false);
   });
 
 document.querySelector(&#x27;#sync-xmlhttprequest&#x27;)
   .addEventListener(&#x27;click&#x27;, function () {
-    window.addEventListener(&#x27;beforeunload&#x27;, function() {
+    window.addEventListener(&#x27;beforeunload&#x27;, function () {
       sendXMLHttpRequest(putsReqUrl, (&quot;Sent by a sync XMLHttpRequest when beforeunload! @&quot; + (new Date())), false);
     }, false);
   });
@@ -166,6 +231,8 @@ function sendXMLHttpRequest(url, data, async) {
 &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;send-beacon-2&quot;&gt;sendBeacon() with beforeunload&lt;/button&gt;
 &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;send-beacon-3&quot;&gt;sendBeacon() with unload&lt;/button&gt;
 &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;send-beacon-4&quot;&gt;sendBeacon() with pagehide&lt;/button&gt;
+&lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;send-beacon-5&quot;&gt;sendBeacon() with global error&lt;/button&gt;
+&lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;send-beacon-6&quot;&gt;sendBeacon() with ReportObserver&lt;/button&gt;
 &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;async-xmlhttprequest&quot;&gt;Async XMLHttpRequest&lt;/button&gt;
 &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;sync-xmlhttprequest&quot;&gt;Sync XMLHttpRequest&lt;/button&gt;
 </textarea>
@@ -192,6 +259,8 @@ function sendXMLHttpRequest(url, data, async) {
     &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;send-beacon-2&quot;&gt;sendBeacon() with beforeunload&lt;/button&gt;
     &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;send-beacon-3&quot;&gt;sendBeacon() with unload&lt;/button&gt;
     &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;send-beacon-4&quot;&gt;sendBeacon() with pagehide&lt;/button&gt;
+    &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;send-beacon-5&quot;&gt;sendBeacon() with global error&lt;/button&gt;
+    &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;send-beacon-6&quot;&gt;sendBeacon() with ReportObserver&lt;/button&gt;
     &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;async-xmlhttprequest&quot;&gt;Async XMLHttpRequest&lt;/button&gt;
     &lt;button class&#x3D;&quot;action-btn&quot; id&#x3D;&quot;sync-xmlhttprequest&quot;&gt;Sync XMLHttpRequest&lt;/button&gt;
     &lt;script&gt;
@@ -222,7 +291,7 @@ function sendXMLHttpRequest(url, data, async) {
             alert(&#x27;Not support sendBeacon in this browser.&#x27;);
           }
 
-          window.addEventListener(&#x27;beforeunload&#x27;, function() {
+          window.addEventListener(&#x27;beforeunload&#x27;, function () {
             sendBeacon(putsReqUrl, (&quot;Sent by a beacon when beforeunload! @&quot; + (new Date())));
           }, false);
         });
@@ -233,7 +302,7 @@ function sendXMLHttpRequest(url, data, async) {
             alert(&#x27;Not support sendBeacon in this browser.&#x27;);
           }
 
-          window.addEventListener(&#x27;unload&#x27;, function() {
+          window.addEventListener(&#x27;unload&#x27;, function () {
             sendBeacon(putsReqUrl, (&quot;Sent by a beacon when unload! @&quot; + (new Date())));
           }, false);
         });
@@ -244,21 +313,84 @@ function sendXMLHttpRequest(url, data, async) {
             alert(&#x27;Not support sendBeacon in this browser.&#x27;);
           }
 
-          window.addEventListener(&#x27;pagehide&#x27;, function() {
+          window.addEventListener(&#x27;pagehide&#x27;, function () {
             sendBeacon(putsReqUrl, (&quot;Sent by a beacon when pagehide! @&quot; + (new Date())));
           }, false);
         });
 
+      document.querySelector(&#x27;#send-beacon-5&#x27;)
+        .addEventListener(&#x27;click&#x27;, function () {
+          if (!(&#x27;sendBeacon&#x27; in navigator)) {
+            alert(&#x27;Not support sendBeacon in this browser.&#x27;);
+          }
+
+          throw new Error(&#x27;Global Error Test&#x27;);
+        });
+
+      document.querySelector(&#x27;#send-beacon-5&#x27;)
+        .addEventListener(&#x27;click&#x27;, function () {
+          if (!(&#x27;sendBeacon&#x27; in navigator)) {
+            alert(&#x27;Not support sendBeacon in this browser.&#x27;);
+          }
+
+          var handler &#x3D; function (ref) {
+            var message &#x3D; ref.message;
+            var filename &#x3D; ref.filename;
+            var lineno &#x3D; ref.lineno;
+            var colno &#x3D; ref.colno;
+            var error &#x3D; ref.error;
+
+            var formData &#x3D; new FormData();
+            formData.append(&#x27;message&#x27;, message);
+            formData.append(&#x27;filename&#x27;, filename);
+            formData.append(&#x27;lineno&#x27;, lineno);
+            formData.append(&#x27;colno&#x27;, colno);
+            formData.append(&#x27;error&#x27;, error);
+
+            sendBeacon(putsReqUrl, formData);
+            window.removeEventListener(&#x27;error&#x27;, handler, false);
+          };
+
+          window.addEventListener(&#x27;error&#x27;, handler, false);
+
+          throw (&quot;Sent by a beacon when global error! @&quot; + (new Date()));
+        });
+
+      document.querySelector(&#x27;#send-beacon-6&#x27;)
+        .addEventListener(&#x27;click&#x27;, function () {
+          if (!(&#x27;sendBeacon&#x27; in navigator)) {
+            alert(&#x27;Not support sendBeacon in this browser.&#x27;);
+          }
+
+          var request &#x3D; new XMLHttpRequest();
+          request.open(&#x27;GET&#x27;, &#x27;http://numbersapi.com/42&#x27;, false);
+          request.send(null);
+          if (request.status &#x3D;&#x3D;&#x3D; 200) {
+            console.log(request.responseText);
+          }
+
+          var observer &#x3D; new ReportingObserver(function (reports, observer) {
+            reports.forEach(function (report) {
+              sendBeacon(putsReqUrl, JSON.stringify(report.body, [&#x27;id&#x27;, &#x27;columnNumber&#x27;, &#x27;lineNumber&#x27;, &#x27;message&#x27;, &#x27;sourceFile&#x27;]));
+            });
+            observer.disconnect();
+          }, {types: [&#x27;intervention&#x27;, &#x27;deprecation&#x27;], buffered: true});
+
+          observer.observe();
+
+          // throw &#x60;Sent by a beacon when ReportObserver! @${new Date()}&#x60;;
+        });
+
       document.querySelector(&#x27;#async-xmlhttprequest&#x27;)
         .addEventListener(&#x27;click&#x27;, function () {
-          window.addEventListener(&#x27;beforeunload&#x27;, function() {
+          window.addEventListener(&#x27;beforeunload&#x27;, function () {
             sendXMLHttpRequest(putsReqUrl, (&quot;Sent by a async XMLHttpRequest when beforeunload! @&quot; + (new Date())), true);
           }, false);
         });
 
       document.querySelector(&#x27;#sync-xmlhttprequest&#x27;)
         .addEventListener(&#x27;click&#x27;, function () {
-          window.addEventListener(&#x27;beforeunload&#x27;, function() {
+          window.addEventListener(&#x27;beforeunload&#x27;, function () {
             sendXMLHttpRequest(putsReqUrl, (&quot;Sent by a sync XMLHttpRequest when beforeunload! @&quot; + (new Date())), false);
           }, false);
         });
