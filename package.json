@@ -51,9 +51,9 @@
     "front-matter": "^2.1.2",
     "fs-extra": "^7.0.0",
     "glob": "^7.1.2",
-    "handlebars": "4.0.11",
+    "handlebars": "^4.1.2",
     "istanbul": "0.4.5",
-    "jquery": "3.4.0",
+    "jquery": "^3.4.0",
     "jsdoc": "3.5.5",
     "karma": "^3.0.0",
     "karma-chrome-launcher": "2.2.0",
@@ -63,7 +63,7 @@
     "karma-sauce-launcher": "1.2.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "4.0.0-beta.0",
-    "marked": "0.5.0",
+    "marked": "^0.6.2",
     "mocha": "5.2.0",
     "mustache": "^2.3.0",
     "pixelmatch": "^4.0.2",
@@ -106,7 +106,6 @@
     "example.css"
   ],
   "dependencies": {
-    "eventemitter3": "^3.1.0",
-    "threadpool-js": "^0.5.0"
+    "eventemitter3": "^3.1.0"
   }
 }
