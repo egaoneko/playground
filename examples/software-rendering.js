@@ -1,6 +1,3 @@
-const canvas = document.querySelector('canvas');
-const ctx = canvas.getContext('2d');
-
 class Matrix4 {
   
   static create() {
@@ -45,11 +42,69 @@ class Matrix4 {
 
     return out;
   }
+
+  static perspective(out, fovy, aspect, near, far) {
+    let f = 1.0 / Math.tan(fovy / 2);
+    let nf;
+
+    out[0] = f / aspect;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[5] = f;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = 0;
+    out[9] = 0;
+    out[11] = -1;
+    out[12] = 0;
+    out[13] = 0;
+    out[15] = 0;
+
+    if (far != null && far !== Infinity) {
+      nf = 1 / (near - far);
+      out[10] = (far + near) * nf;
+      out[14] = (2 * far * near) * nf;
+    } else {
+      out[10] = -1;
+      out[14] = -2 * near;
+    }
+
+    return out;
+  }
 }
 
-console.log(Matrix4.create());
-console.log(Matrix4.multiply(
-  Matrix4.create(),
-  [5, 7, 9, 10, 2, 3, 3, 8, 8, 10, 2, 3, 3, 3, 4, 8],
-  [3, 10, 12, 18, 12, 1, 4, 9, 9, 10 ,12, 2, 3, 12, 4, 10]
-));
+class Renderer {
+  constructor(container) {
+    if (typeof container === 'string') {
+      container = document.querySelector(`#${container}`);
+    }
+
+    if (!(container instanceof HTMLElement)) {
+      throw 'Container must be HTMLElment';
+    }
+
+    this._initCanvas(container);
+  }
+
+  draw() {
+    this.ctx.fillRect(20, 20, 20, 20);
+  }
+
+  _initCanvas(container) {
+    this.width = container.clientWidth;
+    this.height = container.clientHeight;
+    const canvas = document.createElement('canvas');
+    canvas.width = this.width;
+    canvas.height = this.height;
+
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+
+    container.appendChild(canvas);
+  }
+}
+
+const renderer = new Renderer('container');
+renderer.draw();
