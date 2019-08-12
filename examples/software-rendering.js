@@ -181,8 +181,7 @@ class Renderer {
   }
 
   render() {
-    this.ctx.fillRect(20, 20, 20, 20);
-    const model = new Model(Vector4.fromValues(0.5, 0.5, 1, 1));
+    const model = new Model(Vector4.fromValues(0.2, 0.2, 1, 1));
     this.renderModel(model);
   }
 
@@ -214,12 +213,16 @@ class Renderer {
     const f = this.far;
 
     const wc = Vector3.fromValues(
-      (w * 0.5 * ndcX) + (x + w * 0.5),
-      (h * 0.5 * ndcY) + (y + h * 0.5),
-      ((f - n) * 0.5 * ndcZ) + ((f + n) * 0.5)
+      w * 0.5 * ndcX + (x + w * 0.5),
+      h * 0.5 * ndcY + (y + h * 0.5),
+      (f - n) * 0.5 * ndcZ + (f + n) * 0.5
     );
 
-    console.log(wc);
+    this.ctx.beginPath();
+    this.ctx.arc(wc[0], wc[1], 5, 0, Math.PI * 2, true);
+    this.ctx.stroke();
+
+    console.log(ndc, wc);
   }
 
   _initCanvas(container) {
