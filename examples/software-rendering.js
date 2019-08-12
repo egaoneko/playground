@@ -128,11 +128,38 @@ class Vector4 {
     out[3] = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
     return out;
   }
+
+  static perspectiveDivision(out, vector4) {
+    const [x, y, z, w] = vector4;
+    out[0] = x / w;
+    out[1] = y / w;
+    out[2] = z / w;
+    return out;
+  }
+}
+
+class Vector3 {
+  static create() {
+    const out = new Float32Array(3);
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+    return out;
+  }
+
+  static fromValues(x, y, z) {
+    const out = new Float32Array(3);
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+    return out;
+  }
 }
 
 class Model {
   constructor(position) {
     this.position = position;
+    this.matrix = Matrix4.create();
   }
 }
 
@@ -147,12 +174,19 @@ class Renderer {
     }
 
     this._initCanvas(container);
+    this.x = 0;
+    this.y = 0;
+    this.near = 0;
+    this.far = 1;
   }
 
-  draw() {
+  render() {
     this.ctx.fillRect(20, 20, 20, 20);
-    const model = new Model(Vector4.fromValues(10, 10, 1, 1));
-    const mMatrix = Matrix4.create();
+    const model = new Model(Vector4.fromValues(0.5, 0.5, 1, 1));
+    this.renderModel(model);
+  }
+
+  renderModel(model) {
     const vMatrix = Matrix4.create();
     const pMatrix = Matrix4.perspective(
       Matrix4.create(),
@@ -162,10 +196,30 @@ class Renderer {
       100.0
     );
 
-    const vector = Vector4.transformMat4(Vector4.create(), model.position, mMatrix);
-    Vector4.transformMat4(vector, vector, vMatrix);
-    Vector4.transformMat4(vector, vector, pMatrix);
-    console.log(vector);
+    const cc = Vector4.transformMat4(
+      Vector4.create(),
+      model.position,
+      model.matrix
+    );
+    Vector4.transformMat4(cc, cc, vMatrix);
+    Vector4.transformMat4(cc, cc, pMatrix);
+
+    const ndc = Vector4.perspectiveDivision(Vector3.create(), cc);
+    const [ndcX, ndcY, ndcZ] = ndc;
+    const x = this.x;
+    const y = this.y;
+    const w = this.width;
+    const h = this.height;
+    const n = this.near;
+    const f = this.far;
+
+    const wc = Vector3.fromValues(
+      (w * 0.5 * ndcX) + (x + w * 0.5),
+      (h * 0.5 * ndcY) + (y + h * 0.5),
+      ((f - n) * 0.5 * ndcZ) + ((f + n) * 0.5)
+    );
+
+    console.log(wc);
   }
 
   _initCanvas(container) {
@@ -183,4 +237,4 @@ class Renderer {
 }
 
 const renderer = new Renderer("container");
-renderer.draw();
+renderer.render();
