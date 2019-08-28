@@ -84,13 +84,7 @@ export default class Renderer {
     // );
 
     const pMatrix = Matrix4.orthogonal(
-      Matrix4.create(),
-      0,
-      this.width,
-      0,
-      this.height,
-      0.1,
-      100.0
+      Matrix4.create(), -1.0, 1.0, -1.0, 1.0, 0.1, 100.0
     );
 
     model.vertices.forEach(vertex => {
