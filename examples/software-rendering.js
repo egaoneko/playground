@@ -2,7 +2,7 @@ import Renderer from './utils/software-rendering/renderer';
 import Model from './utils/software-rendering/model';
 import Vector3 from './utils/software-rendering/math/vector3';
 import PerspectiveProjection from './utils/software-rendering/projection/perspective-projection';
-import OrthogonalProjection from './utils/software-rendering/projection/orthogonal-projection';
+import OrthographicProjection from './utils/software-rendering/projection/orthographic-projection';
 
 const renderer = new Renderer('container');
 const model = new Model(
@@ -54,7 +54,7 @@ const model = new Model(
 );
 
 const perspective = new PerspectiveProjection(45, renderer.width / renderer.height, 0.1, 100.0);
-const orthogonal = new OrthogonalProjection(-1.0, 1.0, -1.0, 1.0, 0.1, 100.0);
+const orthographic = new OrthographicProjection(-1.0, 1.0, -1.0, 1.0, 0.1, 100.0);
 
 renderer.scale = Vector3.fromValues(0.5, 0.5, 0.5);
 renderer.scale = Vector3.fromValues(1, 1, 1);
@@ -70,10 +70,10 @@ const data = {
 const gui = new dat.GUI();
 const f1 = gui.addFolder('Projection');
 
-controller = f1.add(data, 'projection', ['perspective', 'orthogonal']);
+controller = f1.add(data, 'projection', ['perspective', 'orthographic']);
 controller.onFinishChange(function(value) {
-  if (value === 'orthogonal') {
-    renderer.projection = orthogonal;
+  if (value === 'orthographic') {
+    renderer.projection = orthographic;
   } else {
     renderer.projection = perspective;
   }

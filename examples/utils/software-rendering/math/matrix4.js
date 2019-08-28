@@ -97,7 +97,7 @@ export default class Matrix4 {
     return out;
   }
 
-  static orthogonal(out, left, right, bottom, top, near, far) {
+  static orthographic(out, left, right, bottom, top, near, far) {
     let lr = 1 / (left - right);
     let bt = 1 / (bottom - top);
     let nf = 1 / (near - far);
@@ -118,7 +118,7 @@ export default class Matrix4 {
     out[13] = (top + bottom) * bt;
     out[14] = (far + near) * nf;
     out[15] = 1;
-    
+
     return out;
   }
 }
