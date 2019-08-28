@@ -1,8 +1,17 @@
 import Vector4 from './math/vector4';
 import Vector3 from './math/vector3';
 import Matrix4 from './math/matrix4';
+import Projection from './projection/projection';
 
 export default class Renderer {
+
+  get width() {
+    return this._width;
+  }
+
+  get height() {
+    return this._height;
+  }
 
   get scale() {
     return this._scale;
@@ -39,6 +48,15 @@ export default class Renderer {
     this._viewMatrix = matrix;
   }
 
+  get projection() {
+    return this._projection;
+  }
+
+  set projection(projection) {
+    this._projection = projection;
+    this.render();
+  }
+
   constructor(container) {
     if (typeof container === 'string') {
       container = document.querySelector(`#${container}`);
@@ -53,10 +71,11 @@ export default class Renderer {
     this.y = 0;
     this.near = 0;
     this.far = 1;
-    this.scale = Vector3.fromValues(1, 1, 1);
-    this.rotate = Vector3.create();
-    this.position = Vector3.create();
     this.models = [];
+    this._scale = Vector3.fromValues(1, 1, 1);
+    this._rotate = Vector3.create();
+    this._position = Vector3.create();
+    this._projection = new Projection();
     this.updateViewMatrix();
   }
 
@@ -65,7 +84,13 @@ export default class Renderer {
     this.render();
   }
 
+  clearRenderer() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
+  }
+
   render() {
+    this.clearRenderer();
+
     if (!Array.isArray(this.models)) {
       return;
     }
@@ -75,18 +100,9 @@ export default class Renderer {
 
   renderModel(model) {
     const vMatrix = this.viewMatrix;
-    // const pMatrix = Matrix4.perspective(
-    //   Matrix4.create(),
-    //   45,
-    //   this.width / this.height,
-    //   0.1,
-    //   100.0
-    // );
+    const pMatrix = this.projection.getMatrix();
 
-    const pMatrix = Matrix4.orthogonal(
-      Matrix4.create(), -1.0, 1.0, -1.0, 1.0, 0.1, 100.0
-    );
-
+    console.log('draw model');
     model.vertices.forEach(vertex => {
       const cc = Vector4.transformMat4(Vector4.create(), vertex, model.matrix);
       Vector4.transformMat4(cc, cc, vMatrix);
@@ -107,6 +123,8 @@ export default class Renderer {
         (f - n) * 0.5 * ndcZ + (f + n) * 0.5
       );
 
+      console.log(vertex[0], vertex[1], wc[0], wc[1]);
+
       this.ctx.beginPath();
       this.ctx.arc(wc[0], wc[1], 5, 0, Math.PI * 2, true);
       this.ctx.stroke();
@@ -114,8 +132,8 @@ export default class Renderer {
   }
 
   _initCanvas(container) {
-    this.width = container.clientWidth;
-    this.height = container.clientHeight;
+    this._width = container.clientWidth;
+    this._height = container.clientHeight;
     const canvas = document.createElement('canvas');
     canvas.width = this.width;
     canvas.height = this.height;

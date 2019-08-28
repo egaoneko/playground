@@ -1,8 +1,10 @@
 import Renderer from './utils/software-rendering/renderer';
 import Model from './utils/software-rendering/model';
 import Vector3 from './utils/software-rendering/math/vector3';
+import PerspectiveProjection from './utils/software-rendering/projection/perspective-projection';
+import OrthogonalProjection from './utils/software-rendering/projection/orthogonal-projection';
 
-const renderer = new Renderer("container");
+const renderer = new Renderer('container');
 const model = new Model(
   [
     // 앞면(Front face)
@@ -51,7 +53,30 @@ const model = new Model(
   ]
 );
 
+const perspective = new PerspectiveProjection(45, renderer.width / renderer.height, 0.1, 100.0);
+const orthogonal = new OrthogonalProjection(-1.0, 1.0, -1.0, 1.0, 0.1, 100.0);
+
 renderer.scale = Vector3.fromValues(0.5, 0.5, 0.5);
 renderer.scale = Vector3.fromValues(1, 1, 1);
+renderer.projection = perspective;
+// renderer.projection = orthogonal;
 renderer.appendChild(model);
 renderer.render();
+
+let controller;
+const data = {
+  projection: 'perspective'
+};
+const gui = new dat.GUI();
+const f1 = gui.addFolder('Projection');
+
+controller = f1.add(data, 'projection', ['perspective', 'orthogonal']);
+controller.onFinishChange(function(value) {
+  if (value === 'orthogonal') {
+    renderer.projection = orthogonal;
+  } else {
+    renderer.projection = perspective;
+  }
+});
+
+f1.open();
