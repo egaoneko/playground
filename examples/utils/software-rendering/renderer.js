@@ -99,14 +99,23 @@ export default class Renderer {
   }
 
   renderModel(model) {
+    if (!model || !model.vertices) {
+      return;
+    }
+
     const vMatrix = this.viewMatrix;
     const pMatrix = this.projection.getMatrix();
 
-    console.log('draw model');
-    model.vertices.forEach(vertex => {
+    const matrix = Matrix4.create();
+    Matrix4.multiply(matrix, vMatrix, matrix);
+    Matrix4.multiply(matrix, pMatrix, matrix);
+
+    const vertices = model.vertices.map(vertex => {
       const cc = Vector4.transformMat4(Vector4.create(), vertex, model.matrix);
-      Vector4.transformMat4(cc, cc, vMatrix);
-      Vector4.transformMat4(cc, cc, pMatrix);
+      console.log(cc);
+      console.log(matrix)
+      Vector4.transformMat4(cc, cc, matrix);
+      console.log(cc);
 
       const ndc = Vector4.perspectiveDivision(Vector3.create(), cc);
       const [ndcX, ndcY, ndcZ] = ndc;
@@ -117,18 +126,40 @@ export default class Renderer {
       const n = this.near;
       const f = this.far;
 
-      const wc = Vector3.fromValues(
+      return Vector3.fromValues(
         w * 0.5 * ndcX + (x + w * 0.5),
-        h * 0.5 * ndcY + (y + h * 0.5),
+        h - (h * 0.5 * ndcY + (y + h * 0.5)),
         (f - n) * 0.5 * ndcZ + (f + n) * 0.5
       );
+    });
 
-      console.log(vertex[0], vertex[1], wc[0], wc[1]);
+    console.log(vertices);
 
+    vertices.forEach(vertex => {
       this.ctx.beginPath();
-      this.ctx.arc(wc[0], wc[1], 5, 0, Math.PI * 2, true);
+      this.ctx.arc(vertex[0], vertex[1], 5, 0, Math.PI * 2, true);
       this.ctx.stroke();
     });
+
+    if (!model.indexes) {
+      return;
+    }
+
+    const indexes = model.indexes;
+    const length = indexes.length;
+
+    for (let i = 0; i < length; i += 3) {
+      const p1 = vertices[indexes[i]];
+      const p2 = vertices[indexes[i + 1]];
+      const p3 = vertices[indexes[i + 2]];
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(p1[0], p1[1]);
+      this.ctx.lineTo(p2[0], p2[1]);
+      this.ctx.lineTo(p3[0], p3[1]);
+      this.ctx.lineTo(p1[0], p1[1]);
+      this.ctx.stroke();
+    }
   }
 
   _initCanvas(container) {
@@ -146,11 +177,19 @@ export default class Renderer {
 
   updateViewMatrix() {
     const viewMarix = Matrix4.create();
+
     const scaleMatrix = Matrix4.create();
     scaleMatrix[0] = this.scale[0];
     scaleMatrix[5] = this.scale[1];
     scaleMatrix[10] = this.scale[2];
-    this.viewMatrix = Matrix4.multiply(viewMarix, viewMarix, scaleMatrix);
+    this.viewMatrix = Matrix4.multiply(viewMarix, scaleMatrix, viewMarix);
+
+    const positionMatrix = Matrix4.create();
+    positionMatrix[3] = this.position[0];
+    positionMatrix[7] = this.position[1];
+    positionMatrix[11] = this.position[2];
+    this.viewMatrix = Matrix4.multiply(viewMarix, positionMatrix, viewMarix);
+
     this.render();
   }
 }

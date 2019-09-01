@@ -67,7 +67,7 @@ export default class Matrix4 {
   }
 
   static perspective(out, fovy, aspect, near, far) {
-    let f = 0.5 / Math.tan(fovy / 2);
+    let f = 1.0 / Math.tan(fovy / 2);
     let nf;
 
     out[0] = f / aspect;
@@ -88,7 +88,7 @@ export default class Matrix4 {
     if (far != null && far !== Infinity) {
       nf = 1 / (near - far);
       out[10] = (far + near) * nf;
-      out[14] = 2 * far * near * nf;
+      out[14] = (2 * far * near) * nf;
     } else {
       out[10] = -1;
       out[14] = -2 * near;
