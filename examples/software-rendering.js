@@ -7,10 +7,6 @@ import OrthographicProjection from './utils/software-rendering/projection/orthog
 const renderer = new Renderer('container');
 const model = new Model(
   [
-    0.5, 0.0, 0.0,
-    // 0.0, 0.5, 0.0,
-    // 0.0, 0.0, 0.5,
-
     // // 앞면(Front face)
     // -0.5, -0.5,  0.5,
     // 0.5, -0.5,  0.5,
@@ -64,16 +60,16 @@ const perspective = new PerspectiveProjection(45, renderer.width / renderer.heig
 const orthographic = new OrthographicProjection(-1.0, 1.0, -1.0, 1.0, 0.1, 100.0);
 
 // renderer.scale = Vector3.fromValues(0.5, 0.5, 0.5);
-// renderer.position = Vector3.fromValues(0, 0, 2);
+renderer.position = Vector3.fromValues(0, 0, -10);
 
-renderer.projection = orthographic;
-// renderer.projection = perspective;
+renderer.projection = perspective;
+// renderer.projection = orthographic;
 renderer.appendChild(model);
 renderer.render();
 
 let controller;
 const data = {
-  projection: 'orthographic'
+  projection: 'perspective'
 };
 const gui = new dat.GUI();
 const f1 = gui.addFolder('Projection');
