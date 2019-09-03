@@ -294,7 +294,7 @@ function getBBoxOnLine(coordinates) {
   var bboxes &#x3D; [];
 
   for (var i &#x3D; 0; i &lt; size - 2; i++) {
-    bboxes.push(coordinates[i].concat( coordinates[i + 1]));
+    bboxes.push(( coordinates[i] ).concat( coordinates[i + 1]));
   }
 
   return bboxes;
@@ -619,7 +619,7 @@ window.DEBUG &#x3D; {
         var bboxes &#x3D; [];
 
         for (var i &#x3D; 0; i &lt; size - 2; i++) {
-          bboxes.push(coordinates[i].concat( coordinates[i + 1]));
+          bboxes.push(( coordinates[i] ).concat( coordinates[i + 1]));
         }
 
         return bboxes;

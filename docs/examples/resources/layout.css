@@ -125,9 +125,12 @@ pre {
 /**
  * Hack for dat.gui
  */
-.dg .c input[type=text] {
-  line-height:normal;
+ .dg .c input[type=text] {
+  line-height: normal;
 }
 .dg .c div {
   box-sizing: content-box;
+}
+.dg .c select {
+  color: black;
 }
