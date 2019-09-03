@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[39],{42:function(a,n){var t=L.map("map");Tangram.leafletLayer({scene:"data/tangram/scene.yaml",attribution:'<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | &copy; OSM contributors'}).addTo(t),t.setView([40.70531887544228,-74.00976419448853],15)}},[[42,0]]]);
+//# sourceMappingURL=tangram-base.js.map
