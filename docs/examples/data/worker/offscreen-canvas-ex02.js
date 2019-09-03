@@ -1,6 +1,6 @@
 let key;
 
-self.importScripts('https://cdnjs.cloudflare.com/ajax/libs/three.js/96/three.min.js');
+self.importScripts('https://cdnjs.cloudflare.com/ajax/libs/three.js/108/three.min.js');
 self.addEventListener('message', function (e) {
   const type = e.data.type;
 
