@@ -28,7 +28,8 @@
     "panzoom": false,
     "PIXI": false,
     "L": false,
-    "Tangram": false
+    "Tangram": false,
+    "deck": false
   },
   "rules": {
     "no-unused-vars": [2, {"varsIgnorePattern": "^map"}]
