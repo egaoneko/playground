@@ -92,7 +92,7 @@ var getURLParameters &#x3D; function (url) { return (url.match(/([^?&#x3D;&amp;]
   ); };
 
 var search &#x3D; getURLParameters(location.search);
-var style &#x3D; decodeURIComponent(search.style) || &quot;mapbox://styles/mapbox/streets-v9&quot;;
+var style &#x3D; search.style ? decodeURIComponent(search.style) : &quot;mapbox://styles/mapbox/streets-v9&quot;;
 
 var encodeQueryData &#x3D; function (data) {
   var ret &#x3D; [];
@@ -200,7 +200,7 @@ var map &#x3D; new mapboxgl.Map({
         ); };
 
       var search &#x3D; getURLParameters(location.search);
-      var style &#x3D; decodeURIComponent(search.style) || &quot;mapbox://styles/mapbox/streets-v9&quot;;
+      var style &#x3D; search.style ? decodeURIComponent(search.style) : &quot;mapbox://styles/mapbox/streets-v9&quot;;
 
       var encodeQueryData &#x3D; function (data) {
         var ret &#x3D; [];

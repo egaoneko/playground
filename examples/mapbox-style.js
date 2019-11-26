@@ -14,7 +14,7 @@ const getURLParameters = url =>
   );
 
 let search = getURLParameters(location.search);
-let style = decodeURIComponent(search.style) || "mapbox://styles/mapbox/streets-v9";
+let style = search.style ? decodeURIComponent(search.style) : "mapbox://styles/mapbox/streets-v9";
 
 const encodeQueryData = data => {
   const ret = [];
