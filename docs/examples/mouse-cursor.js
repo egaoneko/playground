@@ -1,2 +1,2 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[15],{22:function(n,w){}},[[22,0]]]);
+(window.webpackJsonp=window.webpackJsonp||[]).push([[16],{23:function(n,w){}},[[23,0]]]);
 //# sourceMappingURL=mouse-cursor.js.map
