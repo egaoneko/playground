@@ -134,3 +134,12 @@ pre {
 .dg .c select {
   color: black;
 }
+.save-row input[type=text] {
+  line-height: normal;
+}
+.save-row div {
+  box-sizing: content-box;
+}
+.save-row select {
+  color: black;
+}

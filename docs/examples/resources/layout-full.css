@@ -137,12 +137,21 @@ pre {
 /**
  * Hack for dat.gui
  */
- .dg .c input[type=text] {
+.dg .c input[type=text] {
   line-height: normal;
 }
 .dg .c div {
   box-sizing: content-box;
 }
 .dg .c select {
+  color: black;
+}
+.save-row input[type=text] {
+  line-height: normal;
+}
+.save-row div {
+  box-sizing: content-box;
+}
+.save-row select {
   color: black;
 }
