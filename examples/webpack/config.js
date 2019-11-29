@@ -4,19 +4,29 @@ const ExampleBuilder = require('./example-builder');
 const fs = require('fs');
 const path = require('path');
 
-const src = path.join(__dirname, '..');
-
-const examples = fs.readdirSync(src)
+const exampleRoot = path.join(__dirname, '..');
+let examples = [];
+walkDir(path.join(__dirname, '../'), (path) => examples.push(path));
+examples = examples
   .filter(name => /^(?!index).*\.html$/.test(name))
-  .map(name => name.replace(/\.html$/, ''));
+  .map(name => [name.replace(/\.html$/, '').replace(exampleRoot, '')]);
 
 const entry = {};
 examples.forEach(example => {
   entry[example] = `./${example}.js`;
 });
 
+function walkDir(dir, callback) {
+  fs.readdirSync(dir).forEach( f => {
+    let dirPath = path.join(dir, f);
+    let isDirectory = fs.statSync(dirPath).isDirectory();
+    isDirectory ? 
+      walkDir(dirPath, callback) : callback(path.join(dir, f), f);
+  });
+};
+
 module.exports = {
-  context: src,
+  context: path.join(__dirname, '..'),
   target: 'web',
   entry: entry,
   module: {

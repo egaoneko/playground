@@ -1,1 +1,0 @@
-{"version":3,"sources":["webpack:///./tabindex.js"],"names":["document","getElementById","onclick","focus"],"mappings":"2EAAAA,SAASC,eAAe,QAAQC,QAAU,WACxCF,SAASC,eAAe,YAAYE","file":"tabindex.js","sourcesContent":["document.getElementById('test').onclick = function () {\n  document.getElementById('scripted').focus();\n};\n"],"sourceRoot":""}
