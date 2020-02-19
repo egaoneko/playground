@@ -6,13 +6,7 @@
   height: 100%;
 }
 
-#style-box {
-  position: absolute;
-  z-index:9999;
-  bottom: 50px;
-  right: 20px;
-}
-
-#style-btn {
-  margin-right: 0;
+.dg.ac {
+  top: 10px;
+  right: 40px;
 }

@@ -15,7 +15,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
     <link rel="stylesheet" href="./resources/layout-full.css" type="text/css">
-    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.1/mapbox-gl.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.js"></script>
+<link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.1/mapbox-gl.css">
 <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.1/mapbox-gl.js"></script>
     <link rel="stylesheet" href="mapbox-style.css">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2CrequestAnimationFrame%2Cfetch%2CElement.prototype.classList%2CURL%2CMap%2CSet%2CPromise%2CObject.values"></script>
@@ -42,10 +43,6 @@
   </header>
   <div id="container" class="main">
   <div id="map"></div>
-  <div id="style-box">
-    <input type="text" id="style-input" placeholder="Input style" vlaue="" />
-    <button id="style-btn">enter</button>
-  </div>
 </div>
 
 
@@ -77,47 +74,146 @@
             <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
               <textarea class="hidden" name="title">Mapbox style</textarea>
               <textarea class="hidden" name="description">Test Mapbox style.</textarea>
-              <textarea class="hidden" name="js">var input &#x3D; document.querySelector(&quot;#style-input&quot;);
-var btn &#x3D; document.querySelector(&quot;#style-btn&quot;);
-
-var key &#x3D;
-  &quot;Your Mapbox access token from http://mapbox.com/ here&quot;;
+              <textarea class="hidden" name="js">var key &#x3D;
+  &#x27;Your Mapbox access token from http://mapbox.com/ here&#x27;;
 mapboxgl.accessToken &#x3D; key;
 
 var getURLParameters &#x3D; function (url) { return (url.match(/([^?&#x3D;&amp;]+)(&#x3D;([^&amp;]*))/g) || []).reduce(
     function (a, v) { return (
-      (a[v.slice(0, v.indexOf(&quot;&#x3D;&quot;))] &#x3D; v.slice(v.indexOf(&quot;&#x3D;&quot;) + 1)), a
+      (a[v.slice(0, v.indexOf(&#x27;&#x3D;&#x27;))] &#x3D; v.slice(v.indexOf(&#x27;&#x3D;&#x27;) + 1)), a
     ); },
     {}
   ); };
 
 var search &#x3D; getURLParameters(location.search);
-var style &#x3D; search.style ? decodeURIComponent(search.style) : &quot;mapbox://styles/mapbox/streets-v9&quot;;
+var style &#x3D; search.style
+  ? decodeURIComponent(search.style)
+  : &#x27;mapbox://styles/mapbox/streets-v9&#x27;;
+var isMabox &#x3D; style.includes(&#x27;mapbox&#x27;);
 
 var encodeQueryData &#x3D; function (data) {
   var ret &#x3D; [];
   for (var d in data)
-    { ret.push(encodeURIComponent(d) + &quot;&#x3D;&quot; + encodeURIComponent(data[d])); }
-  return ret.join(&quot;&amp;&quot;);
+    { ret.push(encodeURIComponent(d) + &#x27;&#x3D;&#x27; + encodeURIComponent(data[d])); }
+  return ret.join(&#x27;&amp;&#x27;);
 };
 
-btn.addEventListener(&quot;click&quot;, function () {
-  if (!input.value) {
-    return;
+var controller;
+var data &#x3D; {
+  style: style,
+  extrusion: false
+};
+var gui &#x3D; new dat.GUI();
+var f1 &#x3D; gui.addFolder(&#x27;Style&#x27;);
+var f2 &#x3D; gui.addFolder(&#x27;Layer&#x27;);
+
+gui.remember(data);
+
+controller &#x3D; f1.add(data, &#x27;style&#x27;);
+controller.onFinishChange(function(style) {
+  if (!style) {
+    style &#x3D; &#x27;mapbox://styles/mapbox/streets-v9&#x27;;
   }
+
   var params &#x3D; encodeQueryData(
-    Object.assign({}, search, { style: input.value })
+    Object.assign({}, search, { style: style })
   );
-  location.href &#x3D; location.origin + location.pathname + &#x27;?&#x27; + params;
+  var url &#x3D; location.pathname + &#x27;?&#x27; + params;
+
+  history.pushState(&#x27;&#x27;, &#x27;&#x27;, url);
+  map.setStyle(style);
 });
 
+controller &#x3D; f2.add(data, &#x27;extrusion&#x27;);
+controller.onFinishChange(function(show) {
+  var layers &#x3D; map.getStyle().layers;
+
+  if (isMabox) {
+    showBuildingWithMapbox(layers, show);
+  } else {
+    showBuilding(layers, show);
+  }
+});
+
+f1.open();
+f2.open();
+
 var map &#x3D; new mapboxgl.Map({
-  container: &quot;map&quot;,
+  container: &#x27;map&#x27;,
   style: style,
   center: [127.0339581, 37.4845477],
   zoom: 15,
   localIdeographFontFamily: false
 });
+
+map.on(&#x27;load&#x27;, function() {
+  // Insert the layer beneath any symbol layer.
+  
+});
+
+function showBuildingWithMapbox(layers, show) {
+  var labelLayerId;
+  for (var i &#x3D; 0; i &lt; layers.length; i++) {
+    if (layers[i].type &#x3D;&#x3D;&#x3D; &#x27;symbol&#x27; &amp;&amp; layers[i].layout[&#x27;text-field&#x27;]) {
+      labelLayerId &#x3D; layers[i].id;
+      break;
+    }
+  }
+
+  if (show) {
+    map.addLayer(
+      {
+        id: &#x27;3d-buildings&#x27;,
+        source: &#x27;composite&#x27;,
+        &#x27;source-layer&#x27;: &#x27;building&#x27;,
+        filter: [&#x27;&#x3D;&#x3D;&#x27;, &#x27;extrude&#x27;, &#x27;true&#x27;],
+        type: &#x27;fill-extrusion&#x27;,
+        minzoom: 15,
+        paint: {
+          &#x27;fill-extrusion-color&#x27;: &#x27;#aaa&#x27;,
+  
+          // use an &#x27;interpolate&#x27; expression to add a smooth transition effect to the
+          // buildings as the user zooms in
+          &#x27;fill-extrusion-height&#x27;: [
+            &#x27;interpolate&#x27;,
+            [&#x27;linear&#x27;],
+            [&#x27;zoom&#x27;],
+            15,
+            0,
+            15.05,
+            [&#x27;get&#x27;, &#x27;height&#x27;]
+          ],
+          &#x27;fill-extrusion-base&#x27;: [
+            &#x27;interpolate&#x27;,
+            [&#x27;linear&#x27;],
+            [&#x27;zoom&#x27;],
+            15,
+            0,
+            15.05,
+            [&#x27;get&#x27;, &#x27;min_height&#x27;]
+          ],
+          &#x27;fill-extrusion-opacity&#x27;: 0.6
+        }
+      },
+      labelLayerId
+    );
+  } else {
+    map.removeLayer(&#x27;3d-buildings&#x27;);
+  }
+}
+
+function showBuilding(layers, show) {
+  for (var i &#x3D; 0; i &lt; layers.length; i++) {
+    if (layers[i].type !&#x3D;&#x3D; &#x27;fill-extrusion&#x27;) {
+      continue;
+    }
+    map.setLayoutProperty(layers[i].id, &#x27;visibility&#x27;, show ? &#x27;visible&#x27; : &#x27;none&#x27;);
+  }
+}
+
+window.DEBUG &#x3D; {
+  map: map
+};
 </textarea>
               <textarea class="hidden" name="css">/**
   * Create a position for the map
@@ -127,22 +223,12 @@ var map &#x3D; new mapboxgl.Map({
   height: 100%;
 }
 
-#style-box {
-  position: absolute;
-  z-index:9999;
-  bottom: 50px;
-  right: 20px;
-}
-
-#style-btn {
-  margin-right: 0;
+.dg.ac {
+  top: 10px;
+  right: 40px;
 }</textarea>
               <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
   &lt;div id&#x3D;&quot;map&quot;&gt;&lt;/div&gt;
-  &lt;div id&#x3D;&quot;style-box&quot;&gt;
-    &lt;input type&#x3D;&quot;text&quot; id&#x3D;&quot;style-input&quot; placeholder&#x3D;&quot;Input style&quot; vlaue&#x3D;&quot;&quot; /&gt;
-    &lt;button id&#x3D;&quot;style-btn&quot;&gt;enter&lt;/button&gt;
-  &lt;/div&gt;
 &lt;/div&gt;
 </textarea>
               <input type="hidden" name="data">
@@ -154,6 +240,7 @@ var map &#x3D; new mapboxgl.Map({
     &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
     &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.js&quot;&gt;&lt;/script&gt;
     &lt;link rel&#x3D;&quot;stylesheet&quot; href&#x3D;&quot;https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.1/mapbox-gl.css&quot;&gt;
     &lt;script src&#x3D;&quot;https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.1/mapbox-gl.js&quot;&gt;&lt;/script&gt;
     &lt;style&gt;
@@ -165,67 +252,156 @@ var map &#x3D; new mapboxgl.Map({
         height: 100%;
       }
 
-      #style-box {
-        position: absolute;
-        z-index:9999;
-        bottom: 50px;
-        right: 20px;
-      }
-
-      #style-btn {
-        margin-right: 0;
+      .dg.ac {
+        top: 10px;
+        right: 40px;
       }    &lt;/style&gt;
   &lt;/head&gt;
   &lt;body&gt;
     &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
       &lt;div id&#x3D;&quot;map&quot;&gt;&lt;/div&gt;
-      &lt;div id&#x3D;&quot;style-box&quot;&gt;
-        &lt;input type&#x3D;&quot;text&quot; id&#x3D;&quot;style-input&quot; placeholder&#x3D;&quot;Input style&quot; vlaue&#x3D;&quot;&quot; /&gt;
-        &lt;button id&#x3D;&quot;style-btn&quot;&gt;enter&lt;/button&gt;
-      &lt;/div&gt;
     &lt;/div&gt;
     &lt;script&gt;
-      var input &#x3D; document.querySelector(&quot;#style-input&quot;);
-      var btn &#x3D; document.querySelector(&quot;#style-btn&quot;);
-
       var key &#x3D;
-        &quot;Your Mapbox access token from http://mapbox.com/ here&quot;;
+        &#x27;Your Mapbox access token from http://mapbox.com/ here&#x27;;
       mapboxgl.accessToken &#x3D; key;
 
       var getURLParameters &#x3D; function (url) { return (url.match(/([^?&#x3D;&amp;]+)(&#x3D;([^&amp;]*))/g) || []).reduce(
           function (a, v) { return (
-            (a[v.slice(0, v.indexOf(&quot;&#x3D;&quot;))] &#x3D; v.slice(v.indexOf(&quot;&#x3D;&quot;) + 1)), a
+            (a[v.slice(0, v.indexOf(&#x27;&#x3D;&#x27;))] &#x3D; v.slice(v.indexOf(&#x27;&#x3D;&#x27;) + 1)), a
           ); },
           {}
         ); };
 
       var search &#x3D; getURLParameters(location.search);
-      var style &#x3D; search.style ? decodeURIComponent(search.style) : &quot;mapbox://styles/mapbox/streets-v9&quot;;
+      var style &#x3D; search.style
+        ? decodeURIComponent(search.style)
+        : &#x27;mapbox://styles/mapbox/streets-v9&#x27;;
+      var isMabox &#x3D; style.includes(&#x27;mapbox&#x27;);
 
       var encodeQueryData &#x3D; function (data) {
         var ret &#x3D; [];
         for (var d in data)
-          { ret.push(encodeURIComponent(d) + &quot;&#x3D;&quot; + encodeURIComponent(data[d])); }
-        return ret.join(&quot;&amp;&quot;);
+          { ret.push(encodeURIComponent(d) + &#x27;&#x3D;&#x27; + encodeURIComponent(data[d])); }
+        return ret.join(&#x27;&amp;&#x27;);
       };
 
-      btn.addEventListener(&quot;click&quot;, function () {
-        if (!input.value) {
-          return;
+      var controller;
+      var data &#x3D; {
+        style: style,
+        extrusion: false
+      };
+      var gui &#x3D; new dat.GUI();
+      var f1 &#x3D; gui.addFolder(&#x27;Style&#x27;);
+      var f2 &#x3D; gui.addFolder(&#x27;Layer&#x27;);
+
+      gui.remember(data);
+
+      controller &#x3D; f1.add(data, &#x27;style&#x27;);
+      controller.onFinishChange(function(style) {
+        if (!style) {
+          style &#x3D; &#x27;mapbox://styles/mapbox/streets-v9&#x27;;
         }
+
         var params &#x3D; encodeQueryData(
-          Object.assign({}, search, { style: input.value })
+          Object.assign({}, search, { style: style })
         );
-        location.href &#x3D; location.origin + location.pathname + &#x27;?&#x27; + params;
+        var url &#x3D; location.pathname + &#x27;?&#x27; + params;
+
+        history.pushState(&#x27;&#x27;, &#x27;&#x27;, url);
+        map.setStyle(style);
       });
 
+      controller &#x3D; f2.add(data, &#x27;extrusion&#x27;);
+      controller.onFinishChange(function(show) {
+        var layers &#x3D; map.getStyle().layers;
+
+        if (isMabox) {
+          showBuildingWithMapbox(layers, show);
+        } else {
+          showBuilding(layers, show);
+        }
+      });
+
+      f1.open();
+      f2.open();
+
       var map &#x3D; new mapboxgl.Map({
-        container: &quot;map&quot;,
+        container: &#x27;map&#x27;,
         style: style,
         center: [127.0339581, 37.4845477],
         zoom: 15,
         localIdeographFontFamily: false
       });
+
+      map.on(&#x27;load&#x27;, function() {
+        // Insert the layer beneath any symbol layer.
+        
+      });
+
+      function showBuildingWithMapbox(layers, show) {
+        var labelLayerId;
+        for (var i &#x3D; 0; i &lt; layers.length; i++) {
+          if (layers[i].type &#x3D;&#x3D;&#x3D; &#x27;symbol&#x27; &amp;&amp; layers[i].layout[&#x27;text-field&#x27;]) {
+            labelLayerId &#x3D; layers[i].id;
+            break;
+          }
+        }
+
+        if (show) {
+          map.addLayer(
+            {
+              id: &#x27;3d-buildings&#x27;,
+              source: &#x27;composite&#x27;,
+              &#x27;source-layer&#x27;: &#x27;building&#x27;,
+              filter: [&#x27;&#x3D;&#x3D;&#x27;, &#x27;extrude&#x27;, &#x27;true&#x27;],
+              type: &#x27;fill-extrusion&#x27;,
+              minzoom: 15,
+              paint: {
+                &#x27;fill-extrusion-color&#x27;: &#x27;#aaa&#x27;,
+        
+                // use an &#x27;interpolate&#x27; expression to add a smooth transition effect to the
+                // buildings as the user zooms in
+                &#x27;fill-extrusion-height&#x27;: [
+                  &#x27;interpolate&#x27;,
+                  [&#x27;linear&#x27;],
+                  [&#x27;zoom&#x27;],
+                  15,
+                  0,
+                  15.05,
+                  [&#x27;get&#x27;, &#x27;height&#x27;]
+                ],
+                &#x27;fill-extrusion-base&#x27;: [
+                  &#x27;interpolate&#x27;,
+                  [&#x27;linear&#x27;],
+                  [&#x27;zoom&#x27;],
+                  15,
+                  0,
+                  15.05,
+                  [&#x27;get&#x27;, &#x27;min_height&#x27;]
+                ],
+                &#x27;fill-extrusion-opacity&#x27;: 0.6
+              }
+            },
+            labelLayerId
+          );
+        } else {
+          map.removeLayer(&#x27;3d-buildings&#x27;);
+        }
+      }
+
+      function showBuilding(layers, show) {
+        for (var i &#x3D; 0; i &lt; layers.length; i++) {
+          if (layers[i].type !&#x3D;&#x3D; &#x27;fill-extrusion&#x27;) {
+            continue;
+          }
+          map.setLayoutProperty(layers[i].id, &#x27;visibility&#x27;, show ? &#x27;visible&#x27; : &#x27;none&#x27;);
+        }
+      }
+
+      window.DEBUG &#x3D; {
+        map: map
+      };
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
