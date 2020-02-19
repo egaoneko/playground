@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-62717870-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-62717870-1');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
+    <link rel="stylesheet" href="./resources/layout.css" type="text/css">
+    
+    <link rel="stylesheet" href="web-rtc-basic.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2CrequestAnimationFrame%2Cfetch%2CElement.prototype.classList%2CURL%2CMap%2CSet%2CPromise%2CObject.values"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+    <title>webRTC basic</title>
+  </head>
+  <body>
+
+    <header class="navbar" role="navigation">
+      <div class="container">
+        <div class="display-table pull-left" id="navbar-logo-container">
+          <a class="navbar-brand" href="./"><img src="./resources/logo-70x70.png">&nbsp;Playground</a>
+        </div>
+        <!-- menu items that get hidden below 768px width -->
+        <nav class='collapse navbar-collapse navbar-responsive-collapse'>
+          <ul class="nav navbar-nav pull-right">
+            <li><a class="active" href="index.html">Examples</a></li>
+            <li><a href="../apidoc">API</a></li>
+            <li><a href="https://github.com/egaoneko/playground">Code</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container-fluid">
+
+      <div id="latest-check" class="alert alert-warning alert-dismissible" role="alert" style="display:none">
+        <button id="latest-dismiss" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        This example uses Playground v<span>0.0.1</span>. The <a id="latest-link" href="#" class="alert-link">latest</a> is v<span id="latest-version"></span>.
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <h4 id="title">webRTC basic</h4>
+          <div id="container" class="main">
+</div>
+<div>
+  <button id="local">Local</button>
+  <button id="remote">Remote</button>
+</div>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <p id="shortdesc">webRTC basic example.</p>
+          <div id="docs"><p>This page&#39;s webRTC basic example.</p>
+</div>
+          <p id="tags">Tags: webRTC</p>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div id="source-controls">
+          <a id="copy-button" data-clipboard-target="#example-source"><i class="fa fa-clipboard"></i> Copy</a>
+          <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
+        </div>
+        <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
+          <textarea class="hidden" name="title">webRTC basic</textarea>
+          <textarea class="hidden" name="description">webRTC basic example.</textarea>
+          <textarea class="hidden" name="js">var container &#x3D; document.querySelector(&quot;#container&quot;);
+
+document.querySelector(&quot;#local&quot;).addEventListener(&quot;click&quot;, startLocal);
+document.querySelector(&quot;#remote&quot;).addEventListener(&quot;click&quot;, startRemote);
+
+function startLocal() {
+  removeAllChildren();
+  var video &#x3D; document.createElement(&quot;video&quot;);
+  video.muted &#x3D; true;
+  video.autoplay &#x3D; true;
+  container.appendChild(video);
+
+  video.addEventListener(&quot;loadedmetadata&quot;, function() {
+    console.log(
+      (&quot;Local video videoWidth: &quot; + (this.videoWidth) + &quot;px, videoHeight: &quot; + (this.videoHeight) + &quot;px&quot;)
+    );
+  });
+
+  new LocalConnection(video);
+}
+
+function startRemote() {
+  removeAllChildren();
+  var video &#x3D; document.createElement(&quot;video&quot;);
+  container.appendChild(video);
+
+  video.muted &#x3D; true;
+  video.autoplay &#x3D; true;
+  container.appendChild(video);
+
+  video.addEventListener(&quot;loadedmetadata&quot;, function() {
+    console.log(
+      (&quot;Remote video videoWidth: &quot; + (this.videoWidth) + &quot;px, videoHeight: &quot; + (this.videoHeight) + &quot;px&quot;)
+    );
+  });
+
+  new RemoteConnection(video);
+}
+
+function removeAllChildren() {
+  while (container.firstChild) {
+    container.removeChild(container.lastChild);
+  }
+}
+
+var PC_CONFIG &#x3D; {
+  iceServers: [
+    {
+      urls: &quot;stun:stun.l.google.com:19302&quot;
+    },
+    {
+      urls: &quot;turn:numb.viagenie.ca&quot;,
+      credential: &quot;muazkh&quot;,
+      username: &quot;webrtc@live.com&quot;
+    }
+  ]
+};
+
+var LocalConnection &#x3D; function LocalConnection(video, config) {
+  var this$1 &#x3D; this;
+  if ( config &#x3D;&#x3D;&#x3D; void 0 ) config &#x3D; PC_CONFIG;
+
+  var pc &#x3D; new RTCPeerConnection(config);
+  this.pc &#x3D; pc;
+  this.video &#x3D; video;
+
+  navigator.mediaDevices
+    .getUserMedia({
+      audio: false,
+      // video: { width: 1280, height: 720, facingMode: &#x27;user&#x27; }, // 전면
+      video: { width: 1280, height: 720, facingMode: &quot;environment&quot; } // 후면
+    })
+    .then(function (stream) {
+      this$1.stream &#x3D; stream;
+      video.srcObject &#x3D; stream;
+      var videoTracks &#x3D; stream.getVideoTracks();
+      if (videoTracks.length &gt; 0) {
+        console.log((&quot;Using video device: &quot; + (videoTracks[0].label)));
+      }
+      stream.getTracks().forEach(function (track) { return pc.addTrack(track, stream); });
+
+      this$1.init();
+    })
+    .catch(function (e) { return console.log(e); });
+};
+
+LocalConnection.prototype.init &#x3D; function init () {
+    var this$1 &#x3D; this;
+
+  var pc &#x3D; this.pc;
+
+  removeItem(&quot;web-rtc-local-candidate&quot;);
+  removeItem(&quot;web-rtc-local-description&quot;);
+  removeItem(&quot;web-rtc-remote-candidate&quot;);
+  removeItem(&quot;web-rtc-remote-description&quot;);
+
+  pc.addEventListener(&quot;icecandidate&quot;, function (e) {
+    var candidate &#x3D; e.candidate;
+    console.log(&quot;local candidate&quot;, candidate);
+
+    if (!candidate) {
+      return;
+    }
+
+    setItem(&quot;web-rtc-local-candidate&quot;, {
+      candidate: candidate.candidate,
+      sdpMid: candidate.sdpMid,
+      sdpMLineIndex: candidate.sdpMLineIndex,
+      foundation: candidate.foundation,
+      component: candidate.component,
+      priority: candidate.priority,
+      protocol: candidate.protocol,
+      port: candidate.port,
+      type: candidate.type,
+      tcpType: candidate.tcpType,
+      relatedAddress: candidate.relatedAddress,
+      relatedPort: candidate.relatedPort,
+      usernameFragment: candidate.usernameFragment
+    });
+  });
+
+  pc.addEventListener(&quot;iceconnectionstatechange&quot;, function (e) { return onIceStateChange(pc, e); }
+  );
+
+  var candidate &#x3D; getItem(&quot;web-rtc-remote-candidate&quot;);
+  if (candidate) {
+    this.addIceCandidate(this.pc, candidate);
+  } else {
+    onItemChange(&quot;web-rtc-remote-candidate&quot;, function (candidate) { return addIceCandidate(this$1.pc, candidate); }
+    );
+  }
+
+  pc.createOffer({
+    // offerToReceiveAudio: true,
+    offerToReceiveVideo: true
+  })
+    .then(function (offer) {
+      setItem(&quot;web-rtc-local-description&quot;, {
+        type: offer.type,
+        sdp: offer.sdp
+      });
+      pc.setLocalDescription(offer);
+
+      onItemChange(&quot;web-rtc-remote-description&quot;, function (remoteDescription) {
+        console.log(&quot;remote description&quot;, remoteDescription);
+
+        if (!remoteDescription) {
+          return;
+        }
+
+        pc.setRemoteDescription(remoteDescription);
+      });
+
+      console.log(&quot;Added local stream&quot;);
+    })
+    .catch(function (e) {
+      console.log(e);
+      this$1.close();
+    });
+};
+
+LocalConnection.prototype.close &#x3D; function close () {
+  this.video.srcObject &#x3D; null;
+  this.stream.getTracks().forEach(function (track) { return track.stop(); });
+  removeItem(&quot;web-rtc-local-candidate&quot;);
+  removeItem(&quot;web-rtc-local-description&quot;);
+  return this.pc.close();
+};
+
+var RemoteConnection &#x3D; function RemoteConnection(video, config) {
+  if ( config &#x3D;&#x3D;&#x3D; void 0 ) config &#x3D; PC_CONFIG;
+
+  this.pc &#x3D; new RTCPeerConnection(config);
+  this.video &#x3D; video;
+  this.init();
+};
+
+RemoteConnection.prototype.init &#x3D; function init () {
+    var this$1 &#x3D; this;
+
+  var pc &#x3D; this.pc;
+
+  removeItem(&quot;web-rtc-remote-candidate&quot;);
+  removeItem(&quot;web-rtc-remote-description&quot;);
+  pc.addEventListener(&quot;icecandidate&quot;, function (e) {
+    var candidate &#x3D; e.candidate;
+    console.log(&quot;remote candidate&quot;, candidate);
+
+    if (!candidate) {
+      return;
+    }
+
+    setItem(&quot;web-rtc-remote-candidate&quot;, {
+      candidate: candidate.candidate,
+      sdpMid: candidate.sdpMid,
+      sdpMLineIndex: candidate.sdpMLineIndex,
+      foundation: candidate.foundation,
+      component: candidate.component,
+      priority: candidate.priority,
+      protocol: candidate.protocol,
+      port: candidate.port,
+      type: candidate.type,
+      tcpType: candidate.tcpType,
+      relatedAddress: candidate.relatedAddress,
+      relatedPort: candidate.relatedPort,
+      usernameFragment: candidate.usernameFragment
+    });
+  });
+  pc.addEventListener(&quot;iceconnectionstatechange&quot;, function (e) { return onIceStateChange(pc, e); }
+  );
+  pc.addEventListener(&quot;track&quot;, function (e) { return this$1.gotRemoteStream(e); });
+
+  var candidate &#x3D; getItem(&quot;web-rtc-local-candidate&quot;);
+  if (candidate) {
+    addIceCandidate(this.pc, candidate);
+  } else {
+    onItemChange(&quot;web-rtc-local-candidate&quot;, function (candidate) { return addIceCandidate(this$1.pc, candidate); }
+    );
+  }
+
+  var localDescription &#x3D; getItem(&quot;web-rtc-local-description&quot;);
+
+  if (localDescription) {
+    this.setDescription(localDescription);
+  } else {
+    onItemChange.on(&quot;web-rtc-local-description&quot;, function (localDescription) { return this$1.setDescription(localDescription); }
+    );
+  }
+};
+
+RemoteConnection.prototype.setDescription &#x3D; function setDescription (localDescription) {
+    var this$1 &#x3D; this;
+
+  var pc &#x3D; this.pc;
+  var video &#x3D; this.video;
+
+  console.log(&quot;local description&quot;, localDescription);
+
+  if (!localDescription) {
+    return;
+  }
+
+  pc.setRemoteDescription(localDescription)
+    .then(function () { return pc.createAnswer(); })
+    .then(function (answer) {
+      pc.setLocalDescription(answer);
+      setItem(&quot;web-rtc-remote-description&quot;, {
+        type: answer.type,
+        sdp: answer.sdp
+      });
+      video.srcObject &#x3D; new MediaStream(
+        pc.getReceivers().map(function (receiver) { return receiver.track; })
+      );
+      console.log(&quot;Added remote stream&quot;);
+    })
+    .catch(function (e) {
+      console.log(e);
+      this$1.close();
+    });
+};
+
+RemoteConnection.prototype.gotRemoteStream &#x3D; function gotRemoteStream (e) {
+  if (this.video.srcObject !&#x3D;&#x3D; e.streams[0]) {
+    this.video.srcObject &#x3D; e.streams[0];
+    console.log(&quot;received remote stream&quot;);
+  }
+};
+
+RemoteConnection.prototype.close &#x3D; function close () {
+  this.video.srcObject &#x3D; null;
+  removeItem(&quot;web-rtc-remote-candidate&quot;);
+  removeItem(&quot;web-rtc-remote-description&quot;);
+  return this.pc.close();
+};
+
+function addIceCandidate(pc, candidate) {
+  console.log(&quot;candidate&quot;, candidate);
+
+  pc.addIceCandidate(new RTCIceCandidate(candidate))
+    .then(function () {
+      console.log(
+        (&quot;ICE candidate:\n&quot; + (candidate ? candidate.candidate : &quot;(null)&quot;))
+      );
+    })
+    .catch(function (e) { return console.log(e); });
+}
+
+function onIceStateChange(pc, event) {
+  if (pc) {
+    console.log((&quot;ICE state: &quot; + (pc.iceConnectionState)));
+    console.log(&quot;ICE state change event: &quot;, event);
+  }
+}
+
+function getItem(key) {
+  return JSON.parse(localStorage.getItem(key));
+}
+
+function setItem(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function removeItem(key) {
+  localStorage.removeItem(key);
+}
+
+var listeners &#x3D; {};
+window.addEventListener(&quot;storage&quot;, function (e) {
+  console.log(e);
+  var callback &#x3D; listeners[e.key];
+  if (!callback) {
+    return;
+  }
+  callback(JSON.parse(e.newValue));
+});
+
+function onItemChange(key, callback) {
+  listeners[key] &#x3D; callback;
+}
+</textarea>
+          <textarea class="hidden" name="css">#container {
+  text-align: center;
+}
+
+#container video{
+  height: 100%;
+}</textarea>
+          <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+&lt;/div&gt;
+&lt;div&gt;
+  &lt;button id&#x3D;&quot;local&quot;&gt;Local&lt;/button&gt;
+  &lt;button id&#x3D;&quot;remote&quot;&gt;Remote&lt;/button&gt;
+&lt;/div&gt;</textarea>
+          <input type="hidden" name="data">
+        </form>
+        <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;webRTC basic&lt;/title&gt;
+    &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
+    &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
+    &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
+
+    &lt;style&gt;
+      #container {
+        text-align: center;
+      }
+
+      #container video{
+        height: 100%;
+      }    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+      &lt;button id&#x3D;&quot;local&quot;&gt;Local&lt;/button&gt;
+      &lt;button id&#x3D;&quot;remote&quot;&gt;Remote&lt;/button&gt;
+    &lt;/div&gt;    &lt;script&gt;
+      var container &#x3D; document.querySelector(&quot;#container&quot;);
+
+      document.querySelector(&quot;#local&quot;).addEventListener(&quot;click&quot;, startLocal);
+      document.querySelector(&quot;#remote&quot;).addEventListener(&quot;click&quot;, startRemote);
+
+      function startLocal() {
+        removeAllChildren();
+        var video &#x3D; document.createElement(&quot;video&quot;);
+        video.muted &#x3D; true;
+        video.autoplay &#x3D; true;
+        container.appendChild(video);
+
+        video.addEventListener(&quot;loadedmetadata&quot;, function() {
+          console.log(
+            (&quot;Local video videoWidth: &quot; + (this.videoWidth) + &quot;px, videoHeight: &quot; + (this.videoHeight) + &quot;px&quot;)
+          );
+        });
+
+        new LocalConnection(video);
+      }
+
+      function startRemote() {
+        removeAllChildren();
+        var video &#x3D; document.createElement(&quot;video&quot;);
+        container.appendChild(video);
+
+        video.muted &#x3D; true;
+        video.autoplay &#x3D; true;
+        container.appendChild(video);
+
+        video.addEventListener(&quot;loadedmetadata&quot;, function() {
+          console.log(
+            (&quot;Remote video videoWidth: &quot; + (this.videoWidth) + &quot;px, videoHeight: &quot; + (this.videoHeight) + &quot;px&quot;)
+          );
+        });
+
+        new RemoteConnection(video);
+      }
+
+      function removeAllChildren() {
+        while (container.firstChild) {
+          container.removeChild(container.lastChild);
+        }
+      }
+
+      var PC_CONFIG &#x3D; {
+        iceServers: [
+          {
+            urls: &quot;stun:stun.l.google.com:19302&quot;
+          },
+          {
+            urls: &quot;turn:numb.viagenie.ca&quot;,
+            credential: &quot;muazkh&quot;,
+            username: &quot;webrtc@live.com&quot;
+          }
+        ]
+      };
+
+      var LocalConnection &#x3D; function LocalConnection(video, config) {
+        var this$1 &#x3D; this;
+        if ( config &#x3D;&#x3D;&#x3D; void 0 ) config &#x3D; PC_CONFIG;
+
+        var pc &#x3D; new RTCPeerConnection(config);
+        this.pc &#x3D; pc;
+        this.video &#x3D; video;
+
+        navigator.mediaDevices
+          .getUserMedia({
+            audio: false,
+            // video: { width: 1280, height: 720, facingMode: &#x27;user&#x27; }, // 전면
+            video: { width: 1280, height: 720, facingMode: &quot;environment&quot; } // 후면
+          })
+          .then(function (stream) {
+            this$1.stream &#x3D; stream;
+            video.srcObject &#x3D; stream;
+            var videoTracks &#x3D; stream.getVideoTracks();
+            if (videoTracks.length &gt; 0) {
+              console.log((&quot;Using video device: &quot; + (videoTracks[0].label)));
+            }
+            stream.getTracks().forEach(function (track) { return pc.addTrack(track, stream); });
+
+            this$1.init();
+          })
+          .catch(function (e) { return console.log(e); });
+      };
+
+      LocalConnection.prototype.init &#x3D; function init () {
+          var this$1 &#x3D; this;
+
+        var pc &#x3D; this.pc;
+
+        removeItem(&quot;web-rtc-local-candidate&quot;);
+        removeItem(&quot;web-rtc-local-description&quot;);
+        removeItem(&quot;web-rtc-remote-candidate&quot;);
+        removeItem(&quot;web-rtc-remote-description&quot;);
+
+        pc.addEventListener(&quot;icecandidate&quot;, function (e) {
+          var candidate &#x3D; e.candidate;
+          console.log(&quot;local candidate&quot;, candidate);
+
+          if (!candidate) {
+            return;
+          }
+
+          setItem(&quot;web-rtc-local-candidate&quot;, {
+            candidate: candidate.candidate,
+            sdpMid: candidate.sdpMid,
+            sdpMLineIndex: candidate.sdpMLineIndex,
+            foundation: candidate.foundation,
+            component: candidate.component,
+            priority: candidate.priority,
+            protocol: candidate.protocol,
+            port: candidate.port,
+            type: candidate.type,
+            tcpType: candidate.tcpType,
+            relatedAddress: candidate.relatedAddress,
+            relatedPort: candidate.relatedPort,
+            usernameFragment: candidate.usernameFragment
+          });
+        });
+
+        pc.addEventListener(&quot;iceconnectionstatechange&quot;, function (e) { return onIceStateChange(pc, e); }
+        );
+
+        var candidate &#x3D; getItem(&quot;web-rtc-remote-candidate&quot;);
+        if (candidate) {
+          this.addIceCandidate(this.pc, candidate);
+        } else {
+          onItemChange(&quot;web-rtc-remote-candidate&quot;, function (candidate) { return addIceCandidate(this$1.pc, candidate); }
+          );
+        }
+
+        pc.createOffer({
+          // offerToReceiveAudio: true,
+          offerToReceiveVideo: true
+        })
+          .then(function (offer) {
+            setItem(&quot;web-rtc-local-description&quot;, {
+              type: offer.type,
+              sdp: offer.sdp
+            });
+            pc.setLocalDescription(offer);
+
+            onItemChange(&quot;web-rtc-remote-description&quot;, function (remoteDescription) {
+              console.log(&quot;remote description&quot;, remoteDescription);
+
+              if (!remoteDescription) {
+                return;
+              }
+
+              pc.setRemoteDescription(remoteDescription);
+            });
+
+            console.log(&quot;Added local stream&quot;);
+          })
+          .catch(function (e) {
+            console.log(e);
+            this$1.close();
+          });
+      };
+
+      LocalConnection.prototype.close &#x3D; function close () {
+        this.video.srcObject &#x3D; null;
+        this.stream.getTracks().forEach(function (track) { return track.stop(); });
+        removeItem(&quot;web-rtc-local-candidate&quot;);
+        removeItem(&quot;web-rtc-local-description&quot;);
+        return this.pc.close();
+      };
+
+      var RemoteConnection &#x3D; function RemoteConnection(video, config) {
+        if ( config &#x3D;&#x3D;&#x3D; void 0 ) config &#x3D; PC_CONFIG;
+
+        this.pc &#x3D; new RTCPeerConnection(config);
+        this.video &#x3D; video;
+        this.init();
+      };
+
+      RemoteConnection.prototype.init &#x3D; function init () {
+          var this$1 &#x3D; this;
+
+        var pc &#x3D; this.pc;
+
+        removeItem(&quot;web-rtc-remote-candidate&quot;);
+        removeItem(&quot;web-rtc-remote-description&quot;);
+        pc.addEventListener(&quot;icecandidate&quot;, function (e) {
+          var candidate &#x3D; e.candidate;
+          console.log(&quot;remote candidate&quot;, candidate);
+
+          if (!candidate) {
+            return;
+          }
+
+          setItem(&quot;web-rtc-remote-candidate&quot;, {
+            candidate: candidate.candidate,
+            sdpMid: candidate.sdpMid,
+            sdpMLineIndex: candidate.sdpMLineIndex,
+            foundation: candidate.foundation,
+            component: candidate.component,
+            priority: candidate.priority,
+            protocol: candidate.protocol,
+            port: candidate.port,
+            type: candidate.type,
+            tcpType: candidate.tcpType,
+            relatedAddress: candidate.relatedAddress,
+            relatedPort: candidate.relatedPort,
+            usernameFragment: candidate.usernameFragment
+          });
+        });
+        pc.addEventListener(&quot;iceconnectionstatechange&quot;, function (e) { return onIceStateChange(pc, e); }
+        );
+        pc.addEventListener(&quot;track&quot;, function (e) { return this$1.gotRemoteStream(e); });
+
+        var candidate &#x3D; getItem(&quot;web-rtc-local-candidate&quot;);
+        if (candidate) {
+          addIceCandidate(this.pc, candidate);
+        } else {
+          onItemChange(&quot;web-rtc-local-candidate&quot;, function (candidate) { return addIceCandidate(this$1.pc, candidate); }
+          );
+        }
+
+        var localDescription &#x3D; getItem(&quot;web-rtc-local-description&quot;);
+
+        if (localDescription) {
+          this.setDescription(localDescription);
+        } else {
+          onItemChange.on(&quot;web-rtc-local-description&quot;, function (localDescription) { return this$1.setDescription(localDescription); }
+          );
+        }
+      };
+
+      RemoteConnection.prototype.setDescription &#x3D; function setDescription (localDescription) {
+          var this$1 &#x3D; this;
+
+        var pc &#x3D; this.pc;
+        var video &#x3D; this.video;
+
+        console.log(&quot;local description&quot;, localDescription);
+
+        if (!localDescription) {
+          return;
+        }
+
+        pc.setRemoteDescription(localDescription)
+          .then(function () { return pc.createAnswer(); })
+          .then(function (answer) {
+            pc.setLocalDescription(answer);
+            setItem(&quot;web-rtc-remote-description&quot;, {
+              type: answer.type,
+              sdp: answer.sdp
+            });
+            video.srcObject &#x3D; new MediaStream(
+              pc.getReceivers().map(function (receiver) { return receiver.track; })
+            );
+            console.log(&quot;Added remote stream&quot;);
+          })
+          .catch(function (e) {
+            console.log(e);
+            this$1.close();
+          });
+      };
+
+      RemoteConnection.prototype.gotRemoteStream &#x3D; function gotRemoteStream (e) {
+        if (this.video.srcObject !&#x3D;&#x3D; e.streams[0]) {
+          this.video.srcObject &#x3D; e.streams[0];
+          console.log(&quot;received remote stream&quot;);
+        }
+      };
+
+      RemoteConnection.prototype.close &#x3D; function close () {
+        this.video.srcObject &#x3D; null;
+        removeItem(&quot;web-rtc-remote-candidate&quot;);
+        removeItem(&quot;web-rtc-remote-description&quot;);
+        return this.pc.close();
+      };
+
+      function addIceCandidate(pc, candidate) {
+        console.log(&quot;candidate&quot;, candidate);
+
+        pc.addIceCandidate(new RTCIceCandidate(candidate))
+          .then(function () {
+            console.log(
+              (&quot;ICE candidate:\n&quot; + (candidate ? candidate.candidate : &quot;(null)&quot;))
+            );
+          })
+          .catch(function (e) { return console.log(e); });
+      }
+
+      function onIceStateChange(pc, event) {
+        if (pc) {
+          console.log((&quot;ICE state: &quot; + (pc.iceConnectionState)));
+          console.log(&quot;ICE state change event: &quot;, event);
+        }
+      }
+
+      function getItem(key) {
+        return JSON.parse(localStorage.getItem(key));
+      }
+
+      function setItem(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      function removeItem(key) {
+        localStorage.removeItem(key);
+      }
+
+      var listeners &#x3D; {};
+      window.addEventListener(&quot;storage&quot;, function (e) {
+        console.log(e);
+        var callback &#x3D; listeners[e.key];
+        if (!callback) {
+          return;
+        }
+        callback(JSON.parse(e.newValue));
+      });
+
+      function onItemChange(key, callback) {
+        listeners[key] &#x3D; callback;
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      </div>
+    </div>
+
+    <script src="./resources/common.js"></script>
+    <script src="./resources/prism/prism.min.js"></script>
+    <script src="common.js"></script><script src="web-rtc-basic.js"></script>
+  </body>
+</html>

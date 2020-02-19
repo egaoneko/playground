@@ -14,7 +14,7 @@ sources:
         type: MVT
         url: https://tile.nextzen.org/tilezen/vector/v1/all/{z}/{x}/{y}.mvt
         url_params:
-            api_key: 4sZUMTlHQLuzzKMeWkTJfQ
+            api_key: 2_JX1417SnON0HbB-ZKVaA
         max_zoom: 16
 
 layers:
