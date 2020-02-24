@@ -1,0 +1,12 @@
+#container {
+  text-align: center;
+}
+
+#container canvas{
+  width: 100%;
+  height: 100%;
+}
+
+#container video{
+  height: 100%;
+}

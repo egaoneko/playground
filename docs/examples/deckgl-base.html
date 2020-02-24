@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="./resources/layout-full.css" type="text/css">
     <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.1/mapbox-gl.css">
 <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.1/mapbox-gl.js"></script>
-<script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
+<script src="https://unpkg.com/deck.gl@v8.0.16/dist.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.js"></script>
 <script src="resources/js/stats.js"></script>
     <link rel="stylesheet" href="deckgl-base.css">
@@ -77,23 +77,51 @@
             <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
               <textarea class="hidden" name="title">DECK.GL base example</textarea>
               <textarea class="hidden" name="description">DECK.GL base example.</textarea>
-              <textarea class="hidden" name="js">var accessToken &#x3D; &#x27;Your Mapbox access token from http://mapbox.com/ here&#x27;;
-var container &#x3D; document.querySelector(&#x27;#map&#x27;);
-var deckgl &#x3D; new deck.DeckGL({
-  container: container,
-  mapboxApiAccessToken: accessToken,
-  mapStyle: &#x27;mapbox://styles/mapbox/dark-v9&#x27;,
-  longitude: -1.4157,
-  latitude: 52.2324,
-  zoom: 6,
-  minZoom: 5,
-  maxZoom: 15,
-  pitch: 40.5
+              <textarea class="hidden" name="js">var accessToken &#x3D;
+  &quot;Your Mapbox access token from http://mapbox.com/ here&quot;;
+var container &#x3D; document.querySelector(&quot;#map&quot;);
+
+var ambientLight &#x3D; new deck.AmbientLight({
+  color: [255, 255, 255],
+  intensity: 1.0
 });
 
-var data &#x3D; d3.csv(&#x27;https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/3d-heatmap/heatmap-data.csv&#x27;);
+var pointLight1 &#x3D; new deck.PointLight({
+  color: [255, 255, 255],
+  intensity: 0.8,
+  position: [-0.144528, 49.739968, 80000]
+});
 
-var COLOR_RANGE &#x3D; [
+var pointLight2 &#x3D; new deck.PointLight({
+  color: [255, 255, 255],
+  intensity: 0.8,
+  position: [-3.807751, 54.104682, 8000]
+});
+
+var lightingEffect &#x3D; new deck.LightingEffect({
+  ambientLight: ambientLight,
+  pointLight1: pointLight1,
+  pointLight2: pointLight2
+});
+
+var material &#x3D; {
+  ambient: 0.64,
+  diffuse: 0.6,
+  shininess: 32,
+  specularColor: [51, 51, 51]
+};
+
+var INITIAL_VIEW_STATE &#x3D; {
+  longitude: -1.4157267858730052,
+  latitude: 52.232395363869415,
+  zoom: 6.6,
+  minZoom: 5,
+  maxZoom: 15,
+  pitch: 40.5,
+  bearing: -27.396674584323023
+};
+
+var colorRange &#x3D; [
   [1, 152, 189],
   [73, 227, 206],
   [216, 254, 181],
@@ -102,24 +130,54 @@ var COLOR_RANGE &#x3D; [
   [209, 55, 78]
 ];
 
-renderLayer();
+var deckgl &#x3D; new deck.DeckGL({
+  container: container,
+  controller: true,
+  reuseMaps: true,
+  mapboxApiAccessToken: accessToken,
+  preventStyleDiffing: true,
+  mapStyle: &quot;mapbox://styles/mapbox/dark-v9&quot;,
+  initialViewState: INITIAL_VIEW_STATE
+});
 
-function renderLayer () {
+function renderLayer(props) {
+  var data &#x3D; props.data;
+  var radius &#x3D; props.radius; if ( radius &#x3D;&#x3D;&#x3D; void 0 ) radius &#x3D; 1000;
+  var upperPercentile &#x3D; props.upperPercentile; if ( upperPercentile &#x3D;&#x3D;&#x3D; void 0 ) upperPercentile &#x3D; 100;
+  var coverage &#x3D; props.coverage; if ( coverage &#x3D;&#x3D;&#x3D; void 0 ) coverage &#x3D; 1;
+
   var hexagonLayer &#x3D; new deck.HexagonLayer({
-    id: &#x27;heatmap&#x27;,
-    colorRange: COLOR_RANGE,
+    id: &quot;heatmap&quot;,
+    colorRange: colorRange,
+    coverage: coverage,
     data: data,
-    elevationRange: [0, 1000],
-    elevationScale: 250,
+    elevationRange: [0, 3000],
+    elevationScale: data &amp;&amp; data.length ? 50 : 0,
     extruded: true,
-    getPosition: function (d) { return [Number(d.lng), Number(d.lat)]; },
-    opacity: 1,
+    getPosition: function (d) { return d; },
+    radius: radius,
+    upperPercentile: upperPercentile,
+    material: material,
+
+    transitions: {
+      elevationScale: 3000
+    }
   });
 
   deckgl.setProps({
-    layers: [hexagonLayer]
+    layers: [hexagonLayer],
+    effects: [lightingEffect]
   });
-}</textarea>
+}
+
+d3.csv(
+  &#x27;https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/3d-heatmap/heatmap-data.csv&#x27;
+).then(function (data) {
+  data &#x3D; data.map(function (d) { return [Number(d.lng), Number(d.lat)]; });
+  renderLayer({
+    data: data
+  });
+});</textarea>
               <textarea class="hidden" name="css">/**
   * Create a position for the map
   * on the page */
@@ -144,7 +202,7 @@ function renderLayer () {
     &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
     &lt;link rel&#x3D;&quot;stylesheet&quot; href&#x3D;&quot;https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.1/mapbox-gl.css&quot;&gt;
     &lt;script src&#x3D;&quot;https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.1/mapbox-gl.js&quot;&gt;&lt;/script&gt;
-    &lt;script src&#x3D;&quot;https://unpkg.com/deck.gl@latest/dist.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://unpkg.com/deck.gl@v8.0.16/dist.min.js&quot;&gt;&lt;/script&gt;
     &lt;script src&#x3D;&quot;https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.js&quot;&gt;&lt;/script&gt;
     &lt;script src&#x3D;&quot;http://www.3daysofprogramming.com/playground/examples/resources/js/stats.js&quot;&gt;&lt;/script&gt;
     &lt;style&gt;
@@ -163,23 +221,51 @@ function renderLayer () {
       &lt;/div&gt;
     &lt;/div&gt;
     &lt;script&gt;
-      var accessToken &#x3D; &#x27;Your Mapbox access token from http://mapbox.com/ here&#x27;;
-      var container &#x3D; document.querySelector(&#x27;#map&#x27;);
-      var deckgl &#x3D; new deck.DeckGL({
-        container: container,
-        mapboxApiAccessToken: accessToken,
-        mapStyle: &#x27;mapbox://styles/mapbox/dark-v9&#x27;,
-        longitude: -1.4157,
-        latitude: 52.2324,
-        zoom: 6,
-        minZoom: 5,
-        maxZoom: 15,
-        pitch: 40.5
+      var accessToken &#x3D;
+        &quot;Your Mapbox access token from http://mapbox.com/ here&quot;;
+      var container &#x3D; document.querySelector(&quot;#map&quot;);
+
+      var ambientLight &#x3D; new deck.AmbientLight({
+        color: [255, 255, 255],
+        intensity: 1.0
       });
 
-      var data &#x3D; d3.csv(&#x27;https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/3d-heatmap/heatmap-data.csv&#x27;);
+      var pointLight1 &#x3D; new deck.PointLight({
+        color: [255, 255, 255],
+        intensity: 0.8,
+        position: [-0.144528, 49.739968, 80000]
+      });
 
-      var COLOR_RANGE &#x3D; [
+      var pointLight2 &#x3D; new deck.PointLight({
+        color: [255, 255, 255],
+        intensity: 0.8,
+        position: [-3.807751, 54.104682, 8000]
+      });
+
+      var lightingEffect &#x3D; new deck.LightingEffect({
+        ambientLight: ambientLight,
+        pointLight1: pointLight1,
+        pointLight2: pointLight2
+      });
+
+      var material &#x3D; {
+        ambient: 0.64,
+        diffuse: 0.6,
+        shininess: 32,
+        specularColor: [51, 51, 51]
+      };
+
+      var INITIAL_VIEW_STATE &#x3D; {
+        longitude: -1.4157267858730052,
+        latitude: 52.232395363869415,
+        zoom: 6.6,
+        minZoom: 5,
+        maxZoom: 15,
+        pitch: 40.5,
+        bearing: -27.396674584323023
+      };
+
+      var colorRange &#x3D; [
         [1, 152, 189],
         [73, 227, 206],
         [216, 254, 181],
@@ -188,24 +274,54 @@ function renderLayer () {
         [209, 55, 78]
       ];
 
-      renderLayer();
+      var deckgl &#x3D; new deck.DeckGL({
+        container: container,
+        controller: true,
+        reuseMaps: true,
+        mapboxApiAccessToken: accessToken,
+        preventStyleDiffing: true,
+        mapStyle: &quot;mapbox://styles/mapbox/dark-v9&quot;,
+        initialViewState: INITIAL_VIEW_STATE
+      });
 
-      function renderLayer () {
+      function renderLayer(props) {
+        var data &#x3D; props.data;
+        var radius &#x3D; props.radius; if ( radius &#x3D;&#x3D;&#x3D; void 0 ) radius &#x3D; 1000;
+        var upperPercentile &#x3D; props.upperPercentile; if ( upperPercentile &#x3D;&#x3D;&#x3D; void 0 ) upperPercentile &#x3D; 100;
+        var coverage &#x3D; props.coverage; if ( coverage &#x3D;&#x3D;&#x3D; void 0 ) coverage &#x3D; 1;
+
         var hexagonLayer &#x3D; new deck.HexagonLayer({
-          id: &#x27;heatmap&#x27;,
-          colorRange: COLOR_RANGE,
+          id: &quot;heatmap&quot;,
+          colorRange: colorRange,
+          coverage: coverage,
           data: data,
-          elevationRange: [0, 1000],
-          elevationScale: 250,
+          elevationRange: [0, 3000],
+          elevationScale: data &amp;&amp; data.length ? 50 : 0,
           extruded: true,
-          getPosition: function (d) { return [Number(d.lng), Number(d.lat)]; },
-          opacity: 1,
+          getPosition: function (d) { return d; },
+          radius: radius,
+          upperPercentile: upperPercentile,
+          material: material,
+
+          transitions: {
+            elevationScale: 3000
+          }
         });
 
         deckgl.setProps({
-          layers: [hexagonLayer]
+          layers: [hexagonLayer],
+          effects: [lightingEffect]
         });
-      }    &lt;/script&gt;
+      }
+
+      d3.csv(
+        &#x27;https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/3d-heatmap/heatmap-data.csv&#x27;
+      ).then(function (data) {
+        data &#x3D; data.map(function (d) { return [Number(d.lng), Number(d.lat)]; });
+        renderLayer({
+          data: data
+        });
+      });    &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
           </div>
