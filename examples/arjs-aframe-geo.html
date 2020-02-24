@@ -1,0 +1,25 @@
+---
+layout: example-full.html
+title: AR.js geo example with a-frame
+shortdesc: Geo example for AR.js.
+docs: >
+  Geo example for AR.js. [DOCS](https://github.com/jeromeetienne/AR.js/blob/master/README.md)
+
+tags: "ar.js a-frame"
+resources:
+  - resources/js/stats.js
+  - https://aframe.io/releases/1.0.0/aframe.min.js
+  - https://raw.githack.com/jeromeetienne/AR.js/2.2.1/aframe/build/aframe-ar.js
+---
+<div id="container" class="main">
+  <a-scene
+        cursor='rayOrigin: mouse; fuse: true; fuseTimeout: 0;'
+        raycaster="objects: [gps-entity-place];"
+        vr-mode-ui="enabled: false"
+		embedded
+		arjs='sourceType: webcam; sourceWidth:1280; sourceHeight:960; displayWidth: 1280; displayHeight: 960; debugUIEnabled: false;'>
+
+        <a-camera gps-camera rotation-reader>
+		</a-camera>
+	</a-scene>
+</div>

@@ -1,0 +1,21 @@
+---
+layout: example-full.html
+title: AR.js basic example with a-frame
+shortdesc: Basic example for AR.js.
+docs: >
+  Basic example for AR.js. [DOCS](https://github.com/jeromeetienne/AR.js/blob/master/README.md)
+
+tags: "ar.js a-frame"
+resources:
+  - resources/js/stats.js
+  - https://aframe.io/releases/1.0.0/aframe.min.js
+  - https://raw.githack.com/jeromeetienne/AR.js/2.2.1/aframe/build/aframe-ar.js
+---
+<div id="container" class="main">
+  <a-scene embedded arjs>
+    <a-marker preset="hiro">
+        <a-box position='0 0.5 0' material='color: yellow;'></a-box>
+    </a-marker>
+    <a-entity camera></a-entity>
+  </a-scene>
+</div>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-62717870-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-62717870-1');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="./resources/prism/prism.css" type="text/css">
+    <link rel="stylesheet" href="./resources/layout-full.css" type="text/css">
+    <script src="resources/js/stats.js"></script>
+<script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
+<script src="https://raw.githack.com/jeromeetienne/AR.js/2.2.1/aframe/build/aframe-ar.js"></script>
+    <link rel="stylesheet" href="arjs-aframe-basic.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2CrequestAnimationFrame%2Cfetch%2CElement.prototype.classList%2CURL%2CMap%2CSet%2CPromise%2CObject.values"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-2.2.4.min.js"
+      integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+      crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <title>AR.js basic example with a-frame</title>
+  </head>
+  <body>
+  <header class="navbar dropdown" role="navigation">
+    <button type="button" class="btn btn-default dropdown-toggle" id="hamburger" data-toggle="dropdown" aria-label="hamburger" aria-haspopup="true" aria-expanded="false">
+      <span class="glyphicon glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="hamburger">
+      <li><a class="active" href="index.html">Examples</a></li>
+      <li><a href="../apidoc">API</a></li>
+      <li><a href="https://github.com/egaoneko/playground">Code</a></li>
+      <li role="separator" class="divider"></li>
+      <li><a href="#" data-toggle="modal" data-target="#flipFlop">Source</a></li>
+    </ul>
+  </header>
+  <div id="container" class="main">
+  <a-scene embedded arjs>
+    <a-marker preset="hiro">
+        <a-box position='0 0.5 0' material='color: yellow;'></a-box>
+    </a-marker>
+    <a-entity camera></a-entity>
+  </a-scene>
+</div>
+
+
+  <!-- The modal -->
+  <div class="modal fade" id="flipFlop" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" id="modalLabel">AR.js basic example with a-frame</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row-fluid">
+            <div class="span12">
+              <p id="shortdesc">Basic example for AR.js.</p>
+              <div id="docs"><p>Basic example for AR.js. <a href="https://github.com/jeromeetienne/AR.js/blob/master/README.md">DOCS</a></p>
+</div>
+              <p id="tags">Tags: ar.js a-frame</p>
+            </div>
+          </div>
+
+          <div class="row-fluid">
+            <div id="source-controls">
+              <a id="copy-button" data-clipboard-target="#example-source"><i class="fa fa-clipboard"></i> Copy</a>
+              <!-- <a id="codepen-button"><i class="fa fa-codepen"></i> Edit</a> -->
+            </div>
+            <form method="POST" id="codepen-form" target="_blank" action="https://codepen.io/pen/define/">
+              <textarea class="hidden" name="title">AR.js basic example with a-frame</textarea>
+              <textarea class="hidden" name="description">Basic example for AR.js.</textarea>
+              <textarea class="hidden" name="js"></textarea>
+              <textarea class="hidden" name="css">body {
+  margin : 0px;
+  overflow: hidden;
+}</textarea>
+              <textarea class="hidden" name="html">&lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+  &lt;a-scene embedded arjs&gt;
+    &lt;a-marker preset&#x3D;&quot;hiro&quot;&gt;
+        &lt;a-box position&#x3D;&#x27;0 0.5 0&#x27; material&#x3D;&#x27;color: yellow;&#x27;&gt;&lt;/a-box&gt;
+    &lt;/a-marker&gt;
+    &lt;a-entity camera&gt;&lt;/a-entity&gt;
+  &lt;/a-scene&gt;
+&lt;/div&gt;
+</textarea>
+              <input type="hidden" name="data">
+            </form>
+            <pre><code id="example-source" class="language-markup">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;AR.js basic example with a-frame&lt;/title&gt;
+    &lt;link rel="stylesheet" href="http://www.3daysofprogramming.com/playground/pg.css" type="text/css"&gt;
+    &lt;!-- The line below is only needed for old environments like Internet Explorer and Android 4.x --&gt;
+    &lt;script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Map,Set,Promise"&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;http://www.3daysofprogramming.com/playground/examples/resources/js/stats.js&quot;&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://aframe.io/releases/1.0.0/aframe.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src&#x3D;&quot;https://raw.githack.com/jeromeetienne/AR.js/2.2.1/aframe/build/aframe-ar.js&quot;&gt;&lt;/script&gt;
+    &lt;style&gt;
+      body {
+        margin : 0px;
+        overflow: hidden;
+      }    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id&#x3D;&quot;container&quot; class&#x3D;&quot;main&quot;&gt;
+      &lt;a-scene embedded arjs&gt;
+        &lt;a-marker preset&#x3D;&quot;hiro&quot;&gt;
+            &lt;a-box position&#x3D;&#x27;0 0.5 0&#x27; material&#x3D;&#x27;color: yellow;&#x27;&gt;&lt;/a-box&gt;
+        &lt;/a-marker&gt;
+        &lt;a-entity camera&gt;&lt;/a-entity&gt;
+      &lt;/a-scene&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./resources/common.js"></script>
+  <script src="./resources/prism/prism.min.js"></script>
+  <script src="common.js"></script><script src="arjs-aframe-basic.js"></script>
+  </body>
+</html>
