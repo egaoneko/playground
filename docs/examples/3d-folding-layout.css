@@ -1,0 +1,82 @@
+#container {
+  width: 100%;
+  height: 100vh;
+}
+
+.screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+}
+
+.wrapper-3d {
+  position: relative;
+  perspective: 20vw;
+  transform-style: preserve-3d;
+}
+
+.fold {
+  overflow: hidden;
+  width: 60vw;
+  height: 80vh;
+}
+.fold-top {
+  position: absolute;
+  transform-origin: bottom center;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+}
+
+.fold-bottom {
+  position: absolute;
+  transform-origin: top center;
+  right: 0;
+  left: 0;
+  top: 100%;
+}
+.fold-align {
+  width: 100%;
+  height: 100%;
+}
+.fold-bottom .fold-align {
+  transform: translateY(-100%);
+}
+.fold-top .fold-align {
+  transform: translateY(100%);
+}
+
+.fold-bottom {
+  transform-origin: top center;
+  transform: rotateX(120deg);
+}
+
+.fold-top {
+  transform-origin: bottom center;
+  transform: rotateX(-120deg);
+}
+
+.square {
+  width: 100%;
+  padding-bottom: 75%;
+}
+.green {
+  background-color: lightgreen;
+}
+.blue {
+  background-color: lightblue;
+}
+.red {
+  background-color: lightcoral;
+}
+h1 {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 400;
+}

@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[1],{8:function(e,n){var t=document.getElementById("center-content"),o=document.getElementById("center-fold"),c=t.clientHeight-o.clientHeight;document.body.style.height=c+window.innerHeight+"px";var r=Array.from(document.getElementsByClassName("fold-content")),d=function(){var e=-(document.documentElement.scrollTop||document.body.scrollTop);r.forEach(function(n){n.style.transform="translateY("+e+"px)"}),requestAnimationFrame(d)};d()}},[[8,0]]]);
+//# sourceMappingURL=3d-folding-layout.js.map

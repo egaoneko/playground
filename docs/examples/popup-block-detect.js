@@ -1,2 +1,2 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[37],{42:function(n,t){document.querySelector("#btn").addEventListener("click",function(){var n=window.open("https://www.naver.com");setTimeout(function(){(function(n){var t=!1;try{t=void 0===n||(!n||!n.closed)&&(!n||!n.test)}catch(n){}return t})(n)&&alert("Popup is blocked!")},100)})}},[[42,0]]]);
+(window.webpackJsonp=window.webpackJsonp||[]).push([[38],{43:function(n,t){document.querySelector("#btn").addEventListener("click",function(){var n=window.open("https://www.naver.com");setTimeout(function(){(function(n){var t=!1;try{t=void 0===n||(!n||!n.closed)&&(!n||!n.test)}catch(n){}return t})(n)&&alert("Popup is blocked!")},100)})}},[[43,0]]]);
 //# sourceMappingURL=popup-block-detect.js.map
